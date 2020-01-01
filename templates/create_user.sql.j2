@@ -1,0 +1,5 @@
+USE {{ icingaweb_auth_backend.icingaweb.dbname }};
+
+{% for k in item %}
+INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('{{ k }}', 1, '{{ icingaweb_users[k].hashed }}');
+{% endfor %}

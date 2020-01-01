@@ -1,0 +1,112 @@
+---
+
+icingaweb_version: 2.7.0
+
+icingaweb_install_dir: /usr/share/icingaweb2
+
+icingaweb_modules_disabled:
+ - setup
+
+icingaweb_modules_enabled:
+ - monitoring
+
+# icingaweb_config_backend: db
+# icingaweb_config_resource: icingaweb_db
+
+icingaweb_preferences_store: ini
+
+# icingaweb_config:
+#   backend: db
+#   resource: icingaweb_db
+#   mysql_host: 127.0.0.1
+#   mysql_schemaname: icingaweb_config
+#   mysql_username: icingaweb_config
+#   mysql_password: icingaweb_config
+#
+# icinga2_ido:
+#   backend: db
+#   mysql_host: 127.0.0.1
+#   mysql_schemaname: icinga2_ido
+#   mysql_username: icinga2_ido
+#   mysql_password: icinga2_ido
+#
+
+# /etc/icingaweb2/config.ini
+# types are: 'ini' or 'db'
+# for type 'db' use the config_resource: 'icingaweb' (see below)
+icingaweb_config_backend: db
+icingaweb_config_resource: icingaweb
+
+# /etc/icingaweb2/authentication.ini
+icingaweb_authentication:
+  auth_db:
+    backend: db
+    resource: icingaweb
+  ldap:
+    resource: ldap
+    user_class: inetOrgPerson
+    user_name_attribute: uid
+    backend:  ldap
+    base_dn: dc=ldap,dc=cm,dc=local
+    domain: ldap.cm.local
+
+
+# /etc/icingaweb2/groups.ini
+icingaweb_groups_backend: db
+icingaweb_groups_resource: icingaweb
+
+
+# the 'icingaweb' is used for database import and should NOT CHANGED!
+icingaweb_auth_backend:
+  icingaweb:
+    type: db
+    db: mysql
+    host: 127.0.0.1
+    port: 3306
+    dbname: icingaweb_config
+    username: icingaweb_config
+    password: icingaweb_config
+    prefix: icingaweb_
+    charset: utf8
+
+  icinga_ido:
+    type: db
+    db: mysql
+    host: 127.0.0.1
+    port: 3306
+    dbname: icinga2_ido
+    username: icinga2_ido
+    password: icinga2_ido
+    charset: utf8
+
+  ldap:
+    type: ldap
+    hostname: localhost
+    port: 389
+    encryption: none
+    root_dn: dc=ldap,dc=cm,dc=local
+    bind_dn: cn=Manager,dc=ldap,dc=cm,dc=local
+    bind_pw: "{{ vault__openldap__rootpw }}"
+    timeout: 5
+
+
+icingaweb_users:
+  admin:
+    password: admin
+
+icingaweb_roles:
+  - name: 'local admins'
+    users:
+      - admin
+    permissions: '*'
+
+# API connection
+icinga2_api_host: localhost
+icinga2_api_port: 5665
+icinga2_api_username: root
+icinga2_api_password: icinga2
+
+icingaweb_dependencies:
+  - jq
+  # attention ... use the right PHP version!
+  - php-ldap

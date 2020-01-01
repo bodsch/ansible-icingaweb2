@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+
+{% if icingaweb_roles is defined and icingaweb_roles | count != 0 %}
+{% for u in icingaweb_roles %}
+[{{ u.name }}]
+users               = "{{ u.users | join(',') }}"
+permissions         = "{{ u.permissions }}"
+{% if u.groups is defined -%}
+groups              = "{{ u.groups }}"
+{% endif %}
+{%- endfor %}
+{% endif %}
