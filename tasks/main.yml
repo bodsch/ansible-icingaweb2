@@ -1,0 +1,183 @@
+---
+
+- name: install requirements
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    "{{ icingaweb_dependencies }}"
+
+- name: create /etc/icingaweb2 directory
+  file:
+    name: '{{ item }}'
+    state: directory
+  loop:
+    - /etc/icingaweb2
+
+# get file or directory stats
+- name: 'stat icingacli'
+  stat:
+    path: '/usr/share/icingaweb2-{{ icingaweb_version }}'
+    get_checksum: no
+    get_md5: no
+    get_mime: no
+    get_attributes: no
+  register: __stat_present_icingaweb2
+  changed_when: not __stat_present_icingaweb2.stat.exists
+
+#- name: detect installed icingaweb version
+#  shell: |
+#    cat /usr/share/icingaweb2/VERSION | sed 's|v||'
+#  register: __stat_present_icingaweb2_version
+#  changed_when: __stat_present_icingaweb2.stat.exists
+
+- block:
+    - name: ensure installation directory exists
+      file:
+        src: '/usr/share/icingaweb2-{{ icingaweb_version }}'
+        dest: '{{ icingaweb_install_dir }}'
+        state: link
+        force: yes
+
+    - name: download and extract icingaweb2 archive
+      unarchive:
+        src: 'https://github.com/Icinga/icingaweb2/archive/v{{ icingaweb_version }}.tar.gz'
+        dest: /usr/share
+        remote_src: yes
+
+    - name: ensure icingacli is in the path
+      file:
+        src: '{{ icingaweb_install_dir }}/bin/icingacli'
+        dest: /usr/bin/icingacli
+        state: link
+        force: yes
+  when: not __stat_present_icingaweb2.stat.exists
+
+- include_tasks: database/mysql.yml
+
+- name: create some directories
+  file:
+    name: '{{ item }}'
+    state: directory
+  loop:
+    - /var/log/icingaweb2
+    - /etc/icingaweb2/modules
+    - /etc/icingaweb2/enabledModules
+
+- name: create some directories
+  file:
+    name: '{{ item }}'
+    state: directory
+    owner: www-data
+    group: www-data
+  loop:
+    - /var/log/icingaweb2
+
+- name: create dashboard directory
+  file:
+    name: '{{ item }}'
+    state: directory
+    owner: www-data
+    group: www-data
+  loop:
+    - /etc/icingaweb2/dashboards
+
+- name: create configurations
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/icingaweb2/{{ item }}"
+  loop:
+    - resources.ini
+    - config.ini
+    - authentication.ini
+    - groups.ini
+    - roles.ini
+
+- name: ensure rights for config.ini
+  file:
+    path: /etc/icingaweb2/config.ini
+    group: www-data
+    mode: 0666
+
+- name: ensure module directory exists
+  file:
+    name: '/etc/icingaweb2/modules/{{item}}'
+    state: directory
+    group: www-data
+    mode: 0770
+  loop:
+    - monitoring
+
+- name: disable icingaweb modules
+  shell: |
+    /usr/bin/icingacli module disable {{ item }}
+  loop:
+    '{{ icingaweb_modules_disabled }}'
+
+- name: enable icingaweb modules
+  file:
+    state: link
+    src: '{{ icingaweb_install_dir }}/modules/{{ item }}'
+    dest: '/etc/icingaweb2/enabledModules/{{ item }}'
+    force: yes
+  loop:
+    '{{ icingaweb_modules_enabled }}'
+
+- name: create monitoring modules configuration
+  template:
+    src: modules/monitoring/{{ item }}.ini.j2
+    dest: /etc/icingaweb2/modules/monitoring/{{ item }}.ini
+  loop:
+    - config
+    - backends
+    - commandtransports
+
+# userhandling in database
+- block:
+    - name: create password hashes
+      shell: >
+        openssl passwd -1 {{ item.value.password }}
+      register: hashes
+      with_dict: "{{ icingaweb_users }}"
+      no_log: true
+
+    # https://stackoverflow.com/questions/48825583/in-ansible-how-do-you-change-a-existing-dictionary-hash-values-using-a-variable
+    - name: merge data
+      set_fact:
+        icingaweb_users: "{{ icingaweb_users | combine(new_item, recursive=true) }}"
+      vars:
+        new_item: "{ '{{ item.0 }}': { 'hashed': '{{ item.1.stdout }}' } }"
+      no_log: true
+      with_together:
+        - "{{ icingaweb_users }}"
+        - "{{ hashes.results }}"
+
+    - name: create temporary icingaweb_users statement
+      template:
+        src: create_user.sql.j2
+        dest: /tmp/create_user.sql
+      #no_log: true
+      loop:
+        - "{{ icingaweb_users }}"
+
+    - name: import icingaweb users into database
+      mysql_db:
+        state: import
+        login_user: "{{ icingaweb_auth_backend.icingaweb.username }}"
+        login_password: "{{ icingaweb_auth_backend.icingaweb.password }}"
+        login_host: "{{ icingaweb_auth_backend.icingaweb.host }}"
+        name: "{{ icingaweb_auth_backend.icingaweb.dbname }}"
+        target: /tmp/create_user.sql
+      register: icingaweb2_import_users
+      changed_when: false
+      check_mode: false
+      #no_log: true
+
+
+    - debug:
+        var: "{{ item }}"
+      when: item is defined
+      loop:
+        - icingaweb2_import_users
+
+  when: icingaweb_users is defined and icingaweb_users | count != 0

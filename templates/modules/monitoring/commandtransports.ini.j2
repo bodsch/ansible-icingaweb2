@@ -1,0 +1,8 @@
+{{ ansible_managed | comment(decoration='#') }}
+
+[icinga]
+transport = "api"
+host      = "{{ icinga2_api_host | default('localhost') }}"
+port      = "{{ icinga2_api_port | default('5665') }}"
+username  = "{{ icinga2_api_username | default('root') }}"
+password  = "{{ icinga2_api_password | default('icinga2') }}"
