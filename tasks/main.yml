@@ -15,7 +15,7 @@
     - /etc/icingaweb2
 
 # get file or directory stats
-- name: 'stat icingacli'
+- name: detect installed icingaweb2
   stat:
     path: '/usr/share/icingaweb2-{{ icingaweb_version }}'
     get_checksum: no
@@ -24,12 +24,6 @@
     get_attributes: no
   register: __stat_present_icingaweb2
   changed_when: not __stat_present_icingaweb2.stat.exists
-
-#- name: detect installed icingaweb version
-#  shell: |
-#    cat /usr/share/icingaweb2/VERSION | sed 's|v||'
-#  register: __stat_present_icingaweb2_version
-#  changed_when: __stat_present_icingaweb2.stat.exists
 
 - block:
     - name: ensure installation directory exists
@@ -156,7 +150,7 @@
       template:
         src: create_user.sql.j2
         dest: /tmp/create_user.sql
-      #no_log: true
+      no_log: true
       loop:
         - "{{ icingaweb_users }}"
 
@@ -171,13 +165,6 @@
       register: icingaweb2_import_users
       changed_when: false
       check_mode: false
-      #no_log: true
-
-
-    - debug:
-        var: "{{ item }}"
-      when: item is defined
-      loop:
-        - icingaweb2_import_users
+      no_log: true
 
   when: icingaweb_users is defined and icingaweb_users | count != 0
