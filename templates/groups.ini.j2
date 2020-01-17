@@ -3,3 +3,12 @@
 [icingaweb2]
 backend  = "{{ icingaweb_groups_backend }}"
 resource = "{{ icingaweb_groups_resource }}"
+
+# [ldap_groups]
+# backend = "ldap"
+# resource = "ldap"
+# user_backend = "auth_ldap"
+# base_dn = "dc=ldap,dc=cm,dc=local"
+# group_class = "*"
+# group_name_attribute = "gid"
+# group_member_attribute = "memberUid"

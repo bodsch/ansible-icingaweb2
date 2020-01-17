@@ -42,13 +42,14 @@ icingaweb_authentication:
   auth_db:
     backend: db
     resource: icingaweb
-  ldap:
-    resource: ldap
-    user_class: inetOrgPerson
-    user_name_attribute: uid
-    backend:  ldap
-    base_dn: dc=ldap,dc=cm,dc=local
-    domain: ldap.cm.local
+
+#  auth_ldap:
+#    resource: ldap
+#    user_class: inetOrgPerson
+#    user_name_attribute: uid
+#    backend:  ldap
+#    base_dn: dc=ldap,dc=cm,dc=local
+#    domain: ldap.cm.local
 
 
 # /etc/icingaweb2/groups.ini
@@ -79,15 +80,15 @@ icingaweb_auth_backend:
     password: icinga2_ido
     charset: utf8
 
-  ldap:
-    type: ldap
-    hostname: localhost
-    port: 389
-    encryption: none
-    root_dn: dc=ldap,dc=cm,dc=local
-    bind_dn: cn=Manager,dc=ldap,dc=cm,dc=local
-    bind_pw: "{{ vault__openldap__rootpw }}"
-    timeout: 5
+#   ldap:
+#     type: ldap
+#     hostname: localhost
+#     port: 389
+#     encryption: none
+#     root_dn: dc=ldap,dc=cm,dc=local
+#     bind_dn: cn=Manager,dc=ldap,dc=cm,dc=local
+#     bind_pw: "{{ vault__openldap__rootpw }}"
+#     timeout: 5
 
 
 icingaweb_users:
