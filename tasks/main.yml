@@ -62,8 +62,8 @@
   file:
     name: '{{ item }}'
     state: directory
-    owner: www-data
-    group: www-data
+    owner: nginx
+    group: nginx
   loop:
     - /var/log/icingaweb2
 
@@ -71,8 +71,8 @@
   file:
     name: '{{ item }}'
     state: directory
-    owner: www-data
-    group: www-data
+    owner: nginx
+    group: nginx
   loop:
     - /etc/icingaweb2/dashboards
 
@@ -90,14 +90,14 @@
 - name: ensure rights for config.ini
   file:
     path: /etc/icingaweb2/config.ini
-    group: www-data
+    group: nginx
     mode: 0666
 
 - name: ensure module directory exists
   file:
     name: '/etc/icingaweb2/modules/{{item}}'
     state: directory
-    group: www-data
+    group: nginx
     mode: 0770
   loop:
     - monitoring
