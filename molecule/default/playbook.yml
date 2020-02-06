@@ -4,4 +4,4 @@
   environment:
     NETRC: ''
   roles:
-    - role: ansible-go-carbon
+    - role: ansible-icingaweb2

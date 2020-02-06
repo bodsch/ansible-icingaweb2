@@ -13,7 +13,6 @@
         section: client
         option: user
         value: "{{ icingaweb_auth_backend.icingaweb.username }}"
-      # no_log: true
 
     - name: ensure password present
       ini_file:
@@ -21,7 +20,6 @@
         section: client
         option: password
         value: "{{ icingaweb_auth_backend.icingaweb.password }}"
-      # no_log: true
 
     - name: ensure host present
       ini_file:

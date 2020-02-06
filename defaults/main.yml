@@ -5,10 +5,10 @@ icingaweb_version: 2.7.3
 icingaweb_install_dir: /usr/share/icingaweb2
 
 icingaweb_modules_disabled:
- - setup
+  - setup
 
 icingaweb_modules_enabled:
- - monitoring
+  - monitoring
 
 # icingaweb_config_backend: db
 # icingaweb_config_resource: icingaweb_db

@@ -18,10 +18,10 @@
 - name: detect installed icingaweb2
   stat:
     path: '/usr/share/icingaweb2-{{ icingaweb_version }}'
-    get_checksum: no
-    get_md5: no
-    get_mime: no
-    get_attributes: no
+    get_checksum: false
+    get_md5: false
+    get_mime: false
+    get_attributes: false
   register: __stat_present_icingaweb2
   changed_when: not __stat_present_icingaweb2.stat.exists
 
@@ -31,20 +31,20 @@
         src: '/usr/share/icingaweb2-{{ icingaweb_version }}'
         dest: '{{ icingaweb_install_dir }}'
         state: link
-        force: yes
+        force: true
 
     - name: download and extract icingaweb2 archive
       unarchive:
         src: 'https://github.com/Icinga/icingaweb2/archive/v{{ icingaweb_version }}.tar.gz'
         dest: /usr/share
-        remote_src: yes
+        remote_src: true
 
     - name: ensure icingacli is in the path
       file:
         src: '{{ icingaweb_install_dir }}/bin/icingacli'
         dest: /usr/bin/icingacli
         state: link
-        force: yes
+        force: true
   when: not __stat_present_icingaweb2.stat.exists
 
 - include_tasks: database/mysql.yml
@@ -62,8 +62,8 @@
   file:
     name: '{{ item }}'
     state: directory
-    owner: nginx
-    group: nginx
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
   loop:
     - /var/log/icingaweb2
 
@@ -71,8 +71,8 @@
   file:
     name: '{{ item }}'
     state: directory
-    owner: nginx
-    group: nginx
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
   loop:
     - /etc/icingaweb2/dashboards
 
@@ -90,14 +90,14 @@
 - name: ensure rights for config.ini
   file:
     path: /etc/icingaweb2/config.ini
-    group: nginx
+    group: "{{ icingaweb_group }}"
     mode: 0666
 
 - name: ensure module directory exists
   file:
-    name: '/etc/icingaweb2/modules/{{item}}'
+    name: '/etc/icingaweb2/modules/{{ item }}'
     state: directory
-    group: nginx
+    group: "{{ icingaweb_group }}"
     mode: 0770
   loop:
     - monitoring
@@ -113,7 +113,7 @@
     state: link
     src: '{{ icingaweb_install_dir }}/modules/{{ item }}'
     dest: '/etc/icingaweb2/enabledModules/{{ item }}'
-    force: yes
+    force: true
   loop:
     '{{ icingaweb_modules_enabled }}'
 
@@ -157,9 +157,10 @@
     - name: import icingaweb users into database
       mysql_db:
         state: import
-        login_user: "{{ icingaweb_auth_backend.icingaweb.username }}"
-        login_password: "{{ icingaweb_auth_backend.icingaweb.password }}"
-        login_host: "{{ icingaweb_auth_backend.icingaweb.host }}"
+        config_file: /etc/icingaweb2/.my.cnf
+        #login_user: "{{ icingaweb_auth_backend.icingaweb.username }}"
+        #login_password: "{{ icingaweb_auth_backend.icingaweb.password }}"
+        #login_host: "{{ icingaweb_auth_backend.icingaweb.host }}"
         name: "{{ icingaweb_auth_backend.icingaweb.dbname }}"
         target: /tmp/create_user.sql
       register: icingaweb2_import_users
