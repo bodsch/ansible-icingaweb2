@@ -11,40 +11,41 @@ lint:
     config-file: molecule/default/yaml-lint.yml
 
 platforms:
-  # - name: centos-7
-  #   image: paulfantom/centos-molecule:7
-  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-  #   privileged: true
-  #   volumes:
-  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  #
-  # - name: centos-8
-  #   image: paulfantom/centos-molecule:8
-  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-  #   privileged: true
-  #   volumes:
-  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  #
-  # - name: ubuntu-16
-  #   image: paulfantom/ubuntu-molecule:16.04
-  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-  #   privileged: true
-  #   volumes:
-  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  #
-  # - name: ubuntu-18
-  #   image: paulfantom/ubuntu-molecule:18.04
-  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-  #   privileged: true
-  #   volumes:
-  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  #
-  # - name: debian-9
-  #   image: paulfantom/debian-molecule:9
-  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-  #   privileged: true
-  #   volumes:
-  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  - name: centos-7
+    image: paulfantom/centos-molecule:7
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  - name: centos-8
+    image: paulfantom/centos-molecule:8
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  - name: ubuntu-16
+    image: paulfantom/ubuntu-molecule:16.04
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  - name: ubuntu-18
+    image: paulfantom/ubuntu-molecule:18.04
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  - name: debian-9
+    image: paulfantom/debian-molecule:9
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
   - name: debian-10
     image: paulfantom/debian-molecule:10
@@ -53,14 +54,21 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
+  - name: amazonlinux2
+    image: geerlingguy/docker-amazonlinux2-ansible
+    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
 provisioner:
   name: ansible
-  # ansible_args:
-  #   - --diff
-  #   - -v
-  # config_options:
-  #   defaults:
-  #     callback_whitelist: profile_tasks
+  ansible_args:
+    - --diff
+  #   - -vvv
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks
   lint:
     name: ansible-lint
   playbooks:
@@ -73,16 +81,14 @@ scenario:
   name: default
   test_sequence:
     - lint
-    # - destroy
-    # - dependency
-    # - syntax
-    # - create
-    # - prepare
-    # - converge
-    # # - idempotence
-    # # - side_effect
-    # - verify
-    # - destroy
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy
 
 verifier:
   name: testinfra

@@ -1,0 +1,129 @@
+---
+
+- name: detect installed php version  # noqa 301 306
+  shell: "php -v 2> /dev/null | grep NTS | awk -F 'PHP ' '{printf $2}' | cut -d . -f 1-2"
+  register: __installed_php_version
+
+- name: define php version.
+  set_fact:
+    php_version: "{{ __installed_php_version.stdout }}"
+  when: __installed_php_version is defined and __installed_php_version.rc is defined and __installed_php_version.rc == 0
+
+- name: assert PHP Version
+  assert:
+    that: php_version is version_compare('7.0', '>=')
+    msg: "This role only works with PHP >= 7.0 .. found: {{ php_version }}"
+
+- block:
+
+    - name: find mysql socket
+      become: true
+      stat:
+        path: "{{ item }}"
+      with_items:
+        - /run/mysql.sock
+        - /run/mysqld.sock
+        - /run/mysqld/mysqld.sock
+        - /var/lib/mysql/mysql.sock
+      register: output
+
+    - name: set mariadb socket
+      set_fact:
+        icingaweb_database_socket: "{{ item.stat.path }}"
+      loop: "{{ output.results }}"
+      when: item.stat.exists | bool
+
+  when: icingaweb_database_socket is defined and icingaweb_database_socket | length == 0
+
+- name: check mysql socket
+  become: true
+  stat:
+    path: "{{ icingaweb_database_socket }}"
+  register: output
+
+- name: assert missing mysql socket
+  assert:
+    that:
+      - icingaweb_database_socket | length != 0
+      - output.stat.exists | bool
+    msg: "missing running database"
+
+- name: merge dependencies between defaults and custom
+  set_fact:
+    icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
+
+# - debug:
+#     var: "{{ item }}"
+#   when: item is defined
+#   loop:
+#     "{{ icingaweb_dependencies }}"
+
+- name: install requirements
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    "{{ icingaweb_dependencies }}"
+
+# - name: ensure python bindings for mariadb are installed
+#   pip:
+#     executable: pip3
+#     name: "{{ item }}"
+#     state: present
+#   loop:
+#     "{{ icingaweb_python_packages }}"
+#   register: icingaweb_install_python_packages
+
+# ---
+
+# - name: check for redhat specific mysql_config
+#   stat:
+#     path: /bin/mysql_config
+#   register: _mysql_config_exists
+#
+# - block:
+#
+#     - name: detect database socket name
+#       shell: |
+#          /bin/mysql_config --socket
+#       register: mysql_socket
+#       #changed_when: false
+#       #check_mode: false
+#       # no_log: true
+#       when: _mysql_config_exists.stat.exists | bool
+#
+#     - name: set mariadb socket
+#       set_fact:
+#         database_socket: "{{ mysql_socket.stdout }}"
+#       when: (
+#         mysql_socket is defined and
+#         mysql_socket.rc is defined and mysql_socket.rc == 0 )
+#
+#     - name: detect database socket name
+#       shell: |
+#         mysql --verbose --help | grep ^socket | sed -e 's|socket||g' -e 's| ||g'
+#       register: mysql_socket
+#       # changed_when: false
+#       # check_mode: false
+#       # no_log: true
+#       when: not _mysql_config_exists.stat.exists | bool
+#
+#     - name: set mariadb socket
+#       set_fact:
+#         database_socket: "{{ mysql_socket.stdout }}"
+#       when: (
+#         mysql_socket is defined and
+#         mysql_socket.rc is defined and mysql_socket.rc == 0 )
+#
+#   when: _mysql_config_exists.stat is defined
+#
+# - name: ensure socket present
+#   ini_file:
+#     path: /etc/icingaweb2/.my.cnf
+#     section: client
+#     option: socket
+#     value: "{{ mysql_socket.stdout }}"
+#   when: (
+#     mysql_socket is defined and
+#     mysql_socket.rc is defined and mysql_socket.rc == 0 )
+#   #no_log: true

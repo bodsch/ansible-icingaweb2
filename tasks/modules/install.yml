@@ -1,0 +1,69 @@
+---
+
+- name: download external module to local directory {{ local_tmp_directory }}
+  become: false
+  delegate_to: localhost
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ local_tmp_directory }}/"   # {{ item.url | basename }}"
+  register: _download_artefact
+  until: _download_artefact is succeeded
+  retries: 5
+  delay: 2
+  check_mode: false
+  loop:
+    "{{ icingaweb_external_modules }}"
+
+- name: Write nested JSON variable to disk
+  become: false
+  delegate_to: localhost
+  copy: content={{ _download_artefact.results }} dest="/tmp/foo.txt"
+
+
+- debug:
+    var: "{{ item.dest }}"
+  when: item is defined
+  with_dict: "{{ _download_artefact.results }}"
+
+
+# - name: deploy modules archiv
+#   copy:
+#     src: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
+#     dest: /tmp
+
+#     - name: download icinaweb2 v{{ icingaweb_version }}.tar.gz to local directory {{ local_tmp_directory }}
+#       become: false
+#       get_url:
+#         url: https://github.com/Icinga/icingaweb2/archive/v{{ icingaweb_version }}.tar.gz
+#         dest: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
+#       register: _download_artefact
+#       until: _download_artefact is succeeded
+#       retries: 5
+#       delay: 2
+#       check_mode: false
+#       delegate_to: localhost
+#
+#     - name: deploy application archiv
+#       copy:
+#         src: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
+#         dest: /tmp
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# - name: configure icingaweb modules
+#   file:
+#     state: link
+#     src: '{{ icingaweb_install_dir }}/modules/{{ item }}'
+#     dest: '/etc/icingaweb2/enabledModules/{{ item }}'
+#     force: true
+#   loop:
+#     '{{ icingaweb_external_modules | list }}'
+#
+#

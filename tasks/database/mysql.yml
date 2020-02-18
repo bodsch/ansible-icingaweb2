@@ -13,6 +13,7 @@
         section: client
         option: user
         value: "{{ icingaweb_auth_backend.icingaweb.username }}"
+      no_log: true
 
     - name: ensure password present
       ini_file:
@@ -20,14 +21,22 @@
         section: client
         option: password
         value: "{{ icingaweb_auth_backend.icingaweb.password }}"
+      no_log: true
 
-    - name: ensure host present
+    - name: ensure socket present
       ini_file:
         path: /etc/icingaweb2/.my.cnf
         section: client
-        option: host
-        value: "{{ icingaweb_auth_backend.icingaweb.host }}"
-      no_log: true
+        option: socket
+        value: "{{ icingaweb_database_socket }}"
+
+    # - name: ensure host present
+    #   ini_file:
+    #     path: /etc/icingaweb2/.my.cnf
+    #     section: client
+    #     option: host
+    #     value: "{{ icingaweb_auth_backend.icingaweb.host }}"
+    #   no_log: true
 
     - name: create '{{ icingaweb_auth_backend.icingaweb.dbname }}' database
       mysql_db:
@@ -35,6 +44,7 @@
         collation: 'utf8_general_ci'
         encoding: 'utf8'
         state: present
+      no_log: true
 
     - name: create '{{ icingaweb_auth_backend.icingaweb.username }}' user
       mysql_user:
@@ -47,15 +57,15 @@
         encrypted: false
       no_log: true
 
+    # needs root rights
     - name: ensure table_schema is created
-      command: >
-        mysql
-          --defaults-file=/etc/icingaweb2/.my.cnf
-          --host={{ icingaweb_auth_backend.icingaweb.host }}
-          --batch
-          --skip-column-names
-          --execute
-          "SELECT TABLE_SCHEMA, TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA = '{{ icingaweb_auth_backend.icingaweb.dbname }}';"
+      shell: >
+        mysql \
+          --socket={{ icingaweb_database_socket }} \
+          --batch \
+          --skip-column-names \
+          --execute \
+          "SELECT count(TABLE_NAME) FROM information_schema.tables where TABLE_SCHEMA = '{{ icingaweb_auth_backend.icingaweb.dbname }}';"
       register: mysql_icingaweb2_schema
       changed_when: false
       check_mode: false
@@ -70,4 +80,4 @@
       register: icingaweb2_database_schema
       changed_when: false
       check_mode: false
-      when: mysql_icingaweb2_schema.stdout_lines | count != 4
+      when: mysql_icingaweb2_schema.stdout | int != 4

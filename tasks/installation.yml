@@ -1,0 +1,51 @@
+---
+
+# get file or directory stats
+- name: detect installed icingaweb2
+  stat:
+    path: '/usr/share/icingaweb2-{{ icingaweb_version }}'
+    get_checksum: false
+    get_md5: false
+    get_mime: false
+    get_attributes: false
+  register: __stat_present_icingaweb2
+  changed_when: not __stat_present_icingaweb2.stat.exists
+
+- block:
+    - name: ensure installation directory exists
+      file:
+        src: '/usr/share/icingaweb2-{{ icingaweb_version }}'
+        dest: '{{ icingaweb_install_dir }}'
+        state: link
+        force: true
+
+    - name: download icinaweb2 v{{ icingaweb_version }}.tar.gz to local directory {{ local_tmp_directory }}
+      become: false
+      get_url:
+        url: https://github.com/Icinga/icingaweb2/archive/v{{ icingaweb_version }}.tar.gz
+        dest: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
+      register: _download_artefact
+      until: _download_artefact is succeeded
+      retries: 5
+      delay: 2
+      check_mode: false
+      delegate_to: localhost
+
+    - name: deploy application archiv
+      copy:
+        src: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
+        dest: /tmp
+
+    - name: download and extract icingaweb2 archive
+      unarchive:
+        src: /tmp/icingaweb2-v{{ icingaweb_version }}.tar.gz
+        dest: /usr/share
+        remote_src: true
+
+    - name: ensure icingacli is in the path
+      file:
+        src: '{{ icingaweb_install_dir }}/bin/icingacli'
+        dest: /usr/bin/icingacli
+        state: link
+        force: true
+  when: not __stat_present_icingaweb2.stat.exists

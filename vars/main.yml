@@ -1,5 +1,65 @@
 ---
 
+local_tmp_directory: /var/tmp
+
+# _icingaweb_dependencies:
+#   default:
+#     - python-mysqldb
+#     - python3-mysqldb
+#     - libmariadb-dev
+#   centos-7:
+#     - python-setuptools
+#     - python3-setuptools
+#     - MariaDB-client
+#     - gcc
+#     - make
+#     - redhat-rpm-config
+#     - python3-devel
+#   centos-8:
+#     - python3-setuptools
+#     - MariaDB-client
+#     - gcc
+#     - make
+#     - redhat-rpm-config
+#     - python3-devel
+#   centos:
+#     - python3-setuptools
+#     - MariaDB-client
+#     - gcc
+#     - make
+#     - redhat-rpm-config
+#     - python36-devel
+#   debian:
+#     - python3-pip
+#     - python3-setuptools
+#     - python-mysqldb
+#     - python3-mysqldb
+#   ubuntu-16:
+#     - python3-pip
+#     - python3-setuptools
+#     - python-setuptools
+#     - python-mysqldb
+#     - python3-mysqldb
+#     - libmariadb-dev
+#   ubuntu:
+#     - python3-pip
+#     - python3-setuptools
+#     - python-mysqldb
+#     - python3-mysqldb
+#     - libmariadb-dev
+
+# _icingaweb_python_packages:
+#   default:
+#     - PyMySQL
+#     - mysqlclient
+#   debian:
+#     - PyMySQL
+#     - mysqlclient
+#   centos:
+#     - PyMySQL
+#     - mysqlclient
+
+
 _icingaweb_user:
   default: www-data
   redhat: nginx
@@ -8,12 +68,19 @@ _icingaweb_group:
   default: www-data
   redhat: nginx
 
-icingaweb_user: "{{
-  _icingaweb_user[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_icingaweb_user[ansible_os_family | lower] |
-  default(_icingaweb_user['default'])))) }}"
+icingaweb_packages: []
+icingaweb_python_packages: []
 
-icingaweb_group: "{{
-  _icingaweb_group[ansible_os_family | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_icingaweb_group[ansible_os_family | lower] |
-  default(_icingaweb_group['default'])))) }}"
+# icingaweb_packages: "{{ _icingaweb_dependencies[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
+#   default(_icingaweb_dependencies[ansible_distribution | lower] |
+#   default(_icingaweb_dependencies['default'])) }}"
+
+icingaweb_user: "{{ _icingaweb_user[ansible_os_family | lower] |
+  default(_icingaweb_user['default']) }}"
+
+icingaweb_group: "{{ _icingaweb_group[ansible_os_family | lower] |
+  default(_icingaweb_group['default']) }}"
+
+# icingaweb_python_packages: "{{ _icingaweb_python_packages[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
+#   default(_icingaweb_python_packages[ansible_distribution | lower] |
+#   default(_icingaweb_python_packages['default'])) }}"
