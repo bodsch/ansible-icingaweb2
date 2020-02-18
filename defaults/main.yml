@@ -10,6 +10,22 @@ icingaweb_modules_disabled:
 icingaweb_modules_enabled:
   - monitoring
 
+icingaweb_database_socket: ''
+
+# icingaweb_external_modules:
+#
+#   - graphite:
+#     enabled: true
+#     version: '1.1.0'
+#     url: https://github.com/Icinga/icingaweb2-module-graphite/archive/v1.1.0.zip
+#     host: ''
+#
+#   - grafana:
+#     enabled: false
+#     version: '1.3.6'
+#     url: https://github.com/Mikesch-mp/icingaweb2-module-grafana/archive/v1.3.6.tar.gz
+#     host: ''
+
 # icingaweb_config_backend: db
 # icingaweb_config_resource: icingaweb_db
 
@@ -110,4 +126,4 @@ icinga2_api_password: icinga2
 icingaweb_dependencies:
   - jq
   # attention ... use the right PHP version!
-  - php-ldap
+  # - php-ldap
