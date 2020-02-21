@@ -118,7 +118,7 @@
     - name: import icingaweb users into database
       shell: >
         mysql \
-          # --defaults-file=/etc/icingaweb2/.my.cnf \
+          --defaults-file=/etc/icingaweb2/.my.cnf \
           --batch \
           --verbose \
           < /tmp/create_user.sql
