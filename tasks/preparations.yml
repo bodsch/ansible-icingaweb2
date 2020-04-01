@@ -52,18 +52,28 @@
   set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
 
-# - debug:
-#     var: "{{ item }}"
-#   when: item is defined
-#   loop:
-#     "{{ icingaweb_dependencies }}"
+- name: merge icingaweb_authentication configuration between defaults and custom
+  set_fact:
+    icingaweb_authentication: "{{ icingaweb_authentication_defaults |
+      combine( icingaweb_authentication, recursive=True ) }}"
+
+- name: merge icingaweb_auth_backend configuration between defaults and custom
+  set_fact:
+    icingaweb_auth_backend: "{{ icingaweb_auth_backend_defaults |
+      combine( icingaweb_auth_backend, recursive=True ) }}"
+
+- debug:
+    var: "{{ item }}"
+  when: item is defined
+  loop:
+    - icingaweb_dependencies
+    - icingaweb_authentication
+    - icingaweb_auth_backend
 
 - name: install requirements
   package:
-    name: "{{ item }}"
+    name: "{{ icingaweb_dependencies }}"
     state: present
-  loop:
-    "{{ icingaweb_dependencies }}"
 
 # - name: ensure python bindings for mariadb are installed
 #   pip:

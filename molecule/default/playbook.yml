@@ -3,10 +3,130 @@
   any_errors_fatal: false
   environment:
     NETRC: ''
+  vars:
+    ansible_python_interpreter: python3
+
+    # nginx
+    #
+    nginx_server_tokens: "off"
+    nginx_remove_default_vhost: true
+
+    nginx_extra_http_options: |
+      map_hash_max_size 128;
+      map_hash_bucket_size 128;
+
+    nginx_vhosts:
+      - listen: 80
+        server_name: _
+        extra_parameters: |
+          location /icinga {
+            root  /usr/share/icingaweb2/public;
+            index index.php;
+            location ~ ^/icinga/index\.php(.*)$ {
+              fastcgi_index          index.php;
+              fastcgi_param          ICINGAWEB_CONFIGDIR /etc/icingaweb2;
+              fastcgi_param          SCRIPT_FILENAME /usr/share/icingaweb2/public/index.php;
+              fastcgi_read_timeout   600;
+              fastcgi_pass           unix:/run/php/worker-01.sock;
+              include fastcgi_params;
+            }
+            location ~ ^/icinga(.+)? {
+              alias /usr/share/icingaweb2/public;
+              index index.php;
+              try_files $1 $uri $uri/ /icinga/index.php$is_args$args;
+            }
+            location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
+              expires 1d;
+            }
+          }
+
+    # php
+    #
+    php_enable_php_fpm: true
+
+    php_fpm_pools:
+      - name: worker-01
+        user: "{{ php_fpm_pool_user }}"
+        group: "{{ php_fpm_pool_group }}"
+        listen.owner: "{{ php_fpm_pool_user }}"
+        listen.group: "{{ php_fpm_pool_group }}"
+        listen: /run/php/worker-01.sock
+        pm: dynamic
+        pm.max_children: 10
+        pm.start_servers: 4
+        pm.min_spare_servers: 2
+        pm.max_spare_servers: 6
+        pm.status_path: /status
+        ping.path: /ping
+        ping.response: pong
+        access.log: /var/log/php-fpm/$pool_access.log
+        access.format: "%R - %n - %{HTTP_HOST}e - %u %t \"%m %r [%Q%q]\" %s %f %{mili}d %{kilo}M %C%%"
+        chdir: /
+        env:
+          PATH: "/usr/local/bin:/usr/bin:/bin"
+          TMPDIR: "/tmp"
+        php_admin_value:
+          date.timezone: "Europe/Berlin"
+          max_execution_time: 300
+
+    php_modules:
+      - name: opcache
+        enabled: true
+        priority: 10
+        content: |
+          zend_extension=opcache.so
+          opcache.enable=1
+          opcache.enable_cli=1
+          opcache.memory_consumption=128
+          opcache.interned_strings_buffer=16
+          opcache.max_accelerated_files=10000
+          opcache.max_wasted_percentage=5
+          opcache.validate_timestamps=1
+          opcache.revalidate_path=0
+          opcache.revalidate_freq=1
+          opcache.max_file_size=0
+      - name: pdo_mysql
+        enabled: true
+        priority: 20
+        content: |
+          extension=pdo_mysql.so
+      - name: apcu
+        enabled: false
+        priority: 20
+        content: |
+          extension=apcu.so
+          apc.shm_size=96M
+          apc.enable_cli=0
+          apc.rfc1867=1
+      - name: gd
+        enabled: true
+        priority: 20
+        content: |
+          extension=gd.so
+      - name: memcached
+        enabled: false
+        priority: 20
+        content: |
+          extension=memcached.so
+
+    # icingaweb
+    #
+    icingaweb_auth_backend:
+      icingaweb:
+        host: localhost
+      icinga_ido: {}
+      ldap:
+        type: ldap
+        hostname: localhost
+        port: 389
+        encryption: none
+        root_dn: dc=ldap,dc=cm,dc=local
+        bind_dn: cn=Manager,dc=ldap,dc=cm,dc=local
+        bind_pw: ldap_admin_password
+        timeout: 5
+
   roles:
     - role: mariadb
     - role: php-fpm
     - role: nginx
     - role: ansible-icingaweb2
-      vars:
-        ansible_python_interpreter: python3
