@@ -29,39 +29,50 @@
         section: client
         option: socket
         value: "{{ icingaweb_database_socket }}"
+      when: icingaweb_database_socket is defined
 
-    # - name: ensure host present
-    #   ini_file:
-    #     path: /etc/icingaweb2/.my.cnf
-    #     section: client
-    #     option: host
-    #     value: "{{ icingaweb_auth_backend.icingaweb.host }}"
-    #   no_log: true
+    - name: ensure socket present
+      ini_file:
+        path: /etc/icingaweb2/.my.cnf
+        section: client
+        option: host
+        value: "{{ icingaweb_auth_backend.icingaweb.host }}"
 
-    - name: create '{{ icingaweb_auth_backend.icingaweb.dbname }}' database
-      mysql_db:
-        name: '{{ icingaweb_auth_backend.icingaweb.dbname }}'
-        collation: 'utf8_general_ci'
-        encoding: 'utf8'
-        state: present
-      no_log: true
-
-    - name: create '{{ icingaweb_auth_backend.icingaweb.username }}' user
-      mysql_user:
-        name: "{{ icingaweb_auth_backend.icingaweb.username }}"
-        host: "{{ icingaweb_auth_backend.icingaweb.host }}"
-        password: "{{ icingaweb_auth_backend.icingaweb.password }}"
-        priv: '{{ icingaweb_auth_backend.icingaweb.dbname }}.*:ALL'
-        state: present
-        append_privs: false
-        encrypted: false
-      no_log: true
+#
+#     # - name: ensure host present
+#     #   ini_file:
+#     #     path: /etc/icingaweb2/.my.cnf
+#     #     section: client
+#     #     option: host
+#     #     value: "{{ icingaweb_auth_backend.icingaweb.host }}"
+#     #   no_log: true
+#
+#     - name: create '{{ icingaweb_auth_backend.icingaweb.dbname }}' database
+#       mysql_db:
+#         name: '{{ icingaweb_auth_backend.icingaweb.dbname }}'
+#         collation: 'utf8_general_ci'
+#         encoding: 'utf8'
+#         state: present
+#       no_log: true
+#
+#     - name: create '{{ icingaweb_auth_backend.icingaweb.username }}' user
+#       mysql_user:
+#         name: "{{ icingaweb_auth_backend.icingaweb.username }}"
+#         host: "{{ icingaweb_auth_backend.icingaweb.host }}"
+#         password: "{{ icingaweb_auth_backend.icingaweb.password }}"
+#         priv: '{{ icingaweb_auth_backend.icingaweb.dbname }}.*:ALL'
+#         state: present
+#         append_privs: false
+#         encrypted: false
+#       no_log: true
 
     # needs root rights
     - name: ensure table_schema is created
       shell: >
         mysql \
-          --socket={{ icingaweb_database_socket }} \
+          --user={{ icingaweb_auth_backend.icingaweb.username }} \
+          --password={{ icingaweb_auth_backend.icingaweb.password }} \
+          --host={{ icingaweb_auth_backend.icingaweb.host }} \
           --batch \
           --skip-column-names \
           --execute \
@@ -69,12 +80,15 @@
       register: mysql_icingaweb2_schema
       changed_when: false
       check_mode: false
-      no_log: true
+      # no_log: true
 
     # database
     - name: import database schema
       mysql_db:
         state: import
+        login_host: "{{ icingaweb_auth_backend.icingaweb.host }}"
+        login_user: "{{ icingaweb_auth_backend.icingaweb.username }}"
+        login_password: "{{ icingaweb_auth_backend.icingaweb.password }}"
         name: "{{ icingaweb_auth_backend.icingaweb.dbname }}"
         target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
       register: icingaweb2_database_schema

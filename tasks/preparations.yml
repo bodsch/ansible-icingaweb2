@@ -14,39 +14,39 @@
     that: php_version is version_compare('7.0', '>=')
     msg: "This role only works with PHP >= 7.0 .. found: {{ php_version }}"
 
-- block:
-
-    - name: find mysql socket
-      become: true
-      stat:
-        path: "{{ item }}"
-      with_items:
-        - /run/mysql.sock
-        - /run/mysqld.sock
-        - /run/mysqld/mysqld.sock
-        - /var/lib/mysql/mysql.sock
-      register: output
-
-    - name: set mariadb socket
-      set_fact:
-        icingaweb_database_socket: "{{ item.stat.path }}"
-      loop: "{{ output.results }}"
-      when: item.stat.exists | bool
-
-  when: icingaweb_database_socket is defined and icingaweb_database_socket | length == 0
-
-- name: check mysql socket
-  become: true
-  stat:
-    path: "{{ icingaweb_database_socket }}"
-  register: output
-
-- name: assert missing mysql socket
-  assert:
-    that:
-      - icingaweb_database_socket | length != 0
-      - output.stat.exists | bool
-    msg: "missing running database"
+# - block:
+#
+#     - name: find mysql socket
+#       become: true
+#       stat:
+#         path: "{{ item }}"
+#       with_items:
+#         - /run/mysql.sock
+#         - /run/mysqld.sock
+#         - /run/mysqld/mysqld.sock
+#         - /var/lib/mysql/mysql.sock
+#       register: output
+#
+#     - name: set mariadb socket
+#       set_fact:
+#         icingaweb_database_socket: "{{ item.stat.path }}"
+#       loop: "{{ output.results }}"
+#       when: item.stat.exists | bool
+#
+#   when: icingaweb_database_socket is defined and icingaweb_database_socket | length == 0
+#
+# - name: check mysql socket
+#   become: true
+#   stat:
+#     path: "{{ icingaweb_database_socket }}"
+#   register: output
+#
+# - name: assert missing mysql socket
+#   assert:
+#     that:
+#       - icingaweb_database_socket | length != 0
+#       - output.stat.exists | bool
+#     msg: "missing running database"
 
 - name: merge dependencies between defaults and custom
   set_fact:

@@ -3,10 +3,24 @@
 local_tmp_directory: /var/tmp
 
 _icingaweb_dependencies:
-  default: []
+  default:
+    - python-mysqldb
+    - python3-mysqldb
+    - mysql-client
+  debian:
+    - python-mysqldb
+    - python3-mysqldb
+    - mysql-client
+  ubuntu:
+    - python-mysqldb
+    - python3-mysqldb
+    - mysql-client
   centos-7:
     - php73-php-mysqlnd
-
+    - mariadb
+    - python36-PyMySQL
+    - python2-PyMySQL
+    - MySQL-python
 
 icingaweb_authentication_defaults:
   auth_db:
