@@ -117,6 +117,16 @@ icingaweb_roles:
     permissions: '*'
 
 # API connection
+
+icingaweb_commandtransport:
+  icinga2:
+    transport: api
+    host: localhost
+    port: 5665
+    username: root
+    password: icinga2
+
+
 icinga2_api_host: localhost
 icinga2_api_port: 5665
 icinga2_api_username: root

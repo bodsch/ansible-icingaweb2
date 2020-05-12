@@ -62,13 +62,14 @@
     icingaweb_auth_backend: "{{ icingaweb_auth_backend_defaults |
       combine( icingaweb_auth_backend, recursive=True ) }}"
 
-- debug:
-    var: "{{ item }}"
-  when: item is defined
-  loop:
-    - icingaweb_dependencies
-    - icingaweb_authentication
-    - icingaweb_auth_backend
+# - debug:
+#     var: "{{ item }}"
+#   when: item is defined
+#   loop:
+#     - icingaweb_dependencies
+#     - icingaweb_authentication
+#     - icingaweb_auth_backend
+#     - icingaweb_commandtransport
 
 - name: install requirements
   package:
