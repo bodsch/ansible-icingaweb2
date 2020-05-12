@@ -1,8 +1,16 @@
-{{ ansible_managed | comment(decoration='#') }}
+; {{ ansible_managed }}
 
-[icinga]
-transport = "api"
-host      = "{{ icinga2_api_host | default('localhost') }}"
-port      = "{{ icinga2_api_port | default('5665') }}"
-username  = "{{ icinga2_api_username | default('root') }}"
-password  = "{{ icinga2_api_password | default('icinga2') }}"
+{% set _valid_attr = ['transport','host','port','username','password'] %}
+
+{% if icingaweb_commandtransport is defined and icingaweb_commandtransport | count != 0 -%}
+{% for key  in icingaweb_commandtransport -%}
+[{{ key }}]
+{% for k,v in icingaweb_commandtransport[key].items() -%}
+{% if k in _valid_attr %}
+{{ "%-10s" | format(k,) }} = "{{ v }}"
+{% endif %}
+{% endfor %}
+
+{% endfor %}
+{% endif %}
+
