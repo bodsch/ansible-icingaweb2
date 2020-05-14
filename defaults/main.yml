@@ -29,7 +29,7 @@ icingaweb_database_socket: ''
 # icingaweb_config_backend: db
 # icingaweb_config_resource: icingaweb_db
 
-icingaweb_preferences_store: ini
+icingaweb_preferences_store: db
 
 # icingaweb_config:
 #   backend: db
@@ -136,3 +136,10 @@ icingaweb_dependencies:
   - jq
   # attention ... use the right PHP version!
   # - php-ldap
+
+icingaweb_module:
+  monitoring:
+    security:
+      protected_customvars:
+        - '*http_auth_pair*'
+        - '*password*'

@@ -4,7 +4,7 @@
 module_path         = "/etc/icingaweb2/enabledModules"
 show_stacktraces    = "{{ icingaweb_show_stacktraces | default(false) | bool | ternary('1', '0') }}"
 show_application_state_messages = "1"
-config_backend      = "{{ icingaweb_config_backend | default('ini') }}"
+config_backend      = "{{ icingaweb_config_backend | default('db') }}"
 config_resource     = "{{ icingaweb_config_resource }}"
 
 [logging]
@@ -13,7 +13,7 @@ level               = "{{ icingaweb_log_level | default('WARNING') }}"
 file                = "/var/log/icingaweb2/icingaweb2.log"
 
 [preferences]
-store               = "{{ icingaweb_preferences_store | default('ini') }}"
+store               = "{{ icingaweb_preferences_store | default('db') }}"
 
 [themes]
 
