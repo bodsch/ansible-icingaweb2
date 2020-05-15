@@ -19,6 +19,9 @@
   tags:
     - installation
 
+- name: install themes
+  include_tasks: themes/install.yml
+
 - include: configure.yml
   become: true
   tags:

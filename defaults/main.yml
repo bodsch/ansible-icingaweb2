@@ -12,6 +12,19 @@ icingaweb_modules_enabled:
 
 icingaweb_database_socket: ''
 
+icingaweb_themes:
+  - unicorn:
+    name: unicorn
+    src: https://github.com/Mikesch-mp/icingaweb2-theme-unicorn.git
+    version: v1.0.2
+    image: { name: "unicorn.png", "url": "http://i.imgur.com/SCfMd.png" }
+  - batman-dark:
+    name: batman-dark
+    src: https://github.com/jschanz/icingaweb2-theme-batman-dark.git
+    version: v1.0.0
+
+icingaweb_theme_active: unicorn
+
 # icingaweb_external_modules:
 #
 #   - graphite:
@@ -126,11 +139,10 @@ icingaweb_commandtransport:
     username: root
     password: icinga2
 
-
-icinga2_api_host: localhost
-icinga2_api_port: 5665
-icinga2_api_username: root
-icinga2_api_password: icinga2
+# icinga2_api_host: localhost
+# icinga2_api_port: 5665
+# icinga2_api_username: root
+# icinga2_api_password: icinga2
 
 icingaweb_dependencies:
   - jq

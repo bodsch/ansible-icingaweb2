@@ -1,7 +1,9 @@
 ; {{ ansible_managed }}
 
+; https://icinga.com/docs/icingaweb2/latest/doc/03-Configuration/
+
 [global]
-module_path         = "/etc/icingaweb2/enabledModules"
+module_path         = "{{ icingaweb_install_dir }}/modules"
 show_stacktraces    = "{{ icingaweb_show_stacktraces | default(false) | bool | ternary('1', '0') }}"
 show_application_state_messages = "1"
 config_backend      = "{{ icingaweb_config_backend | default('db') }}"

@@ -40,8 +40,11 @@ icingaweb_commandtransport:
     username: icingaweb
     password: S0mh1TuFJI
 
-icinga2_api_host:
-icinga2_api_port: 5665
-icinga2_api_username:
-icinga2_api_password:
+
+icingaweb_module:
+  monitoring:
+    security:
+      protected_customvars:
+        - '*http_auth_pair*'
+        - '*password*'
 ```
