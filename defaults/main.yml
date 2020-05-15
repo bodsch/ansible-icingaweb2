@@ -23,7 +23,11 @@ icingaweb_themes:
     src: https://github.com/jschanz/icingaweb2-theme-batman-dark.git
     version: v1.0.0
 
-icingaweb_theme_active: unicorn
+# if users should not be allowed to change their theme
+icingaweb_themes_disabled: true
+
+# Can be set to 'Icinga', 'high-contrast', 'Winter', ‘colorblind’ or your own installed theme
+icingaweb_themes_default: Icinga
 
 # icingaweb_external_modules:
 #
@@ -86,38 +90,23 @@ icingaweb_groups_backend: db
 icingaweb_groups_resource: icingaweb
 
 # the 'icingaweb' is used for database import and should NOT CHANGED!
-icingaweb_auth_backend: {}
-#   icingaweb:
-#     type: db
-#     db: mysql
-#     host: 127.0.0.1
-#     port: 3306
-#     dbname: icingaweb_config
-#     username: icingaweb_config
-#     password: icingaweb_config
-#     prefix: icingaweb_
-#     charset: utf8
-#
-#   icinga_ido:
-#     type: db
-#     db: mysql
-#     host: 127.0.0.1
-#     port: 3306
-#     dbname: icinga2_ido
-#     username: icinga2_ido
-#     password: icinga2_ido
-#     charset: utf8
-#
-#   ldap:
-#     type: ldap
-#     hostname: localhost
-#     port: 389
-#     encryption: none
-#     root_dn: dc=ldap,dc=cm,dc=local
-#     bind_dn: cn=Manager,dc=ldap,dc=cm,dc=local
-#     bind_pw: "{{ vault__openldap__rootpw }}"
-#     timeout: 5
 
+icingaweb_resources:
+  db:
+    icingaweb:
+      type: db
+      db: mysql
+      host: localhost
+      port: 3306
+      dbname: "{{ icingaweb_auth_dba_database }}"
+      username: "{{ icingaweb_auth_dba_username }}"
+      password: "{{ icingaweb_auth_dba_password }}"
+      prefix: icingaweb_
+      charset: utf8
+  ldap: {}
+  ssh: {}
+
+icingaweb_auth_backend: "{{ icingaweb_resources.db.icingaweb }}"
 
 icingaweb_users:
   admin:
@@ -138,11 +127,6 @@ icingaweb_commandtransport:
     port: 5665
     username: root
     password: icinga2
-
-# icinga2_api_host: localhost
-# icinga2_api_port: 5665
-# icinga2_api_username: root
-# icinga2_api_password: icinga2
 
 icingaweb_dependencies:
   - jq

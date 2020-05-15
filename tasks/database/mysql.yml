@@ -1,5 +1,13 @@
 ---
 
+- debug:
+    var: "{{ item }}"
+  when: item is defined
+  loop:
+    - icingaweb_auth_backend
+    - icingaweb_auth_backend.username
+
+
 - block:
 
     - name: create my.cnf file with password credentials
@@ -12,7 +20,7 @@
         path: /etc/icingaweb2/.my.cnf
         section: client
         option: user
-        value: "{{ icingaweb_auth_backend.icingaweb.username }}"
+        value: "{{ icingaweb_auth_backend.username }}"
       no_log: true
 
     - name: ensure password present
@@ -20,7 +28,7 @@
         path: /etc/icingaweb2/.my.cnf
         section: client
         option: password
-        value: "{{ icingaweb_auth_backend.icingaweb.password }}"
+        value: "{{ icingaweb_auth_backend.password }}"
       no_log: true
 
     - name: ensure socket present
@@ -36,7 +44,7 @@
         path: /etc/icingaweb2/.my.cnf
         section: client
         option: host
-        value: "{{ icingaweb_auth_backend.icingaweb.host }}"
+        value: "{{ icingaweb_auth_backend.host }}"
 
 #
 #     # - name: ensure host present
@@ -44,23 +52,23 @@
 #     #     path: /etc/icingaweb2/.my.cnf
 #     #     section: client
 #     #     option: host
-#     #     value: "{{ icingaweb_auth_backend.icingaweb.host }}"
+#     #     value: "{{ icingaweb_auth_backend.host }}"
 #     #   no_log: true
 #
-#     - name: create '{{ icingaweb_auth_backend.icingaweb.dbname }}' database
+#     - name: create '{{ icingaweb_auth_backend.dbname }}' database
 #       mysql_db:
-#         name: '{{ icingaweb_auth_backend.icingaweb.dbname }}'
+#         name: '{{ icingaweb_auth_backend.dbname }}'
 #         collation: 'utf8_general_ci'
 #         encoding: 'utf8'
 #         state: present
 #       no_log: true
 #
-#     - name: create '{{ icingaweb_auth_backend.icingaweb.username }}' user
+#     - name: create '{{ icingaweb_auth_backend.username }}' user
 #       mysql_user:
-#         name: "{{ icingaweb_auth_backend.icingaweb.username }}"
-#         host: "{{ icingaweb_auth_backend.icingaweb.host }}"
-#         password: "{{ icingaweb_auth_backend.icingaweb.password }}"
-#         priv: '{{ icingaweb_auth_backend.icingaweb.dbname }}.*:ALL'
+#         name: "{{ icingaweb_auth_backend.username }}"
+#         host: "{{ icingaweb_auth_backend.host }}"
+#         password: "{{ icingaweb_auth_backend.password }}"
+#         priv: '{{ icingaweb_auth_backend.dbname }}.*:ALL'
 #         state: present
 #         append_privs: false
 #         encrypted: false
@@ -70,13 +78,13 @@
     - name: ensure table_schema is created
       shell: >
         mysql \
-          --user={{ icingaweb_auth_backend.icingaweb.username }} \
-          --password={{ icingaweb_auth_backend.icingaweb.password }} \
-          --host={{ icingaweb_auth_backend.icingaweb.host }} \
+          --user={{ icingaweb_auth_backend.username }} \
+          --password={{ icingaweb_auth_backend.password }} \
+          --host={{ icingaweb_auth_backend.host }} \
           --batch \
           --skip-column-names \
           --execute \
-          "SELECT count(TABLE_NAME) FROM information_schema.tables where TABLE_SCHEMA = '{{ icingaweb_auth_backend.icingaweb.dbname }}';"
+          "SELECT count(TABLE_NAME) FROM information_schema.tables where TABLE_SCHEMA = '{{ icingaweb_auth_backend.dbname }}';"
       register: mysql_icingaweb2_schema
       changed_when: false
       check_mode: false
@@ -86,10 +94,10 @@
     - name: import database schema
       mysql_db:
         state: import
-        login_host: "{{ icingaweb_auth_backend.icingaweb.host }}"
-        login_user: "{{ icingaweb_auth_backend.icingaweb.username }}"
-        login_password: "{{ icingaweb_auth_backend.icingaweb.password }}"
-        name: "{{ icingaweb_auth_backend.icingaweb.dbname }}"
+        login_host: "{{ icingaweb_auth_backend.host }}"
+        login_user: "{{ icingaweb_auth_backend.username }}"
+        login_password: "{{ icingaweb_auth_backend.password }}"
+        name: "{{ icingaweb_auth_backend.dbname }}"
         target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
       register: icingaweb2_database_schema
       changed_when: false
