@@ -21,4 +21,4 @@ store               = "{{ icingaweb_preferences_store | default('db') }}"
 disabled            = "{{ icingaweb_themes_disabled | default(false) | bool | ternary('1', '0') }}"
 default             = "{{ icingaweb_themes_default | default('Icinga') }}"
 
-; [authentication]
+[authentication]

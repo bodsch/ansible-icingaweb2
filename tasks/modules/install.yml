@@ -1,69 +1,91 @@
 ---
 
-- name: download external module to local directory {{ local_tmp_directory }}
+- name: create local temp directory
   become: false
   delegate_to: localhost
-  get_url:
-    url: "{{ item.url }}"
-    dest: "{{ local_tmp_directory }}/"   # {{ item.url | basename }}"
-  register: _download_artefact
-  until: _download_artefact is succeeded
-  retries: 5
-  delay: 2
-  check_mode: false
+  file:
+    path: "{{ local_tmp_directory }}/icingaweb_modules/"
+    state: directory
+
+
+- name: download external module to local directory {{ local_tmp_directory }}/icingaweb_modules
+  become: false
+  delegate_to: localhost
+  git:
+    depth: 1 # copy the least bit of history possible to get that repo.
+    repo: "{{ item.src }}"
+    version: "{{ item.version }}"
+    dest: "{{ local_tmp_directory }}/icingaweb_modules/{{ item.name }}"
+    update: true
   loop:
     "{{ icingaweb_external_modules }}"
 
-- name: Write nested JSON variable to disk
+- name: create transfer archive
   become: false
   delegate_to: localhost
-  copy: content={{ _download_artefact.results }} dest="/tmp/foo.txt"
+  archive:
+    path: "{{ local_tmp_directory }}/icingaweb_modules"
+    dest: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
 
+- name: propagate icingaweb_modules.tgz
+  become: true
+  copy:
+    src: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
+    dest: "/tmp/"
 
-- debug:
-    var: "{{ item.dest }}"
-  when: item is defined
-  with_dict: "{{ _download_artefact.results }}"
+- name: extract icingaweb_modules.tgz
+  unarchive:
+    src: "/tmp/icingaweb_modules.tgz"
+    dest: /tmp/
+    remote_src: true
 
+- name: copy themes in place
+  become: true
+  copy:
+    src: "/tmp/icingaweb_modules/{{ item.name }}/"
+    dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
+    remote_src: true
+  loop:
+    "{{ icingaweb_external_modules }}"
 
-# - name: deploy modules archiv
-#   copy:
-#     src: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
-#     dest: /tmp
+- name: create directory for module configuration
+  become: true
+  file:
+    path: /etc/icingaweb2/modules/{{ item.name }}
+    state: directory
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+  loop:
+    "{{ icingaweb_external_modules }}"
+  when: item.enabled and
+    item.configuration is defined and
+    item.configuration | count != 0
 
-#     - name: download icinaweb2 v{{ icingaweb_version }}.tar.gz to local directory {{ local_tmp_directory }}
-#       become: false
-#       get_url:
-#         url: https://github.com/Icinga/icingaweb2/archive/v{{ icingaweb_version }}.tar.gz
-#         dest: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
-#       register: _download_artefact
-#       until: _download_artefact is succeeded
-#       retries: 5
-#       delay: 2
-#       check_mode: false
-#       delegate_to: localhost
-#
-#     - name: deploy application archiv
-#       copy:
-#         src: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
-#         dest: /tmp
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-# - name: configure icingaweb modules
-#   file:
-#     state: link
-#     src: '{{ icingaweb_install_dir }}/modules/{{ item }}'
-#     dest: '/etc/icingaweb2/enabledModules/{{ item }}'
-#     force: true
-#   loop:
-#     '{{ icingaweb_external_modules | list }}'
-#
-#
+- name: configure module
+  become: true
+  template:
+    src: modules/{{ item.name }}/config.ini.j2
+    dest: /etc/icingaweb2/modules/{{ item.name }}/config.ini
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+  loop:
+    "{{ icingaweb_external_modules }}"
+  when: item.enabled and
+    item.configuration is defined and
+    item.configuration | count != 0
+
+- name: disable modules
+  become: true
+  command: |
+    icingacli module disable {{ item.name }}
+  loop:
+    "{{ icingaweb_external_modules }}"
+  when: not item.enabled | bool | default('false')
+
+- name: enable modules
+  become: true
+  command: |
+    icingacli module enable {{ item.name }}
+  loop:
+    "{{ icingaweb_external_modules }}"
+  when: item.enabled

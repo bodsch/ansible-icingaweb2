@@ -1,13 +1,35 @@
+; {{ ansible_managed }}
+
+{% if item.configuration is defined and item.configuration | count != 0 %}
+{% set graphite = item.configuration %}
+{% set _attr = ['host','port','user','password','ui','advanced'] %}
+
 [graphite]
-url = "http://{{ icingaweb_modules_enabled.graphite.host }}:{{ icingaweb_modules_enabled.graphite.port | default('2003') }}"
-; user = "user"
-; password = "pass"
+url = "{{ graphite.host | default('127.0.0.1') }}:{{ graphite.port | default('2003') }}"
+{% if graphite.user is defined and graphite.user | length != 0 %}
+user = "{{ graphite.user }}"
+{% endif %}
+{% if graphite.password is defined and graphite.password | length != 0 %}
+password = "{{ graphite.password }}"
+{% endif %}
+{% endif %}
 
+{% if graphite.ui is defined and graphite.ui | count != 0 %}
+{% set _attr = ['default_time_range','default_time_range_unit','disable_no_graphs_found'] %}
 [ui]
-default_time_range = "12"
-default_time_range_unit = "hours"
-disable_no_graphs_found = "0"
+{% for k, v in graphite.ui.items() %}
+{% if k in _attr %}
+{{ k }} = "{{ v }}"
+{% endif %}
+{% endfor %}
+{% endif %}
 
-;[icinga]
-; graphite_writer_host_name_template = "host tpl"
-; graphite_writer_service_name_template = "service tpl"
+{% if graphite.advanced is defined and graphite.advanced | count != 0 %}
+{% set _attr = ['graphite_writer_host_name_template','graphite_writer_service_name_template','customvar_obscured_check_command'] %}
+[icinga]
+{% for k, v in graphite.advanced.items() %}
+{% if k in _attr %}
+; {{ k }} = "{{ v }}"
+{% endif %}
+{% endfor %}
+{% endif %}

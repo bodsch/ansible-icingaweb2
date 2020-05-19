@@ -14,6 +14,8 @@
   file:
     name: '{{ item }}'
     state: directory
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
   loop:
     - /etc/icingaweb2/modules
     - /etc/icingaweb2/enabledModules

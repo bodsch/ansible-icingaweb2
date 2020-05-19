@@ -6,9 +6,6 @@
 #   loop:
 #     - ansible_python_interpreter
 
-#- name: external modules
-#  include_tasks: modules/install.yml
-
 - include: preparations.yml
   become: true
   tags:
@@ -19,10 +16,13 @@
   tags:
     - installation
 
-- name: install themes
-  include_tasks: themes/install.yml
-
 - include: configure.yml
   become: true
   tags:
     - configure
+
+- name: install themes
+  include_tasks: themes/install.yml
+
+- name: external modules
+  include_tasks: modules/install.yml
