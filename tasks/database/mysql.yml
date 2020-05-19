@@ -1,78 +1,55 @@
 ---
 
-- debug:
-    var: "{{ item }}"
-  when: item is defined
-  loop:
-    - icingaweb_auth_backend
-    - icingaweb_auth_backend.username
+# - debug:
+#     var: "{{ item }}"
+#   when: item is defined
+#   loop:
+#     - icingaweb_auth_backend
+#     - icingaweb_auth_backend.username
 
-
-- block:
+- name: database configuration
+  block:
 
     - name: create my.cnf file with password credentials
-      file:
-        path: /etc/icingaweb2/.my.cnf
-        state: touch
+      template:
+        src: my.cnf.j2
+        dest: /etc/icingaweb2/.my.cnf
 
-    - name: ensure user name present
-      ini_file:
-        path: /etc/icingaweb2/.my.cnf
-        section: client
-        option: user
-        value: "{{ icingaweb_auth_backend.username }}"
-      no_log: true
-
-    - name: ensure password present
-      ini_file:
-        path: /etc/icingaweb2/.my.cnf
-        section: client
-        option: password
-        value: "{{ icingaweb_auth_backend.password }}"
-      no_log: true
-
-    - name: ensure socket present
-      ini_file:
-        path: /etc/icingaweb2/.my.cnf
-        section: client
-        option: socket
-        value: "{{ icingaweb_database_socket }}"
-      when: icingaweb_database_socket is defined
-
-    - name: ensure socket present
-      ini_file:
-        path: /etc/icingaweb2/.my.cnf
-        section: client
-        option: host
-        value: "{{ icingaweb_auth_backend.host }}"
-
-#
-#     # - name: ensure host present
-#     #   ini_file:
-#     #     path: /etc/icingaweb2/.my.cnf
-#     #     section: client
-#     #     option: host
-#     #     value: "{{ icingaweb_auth_backend.host }}"
-#     #   no_log: true
-#
-#     - name: create '{{ icingaweb_auth_backend.dbname }}' database
-#       mysql_db:
-#         name: '{{ icingaweb_auth_backend.dbname }}'
-#         collation: 'utf8_general_ci'
-#         encoding: 'utf8'
-#         state: present
-#       no_log: true
-#
-#     - name: create '{{ icingaweb_auth_backend.username }}' user
-#       mysql_user:
-#         name: "{{ icingaweb_auth_backend.username }}"
-#         host: "{{ icingaweb_auth_backend.host }}"
-#         password: "{{ icingaweb_auth_backend.password }}"
-#         priv: '{{ icingaweb_auth_backend.dbname }}.*:ALL'
-#         state: present
-#         append_privs: false
-#         encrypted: false
-#       no_log: true
+    # - name: create my.cnf file with password credentials
+    #   file:
+    #     path: /etc/icingaweb2/.my.cnf
+    #     state: touch
+    #
+    # - name: ensure user name present
+    #   ini_file:
+    #     path: /etc/icingaweb2/.my.cnf
+    #     section: client
+    #     option: user
+    #     value: "{{ icingaweb_auth_backend.username }}"
+    #   no_log: true
+    #
+    # - name: ensure password present
+    #   ini_file:
+    #     path: /etc/icingaweb2/.my.cnf
+    #     section: client
+    #     option: password
+    #     value: "{{ icingaweb_auth_backend.password }}"
+    #   no_log: true
+    #
+    # - name: ensure socket present
+    #   ini_file:
+    #     path: /etc/icingaweb2/.my.cnf
+    #     section: client
+    #     option: socket
+    #     value: "{{ icingaweb_database_socket }}"
+    #   when: icingaweb_database_socket is defined
+    #
+    # - name: ensure socket present
+    #   ini_file:
+    #     path: /etc/icingaweb2/.my.cnf
+    #     section: client
+    #     option: host
+    #     value: "{{ icingaweb_auth_backend.host }}"
 
     # needs root rights
     - name: ensure table_schema is created

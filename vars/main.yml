@@ -22,6 +22,10 @@ _icingaweb_dependencies:
     - python2-PyMySQL
     - MySQL-python
 
+
+icingaweb_modules_enabled_defaults:
+  - monitoring
+
 icingaweb_authentication_defaults:
   auth_db:
     backend: db

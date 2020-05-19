@@ -1,70 +1,77 @@
 ---
 
-- name: create local temp directory
-  become: false
-  delegate_to: localhost
-  file:
-    path: "{{ local_tmp_directory }}/icingaweb_themes/"
-    state: directory
+- name: icingaweb themes
+  block:
 
-- name: download external themes to local directory {{ local_tmp_directory }}/icingaweb_themes
-  become: false
-  delegate_to: localhost
-  git:
-    depth: 1 # copy the least bit of history possible to get that repo.
-    repo: "{{ item.src }}"
-    version: "{{ item.version }}"
-    dest: "{{ local_tmp_directory }}/icingaweb_themes/{{ item.name }}"
-    update: true
-  loop:
-    "{{ icingaweb_themes }}"
+    - name: create local temp directory
+      become: false
+      delegate_to: localhost
+      file:
+        path: "{{ local_tmp_directory }}/icingaweb_themes/"
+        state: directory
 
-- name: download external images for themes to local directory {{ local_tmp_directory }}/icingaweb_themes
-  become: false
-  delegate_to: localhost
-  get_url:
-    url: "{{ item.image.url }}"
-    dest: "{{ local_tmp_directory }}/icingaweb_themes/{{ item.name }}/public/img/{{ item.image.name }}"
-  register: _download_artefact
-  until: _download_artefact is succeeded
-  retries: 5
-  delay: 2
-  check_mode: false
-  loop:
-    "{{ icingaweb_themes }}"
-  when: item.image is defined
+    - name: download external themes to local directory {{ local_tmp_directory }}/icingaweb_themes
+      become: false
+      delegate_to: localhost
+      git:
+        depth: 1 # copy the least bit of history possible to get that repo.
+        repo: "{{ item.src }}"
+        version: "{{ item.version }}"
+        dest: "{{ local_tmp_directory }}/icingaweb_themes/{{ item.name }}"
+        update: true
+      loop:
+        "{{ icingaweb_themes }}"
 
-- name: create transfer archive
-  become: false
-  delegate_to: localhost
-  archive:
-    path: "{{ local_tmp_directory }}/icingaweb_themes"
-    dest: "{{ local_tmp_directory }}/icingaweb_themes.tgz"
+    - name: download external images for themes to local directory {{ local_tmp_directory }}/icingaweb_themes
+      become: false
+      delegate_to: localhost
+      get_url:
+        url: "{{ item.image.url }}"
+        dest: "{{ local_tmp_directory }}/icingaweb_themes/{{ item.name }}/public/img/{{ item.image.name }}"
+      register: _download_artefact
+      until: _download_artefact is succeeded
+      retries: 5
+      delay: 2
+      check_mode: false
+      loop:
+        "{{ icingaweb_themes }}"
+      when: item.image is defined
 
-- name: propagate icingaweb_themes.tgz
-  become: true
-  copy:
-    src: "{{ local_tmp_directory }}/icingaweb_themes.tgz"
-    dest: "/tmp/"
+    - name: create transfer archive
+      become: false
+      delegate_to: localhost
+      archive:
+        path: "{{ local_tmp_directory }}/icingaweb_themes"
+        dest: "{{ local_tmp_directory }}/icingaweb_themes.tgz"
 
-- name: extract icingaweb_themes.tgz
-  unarchive:
-    src: "/tmp/icingaweb_themes.tgz"
-    dest: /tmp/
-    remote_src: true
+    - name: propagate icingaweb_themes.tgz
+      become: true
+      copy:
+        src: "{{ local_tmp_directory }}/icingaweb_themes.tgz"
+        dest: "/tmp/"
 
-- name: copy themes in place
-  become: true
-  copy:
-    src: "/tmp/icingaweb_themes/{{ item.name }}/"
-    dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
-    remote_src: true
-  loop:
-    "{{ icingaweb_themes }}"
+    - name: extract icingaweb_themes.tgz
+      unarchive:
+        src: "/tmp/icingaweb_themes.tgz"
+        dest: /tmp/
+        remote_src: true
 
-- name: enable themes
-  become: true
-  command: |
-    icingacli module enable {{ item.name }}
-  loop:
-    "{{ icingaweb_themes }}"
+    - name: copy themes in place
+      become: true
+      copy:
+        src: "/tmp/icingaweb_themes/{{ item.name }}/"
+        dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
+        remote_src: true
+      loop:
+        "{{ icingaweb_themes }}"
+
+    - name: enable themes
+      become: true
+      command: |
+        icingacli module enable {{ item.name }}
+      loop:
+        "{{ icingaweb_themes }}"
+
+  when:
+    - icingaweb_themes is defined
+    - icingaweb_themes | flatten(1) | count != 0

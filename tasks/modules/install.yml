@@ -1,91 +1,98 @@
 ---
 
-- name: create local temp directory
-  become: false
-  delegate_to: localhost
-  file:
-    path: "{{ local_tmp_directory }}/icingaweb_modules/"
-    state: directory
+- name: icingaweb modules
+  block:
+
+    - name: create local temp directory
+      become: false
+      delegate_to: localhost
+      file:
+        path: "{{ local_tmp_directory }}/icingaweb_modules/"
+        state: directory
 
 
-- name: download external module to local directory {{ local_tmp_directory }}/icingaweb_modules
-  become: false
-  delegate_to: localhost
-  git:
-    depth: 1 # copy the least bit of history possible to get that repo.
-    repo: "{{ item.src }}"
-    version: "{{ item.version }}"
-    dest: "{{ local_tmp_directory }}/icingaweb_modules/{{ item.name }}"
-    update: true
-  loop:
-    "{{ icingaweb_external_modules }}"
+    - name: download external module to local directory {{ local_tmp_directory }}/icingaweb_modules
+      become: false
+      delegate_to: localhost
+      git:
+        depth: 1 # copy the least bit of history possible to get that repo.
+        repo: "{{ item.src }}"
+        version: "{{ item.version }}"
+        dest: "{{ local_tmp_directory }}/icingaweb_modules/{{ item.name }}"
+        update: true
+      loop:
+        "{{ icingaweb_external_modules }}"
 
-- name: create transfer archive
-  become: false
-  delegate_to: localhost
-  archive:
-    path: "{{ local_tmp_directory }}/icingaweb_modules"
-    dest: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
+    - name: create transfer archive
+      become: false
+      delegate_to: localhost
+      archive:
+        path: "{{ local_tmp_directory }}/icingaweb_modules"
+        dest: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
 
-- name: propagate icingaweb_modules.tgz
-  become: true
-  copy:
-    src: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
-    dest: "/tmp/"
+    - name: propagate icingaweb_modules.tgz
+      become: true
+      copy:
+        src: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
+        dest: "/tmp/"
 
-- name: extract icingaweb_modules.tgz
-  unarchive:
-    src: "/tmp/icingaweb_modules.tgz"
-    dest: /tmp/
-    remote_src: true
+    - name: extract icingaweb_modules.tgz
+      unarchive:
+        src: "/tmp/icingaweb_modules.tgz"
+        dest: /tmp/
+        remote_src: true
 
-- name: copy themes in place
-  become: true
-  copy:
-    src: "/tmp/icingaweb_modules/{{ item.name }}/"
-    dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
-    remote_src: true
-  loop:
-    "{{ icingaweb_external_modules }}"
+    - name: copy themes in place
+      become: true
+      copy:
+        src: "/tmp/icingaweb_modules/{{ item.name }}/"
+        dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
+        remote_src: true
+      loop:
+        "{{ icingaweb_external_modules }}"
 
-- name: create directory for module configuration
-  become: true
-  file:
-    path: /etc/icingaweb2/modules/{{ item.name }}
-    state: directory
-    owner: "{{ icingaweb_user }}"
-    group: "{{ icingaweb_group }}"
-  loop:
-    "{{ icingaweb_external_modules }}"
-  when: item.enabled and
-    item.configuration is defined and
-    item.configuration | count != 0
+    - name: create directory for module configuration
+      become: true
+      file:
+        path: /etc/icingaweb2/modules/{{ item.name }}
+        state: directory
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+      loop:
+        "{{ icingaweb_external_modules }}"
+      when: item.enabled and
+        item.configuration is defined and
+        item.configuration | count != 0
 
-- name: configure module
-  become: true
-  template:
-    src: modules/{{ item.name }}/config.ini.j2
-    dest: /etc/icingaweb2/modules/{{ item.name }}/config.ini
-    owner: "{{ icingaweb_user }}"
-    group: "{{ icingaweb_group }}"
-  loop:
-    "{{ icingaweb_external_modules }}"
-  when: item.enabled and
-    item.configuration is defined and
-    item.configuration | count != 0
+    - name: configure module
+      become: true
+      template:
+        src: modules/{{ item.name }}/config.ini.j2
+        dest: /etc/icingaweb2/modules/{{ item.name }}/config.ini
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+      loop:
+        "{{ icingaweb_external_modules }}"
+      when: item.enabled and
+        item.configuration is defined and
+        item.configuration | count != 0
 
-- name: disable modules
-  become: true
-  command: |
-    icingacli module disable {{ item.name }}
-  loop:
-    "{{ icingaweb_external_modules }}"
-  when: not item.enabled | bool | default('false')
+    - name: disable modules
+      become: true
+      command: |
+        icingacli module disable {{ item.name }}
+      loop:
+        "{{ icingaweb_external_modules }}"
+      when: not item.enabled | bool | default('false')
 
-- name: enable modules
-  become: true
-  command: |
-    icingacli module enable {{ item.name }}
-  loop:
-    "{{ icingaweb_external_modules }}"
-  when: item.enabled
+    - name: enable modules
+      become: true
+      command: |
+        icingacli module enable {{ item.name }}
+      loop:
+        "{{ icingaweb_external_modules }}"
+      when: item.enabled
+
+  when:
+    - icingaweb_external_modules is defined
+    - icingaweb_external_modules | flatten(1) | count != 0
