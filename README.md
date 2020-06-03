@@ -169,3 +169,70 @@ icingaweb_authentication:
     domain: ldap.cm.local
 
 ```
+
+
+```
+icingaweb_log_level: DEBUG
+
+icingaweb_resources:
+  db:
+    icingaweb:
+      type: db
+      db: mysql
+      host: 192.168.130.10
+      port: 3306
+      dbname: "{{ icingaweb_auth_dba_database }}"
+      username: "{{ icingaweb_auth_dba_username }}"
+      password: "{{ icingaweb_auth_dba_password }}"
+      prefix: icingaweb_
+      charset: utf8
+
+    icinga_ido:
+      type: db
+      db: mysql
+      host: 192.168.130.10
+      port: 3306
+      dbname: "{{ icinga2_ido_database }}"
+      username: "{{ icinga2_ido_username }}"
+      password: "{{ icinga2_ido_password }}"
+      charset: utf8
+
+icingaweb_auth_backend: "{{ icingaweb_resources.db.icingaweb }}"
+
+icingaweb_commandtransport:
+  master-1:
+    transport: api
+    host: 192.168.130.20
+    port: 5665
+    username: icingaweb
+    password: S0mh1TuFJI
+  master-2:
+    transport: api
+    host: 192.168.130.21
+    port: 5665
+    username: icingaweb
+    password: S0mh1TuFJI
+
+icinga2_api:
+  user:
+    icingaweb:
+      password: S0mh1TuFJI
+
+icingaweb_external_modules:
+  - graphite:
+    enabled: false
+    name: graphite
+    src: https://github.com/Icinga/icingaweb2-module-graphite.git
+    version: v1.1.0
+    # url: https://github.com/Icinga/icingaweb2-module-graphite/archive/v1.1.0.zip
+    configuration:
+      host: tsdb-1.icinga.local
+      port: 8088
+      # ui:
+      #   default_time_range: 12
+      #   default_time_range_unit: hours
+      # advanced:
+      #   # graphite_writer_host_name_template: host.tpl
+      #   # graphite_writer_service_name_template: ''
+      #   # customvar_obscured_check_command: ''
+```
