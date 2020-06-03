@@ -4,6 +4,8 @@
   file:
     name: '{{ item }}'
     state: directory
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
   loop:
     - /etc/icingaweb2
 
@@ -99,7 +101,7 @@
       no_log: true
 
     # https://stackoverflow.com/questions/48825583/in-ansible-how-do-you-change-a-existing-dictionary-hash-values-using-a-variable
-    - name: merge data
+    - name: merge icingaweb_users with password hashes
       set_fact:
         icingaweb_users: "{{ icingaweb_users | combine(new_item, recursive=true) }}"
       vars:
@@ -130,3 +132,11 @@
       # no_log: true
 
   when: icingaweb_users is defined and icingaweb_users | count != 0
+
+- name: change ownership of /etc/icingaweb2 directory
+  file:
+    name: /etc/icingaweb2
+    state: directory
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+    recurse: true

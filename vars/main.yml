@@ -31,8 +31,9 @@ icingaweb_authentication_defaults:
     backend: db
     resource: icingaweb
 
-icingaweb_auth_backend_defaults:
+# icingaweb_auth_backend_defaults:
 
+icingaweb_resources_defaults:
   icingaweb:
     type: db
     db: mysql
