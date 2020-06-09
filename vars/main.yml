@@ -6,15 +6,15 @@ _icingaweb_dependencies:
   default:
     - python-mysqldb
     - python3-mysqldb
-    - mysql-client
+    - mysql-client-core
   debian:
     - python-mysqldb
     - python3-mysqldb
-    - mysql-client
+    - mysql-client-core
   ubuntu:
     - python-mysqldb
     - python3-mysqldb
-    - mysql-client
+    - mysql-client-core
   centos-7:
     - php73-php-mysqlnd
     - mariadb
