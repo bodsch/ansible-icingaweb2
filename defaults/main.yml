@@ -1,6 +1,6 @@
 ---
 
-icingaweb_version: 2.7.3
+icingaweb_version: 2.8.2
 
 icingaweb_install_dir: /usr/share/icingaweb2
 
@@ -41,17 +41,16 @@ icingaweb_groups_backend: db
 icingaweb_groups_resource: icingaweb
 
 # the 'icingaweb' is used for database import and should NOT CHANGED!
-
 icingaweb_resources:
   db:
     icingaweb:
       type: db
       db: mysql
-      host: localhost
+      host: 127.0.0.1
       port: 3306
-      dbname: "{{ icingaweb_auth_dba_database }}"
-      username: "{{ icingaweb_auth_dba_username }}"
-      password: "{{ icingaweb_auth_dba_password }}"
+      # dbname: "{{ icingaweb_auth_dba_database }}"
+      # username: "{{ icingaweb_auth_dba_username }}"
+      # password: "{{ icingaweb_auth_dba_password }}"
       prefix: icingaweb_
       charset: utf8
   ldap: {}

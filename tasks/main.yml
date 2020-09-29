@@ -1,11 +1,5 @@
 ---
 
-# - debug:
-#     var: "{{ item }}"
-#   when: item is defined
-#   loop:
-#     - ansible_python_interpreter
-
 - include: preparations.yml
   become: true
   tags:

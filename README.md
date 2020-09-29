@@ -137,6 +137,8 @@ icingaweb_external_modules:
     configuration:
       host: localhost
       port: 2003
+      # host: tsdb-1.icinga.local
+      # port: 8088
       user: ''
       password: ''
       # ui:
@@ -218,21 +220,4 @@ icinga2_api:
     icingaweb:
       password: S0mh1TuFJI
 
-icingaweb_external_modules:
-  - graphite:
-    enabled: false
-    name: graphite
-    src: https://github.com/Icinga/icingaweb2-module-graphite.git
-    version: v1.1.0
-    # url: https://github.com/Icinga/icingaweb2-module-graphite/archive/v1.1.0.zip
-    configuration:
-      host: tsdb-1.icinga.local
-      port: 8088
-      # ui:
-      #   default_time_range: 12
-      #   default_time_range_unit: hours
-      # advanced:
-      #   # graphite_writer_host_name_template: host.tpl
-      #   # graphite_writer_service_name_template: ''
-      #   # customvar_obscured_check_command: ''
 ```

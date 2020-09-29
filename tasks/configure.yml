@@ -44,6 +44,9 @@
   template:
     src: "{{ item }}.j2"
     dest: "/etc/icingaweb2/{{ item }}"
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+    mode: 0660
   loop:
     - resources.ini
     - config.ini
@@ -78,6 +81,9 @@
     state: link
     src: '{{ icingaweb_install_dir }}/modules/{{ item }}'
     dest: '/etc/icingaweb2/enabledModules/{{ item }}'
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+    mode: 0660
     force: true
   loop:
     '{{ icingaweb_modules_enabled | list }}'
@@ -86,6 +92,9 @@
   template:
     src: modules/monitoring/{{ item }}.ini.j2
     dest: /etc/icingaweb2/modules/monitoring/{{ item }}.ini
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+    mode: 0660
   loop:
     - config
     - backends

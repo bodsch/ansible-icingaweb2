@@ -1,6 +1,9 @@
 
 [client]
+
+{% if icingaweb_auth_backend.username is defined %}
 user = {{ icingaweb_auth_backend.username }}
+{% endif %}
 password = {{ icingaweb_auth_backend.password }}
 host = {{ icingaweb_auth_backend.host }}
 {% if icingaweb_database_socket is defined %}

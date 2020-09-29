@@ -16,6 +16,9 @@
       file:
         src: '/usr/share/icingaweb2-{{ icingaweb_version }}'
         dest: '{{ icingaweb_install_dir }}'
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0750
         state: link
         force: true
 
@@ -24,6 +27,7 @@
       get_url:
         url: https://github.com/Icinga/icingaweb2/archive/v{{ icingaweb_version }}.tar.gz
         dest: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
+        mode: 0660
       register: _download_artefact
       until: _download_artefact is succeeded
       retries: 5
@@ -35,17 +39,24 @@
       copy:
         src: "{{ local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
         dest: /tmp
+        mode: 0700
 
     - name: download and extract icingaweb2 archive
       unarchive:
         src: /tmp/icingaweb2-v{{ icingaweb_version }}.tar.gz
         dest: /usr/share
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0750
         remote_src: true
 
     - name: ensure icingacli is in the path
       file:
         src: '{{ icingaweb_install_dir }}/bin/icingacli'
         dest: /usr/bin/icingacli
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0750
         state: link
         force: true
   when: not __stat_present_icingaweb2.stat.exists

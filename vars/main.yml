@@ -1,6 +1,6 @@
 ---
 
-local_tmp_directory: /var/tmp
+local_tmp_directory: /tmp/ansible/icingaweb
 
 _icingaweb_dependencies:
   default:
@@ -11,6 +11,10 @@ _icingaweb_dependencies:
     - python-mysqldb
     - python3-mysqldb
     - mysql-client-core
+  debian-9:
+    - default-mysql-client-core
+  debian-10:
+    - default-mysql-client-core
   ubuntu:
     - python-mysqldb
     - python3-mysqldb
@@ -22,7 +26,6 @@ _icingaweb_dependencies:
     - python2-PyMySQL
     - MySQL-python
 
-
 icingaweb_modules_enabled_defaults:
   - monitoring
 
@@ -31,29 +34,28 @@ icingaweb_authentication_defaults:
     backend: db
     resource: icingaweb
 
-# icingaweb_auth_backend_defaults:
-
 icingaweb_resources_defaults:
-  icingaweb:
-    type: db
-    db: mysql
-    host: 127.0.0.1
-    port: 3306
-    dbname: icingaweb_config
-    username: icingaweb_config
-    password: icingaweb_config
-    prefix: icingaweb_
-    charset: utf8
+  db:
+    icingaweb:
+      type: db
+      db: mysql
+      host: 127.0.0.1
+      port: 3306
+      dbname: icingaweb_config
+      username: icingaweb_config
+      password: icingaweb_config
+      prefix: icingaweb_
+      charset: utf8
 
-  icinga_ido:
-    type: db
-    db: mysql
-    host: 127.0.0.1
-    port: 3306
-    dbname: icinga2_ido
-    username: icinga2_ido
-    password: icinga2_ido
-    charset: utf8
+    icinga_ido:
+      type: db
+      db: mysql
+      host: 127.0.0.1
+      port: 3306
+      dbname: icinga2_ido
+      username: icinga2_ido
+      password: icinga2_ido
+      charset: utf8
 
 _icingaweb_user:
   default: www-data
@@ -63,15 +65,18 @@ _icingaweb_group:
   default: www-data
   redhat: nginx
 
-# icingaweb_packages: []
 icingaweb_python_packages: []
 
-icingaweb_packages: "{{ _icingaweb_dependencies[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
+icingaweb_packages: "{{
+          _icingaweb_dependencies[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
   default(_icingaweb_dependencies[ansible_distribution | lower] |
-  default(_icingaweb_dependencies['default'])) }}"
+  default(_icingaweb_user[ansible_os_family | lower] |
+  default(_icingaweb_dependencies['default']))) }}"
 
-icingaweb_user: "{{ _icingaweb_user[ansible_os_family | lower] |
+icingaweb_user: "{{
+          _icingaweb_user[ansible_os_family | lower] |
   default(_icingaweb_user['default']) }}"
 
-icingaweb_group: "{{ _icingaweb_group[ansible_os_family | lower] |
+icingaweb_group: "{{
+          _icingaweb_group[ansible_os_family | lower] |
   default(_icingaweb_group['default']) }}"

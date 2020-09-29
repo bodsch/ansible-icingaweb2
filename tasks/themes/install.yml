@@ -28,6 +28,7 @@
       get_url:
         url: "{{ item.image.url }}"
         dest: "{{ local_tmp_directory }}/icingaweb_themes/{{ item.name }}/public/img/{{ item.image.name }}"
+        mode: 0660
       register: _download_artefact
       until: _download_artefact is succeeded
       retries: 5
@@ -49,11 +50,13 @@
       copy:
         src: "{{ local_tmp_directory }}/icingaweb_themes.tgz"
         dest: "/tmp/"
+        mode: 0660
 
     - name: extract icingaweb_themes.tgz
       unarchive:
         src: "/tmp/icingaweb_themes.tgz"
         dest: /tmp/
+        mode: 0660
         remote_src: true
 
     - name: copy themes in place

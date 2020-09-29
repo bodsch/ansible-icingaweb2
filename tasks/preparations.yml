@@ -27,16 +27,27 @@
     icingaweb_authentication: "{{ icingaweb_authentication_defaults |
       combine( icingaweb_authentication, recursive=True ) }}"
 
+#- name: merge icingaweb_auth configuration between defaults and custom
+#  set_fact:
+#    icingaweb_authentication: "{{ icingaweb_auth_defaults |
+#      combine( icingaweb_auth, recursive=True ) }}"
+
 # - name: merge icingaweb_auth_backend configuration between defaults and custom
 #   set_fact:
 #     icingaweb_auth_backend: "{{ icingaweb_auth_backend_defaults |
 #       combine( icingaweb_auth_backend, recursive=True ) }}"
 
+# - debug:
+#     var: "{{ item }}"
+#   when: item is defined
+#   loop:
+#     - icingaweb_resources_defaults
+#     - icingaweb_resources
+
 - name: merge icingaweb_resources configuration between defaults and custom
   set_fact:
     icingaweb_resources: "{{ icingaweb_resources_defaults |
       combine( icingaweb_resources, recursive=True ) }}"
-
 
 - name: install requirements
   package:
@@ -48,7 +59,8 @@
 #   when: item is defined
 #   loop:
 #     # - icingaweb_dependencies
-#     - icingaweb_authentication
+#     # - icingaweb_authentication
+#     - icingaweb_resources_defaults
 #     - icingaweb_resources
-#     - icingaweb_commandtransport
-#     - icingaweb_auth_backend
+#     # - icingaweb_commandtransport
+#     # - icingaweb_auth_backend

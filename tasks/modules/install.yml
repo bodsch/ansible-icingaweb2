@@ -35,11 +35,13 @@
       copy:
         src: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
         dest: "/tmp/"
+        mode: 0660
 
     - name: extract icingaweb_modules.tgz
       unarchive:
         src: "/tmp/icingaweb_modules.tgz"
         dest: /tmp/
+        mode: 0660
         remote_src: true
 
     - name: copy themes in place
@@ -71,6 +73,7 @@
         dest: /etc/icingaweb2/modules/{{ item.name }}/config.ini
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
+        mode: 0660
       loop:
         "{{ icingaweb_external_modules }}"
       when: item.enabled and

@@ -14,6 +14,9 @@
       template:
         src: my.cnf.j2
         dest: /etc/icingaweb2/.my.cnf
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0660
 
     # - name: create my.cnf file with password credentials
     #   file:

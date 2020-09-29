@@ -4,7 +4,29 @@
   environment:
     NETRC: ''
   vars:
-    ansible_python_interpreter: python3
+    # ansible_python_interpreter: python3
+
+
+    mysql_python_package_debian: "{{ 'python3-mysqldb' if ansible_python.version.major == 3 else 'python-mysqldb' }}"
+
+    mysql_bind_address: 127.0.0.1
+    mysql_max_connections: 20
+
+    mysql_root_password_update: true
+
+    mysql_databases:
+      - name: icinga2_ido
+      - name: icingaweb_config
+
+    mysql_users:
+      - name: icinga2_ido
+        host: 127.0.0.1
+        password: icinga2
+        priv: "icinga2_ido.*:ALL"
+      - name: icingaweb_config
+        host: 127.0.0.1
+        password: icingaweb_config
+        priv: "icingaweb_config.*:ALL"
 
     # nginx
     #
@@ -111,19 +133,38 @@
 
     # icingaweb
     #
-    icingaweb_auth_backend:
-      icingaweb:
-        host: localhost
-      icinga_ido: {}
-      ldap:
-        type: ldap
-        hostname: localhost
-        port: 389
-        encryption: none
-        root_dn: dc=ldap,dc=cm,dc=local
-        bind_dn: cn=Manager,dc=ldap,dc=cm,dc=local
-        bind_pw: ldap_admin_password
-        timeout: 5
+
+    icingaweb_external_modules:
+
+      - audit:
+        enabled: true
+        name: audit
+        src: https://github.com/Icinga/icingaweb2-module-audit.git
+        version: v1.0.1
+        configuration:
+          log:
+            # file / syslog / none
+            type: file
+            # ident = "web-ident"
+            # facility = "authpriv"
+            path: /var/log/icingaweb2/audit.log
+          stream:
+            # none / json
+            format: json
+            path: /var/log/icingaweb2/json.log
+
+    icingaweb_themes:
+      - unicorn:
+        name: unicorn
+        src: https://github.com/Mikesch-mp/icingaweb2-theme-unicorn.git
+        version: v1.0.2
+        image: { name: "unicorn.png", "url": "http://i.imgur.com/SCfMd.png" }
+      - batman-dark:
+        name: batman-dark
+        src: https://github.com/jschanz/icingaweb2-theme-batman-dark.git
+        version: v1.0.0
+
+    icingaweb_themes_default: batman-dark
 
   roles:
     - role: mariadb
