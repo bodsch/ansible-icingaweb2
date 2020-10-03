@@ -54,6 +54,15 @@
     name: "{{ icingaweb_dependencies }}"
     state: present
 
+- name: create local temp directory
+  become: false
+  delegate_to: localhost
+  file:
+    path: "{{ icingaweb_local_tmp_directory }}"
+    state: directory
+    mode: 0660
+
+
 # - debug:
 #     var: "{{ item }}"
 #   when: item is defined

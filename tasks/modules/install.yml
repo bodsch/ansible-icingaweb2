@@ -7,19 +7,19 @@
       become: false
       delegate_to: localhost
       file:
-        path: "{{ local_tmp_directory }}/icingaweb_modules/"
+        path: "{{ icingaweb_local_tmp_directory }}/icingaweb_modules/"
         state: directory
         mode: 0660
 
 
-    - name: download external module to local directory {{ local_tmp_directory }}/icingaweb_modules
+    - name: download external module to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_modules
       become: false
       delegate_to: localhost
       git:
         depth: 1 # copy the least bit of history possible to get that repo.
         repo: "{{ item.src }}"
         version: "{{ item.version }}"
-        dest: "{{ local_tmp_directory }}/icingaweb_modules/{{ item.name }}"
+        dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_modules/{{ item.name }}"
         update: true
       loop:
         "{{ icingaweb_external_modules }}"
@@ -28,14 +28,14 @@
       become: false
       delegate_to: localhost
       archive:
-        path: "{{ local_tmp_directory }}/icingaweb_modules"
-        dest: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
+        path: "{{ icingaweb_local_tmp_directory }}/icingaweb_modules"
+        dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_modules.tgz"
         mode: 0700
 
     - name: propagate icingaweb_modules.tgz
       become: true
       copy:
-        src: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
+        src: "{{ icingaweb_local_tmp_directory }}/icingaweb_modules.tgz"
         dest: "/tmp/"
         mode: 0660
 

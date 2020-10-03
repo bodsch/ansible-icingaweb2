@@ -1,6 +1,6 @@
 ---
 
-local_tmp_directory: /tmp/ansible/icingaweb
+icingaweb_local_tmp_directory: /tmp/ansible/icingaweb
 
 _icingaweb_dependencies:
   default:

@@ -7,28 +7,28 @@
       become: false
       delegate_to: localhost
       file:
-        path: "{{ local_tmp_directory }}/icingaweb_themes/"
+        path: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes/"
         state: directory
         mode: 0660
 
-    - name: download external themes to local directory {{ local_tmp_directory }}/icingaweb_themes
+    - name: download external themes to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_themes
       become: false
       delegate_to: localhost
       git:
         depth: 1 # copy the least bit of history possible to get that repo.
         repo: "{{ item.src }}"
         version: "{{ item.version }}"
-        dest: "{{ local_tmp_directory }}/icingaweb_themes/{{ item.name }}"
+        dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes/{{ item.name }}"
         update: true
       loop:
         "{{ icingaweb_themes }}"
 
-    - name: download external images for themes to local directory {{ local_tmp_directory }}/icingaweb_themes
+    - name: download external images for themes to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_themes
       become: false
       delegate_to: localhost
       get_url:
         url: "{{ item.image.url }}"
-        dest: "{{ local_tmp_directory }}/icingaweb_themes/{{ item.name }}/public/img/{{ item.image.name }}"
+        dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes/{{ item.name }}/public/img/{{ item.image.name }}"
         mode: 0660
       register: _download_artefact
       until: _download_artefact is succeeded
@@ -43,14 +43,14 @@
       become: false
       delegate_to: localhost
       archive:
-        path: "{{ local_tmp_directory }}/icingaweb_themes"
-        dest: "{{ local_tmp_directory }}/icingaweb_themes.tgz"
+        path: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes"
+        dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes.tgz"
         mode: 0700
 
     - name: propagate icingaweb_themes.tgz
       become: true
       copy:
-        src: "{{ local_tmp_directory }}/icingaweb_themes.tgz"
+        src: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes.tgz"
         dest: "/tmp/"
         mode: 0660
 
