@@ -9,7 +9,7 @@
       file:
         path: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes/"
         state: directory
-        mode: 0660
+        mode: 0770
 
     - name: download external themes to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_themes
       become: false
@@ -45,7 +45,7 @@
       archive:
         path: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes"
         dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes.tgz"
-        mode: 0700
+        mode: 0660
 
     - name: propagate icingaweb_themes.tgz
       become: true
