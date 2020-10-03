@@ -9,6 +9,7 @@
       file:
         path: "{{ local_tmp_directory }}/icingaweb_modules/"
         state: directory
+        mode: 0660
 
 
     - name: download external module to local directory {{ local_tmp_directory }}/icingaweb_modules
@@ -29,6 +30,7 @@
       archive:
         path: "{{ local_tmp_directory }}/icingaweb_modules"
         dest: "{{ local_tmp_directory }}/icingaweb_modules.tgz"
+        mode: 0700
 
     - name: propagate icingaweb_modules.tgz
       become: true
@@ -50,6 +52,7 @@
         src: "/tmp/icingaweb_modules/{{ item.name }}/"
         dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
         remote_src: true
+        mode: 0750
       loop:
         "{{ icingaweb_external_modules }}"
 
@@ -60,6 +63,7 @@
         state: directory
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
+        mode: 0660
       loop:
         "{{ icingaweb_external_modules }}"
       when: item.enabled and
