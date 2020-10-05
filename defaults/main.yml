@@ -80,6 +80,8 @@ icingaweb_commandtransport:
 
 icingaweb_dependencies:
   - jq
+
+icingaweb_php_dependencies: []
   # attention ... use the right PHP version!
   # - php-ldap
 

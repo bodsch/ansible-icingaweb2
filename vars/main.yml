@@ -4,27 +4,49 @@ icingaweb_local_tmp_directory: /tmp/ansible/icingaweb
 
 _icingaweb_dependencies:
   default:
-    - python-mysqldb
     - python3-mysqldb
     - mysql-client-core
   debian:
-    - python-mysqldb
     - python3-mysqldb
     - mysql-client-core
   debian-9:
     - default-mysql-client-core
   debian-10:
     - default-mysql-client-core
-  ubuntu:
-    - python-mysqldb
+  ubuntu: []
+  ubuntu-18:
     - python3-mysqldb
-    - mysql-client-core
-  centos-7:
-    - php73-php-mysqlnd
-    - mariadb
-    - python36-PyMySQL
-    - python2-PyMySQL
-    - MySQL-python
+    - default-mysql-client
+  ubuntu-20:
+    - default-mysql-client-core
+  centos: []
+  # centos-7:
+  #   - python36-PyMySQL
+  #   - python2-PyMySQL
+  #   - MySQL-python
+
+_icingaweb_php_dependencies:
+  default:
+    - php-db
+    - php-gd
+    - php-intl
+    - php-json
+    - php-mysql
+    - php-pear
+  debian:
+    - php-db
+    - php-gd
+    - php-intl
+    - php-json
+    - php-mysql
+    - php-pear
+  redhat:
+    - php{{ php_package_version }}-php-gd
+    - php{{ php_package_version }}-php-intl
+    - php{{ php_package_version }}-php-json
+    - php{{ php_package_version }}-php-mysqlnd
+    - php{{ php_package_version }}-php-pear
+    - php{{ php_package_version }}-php-pdo
 
 icingaweb_modules_enabled_defaults:
   - monitoring
@@ -72,6 +94,11 @@ icingaweb_packages: "{{
   default(_icingaweb_dependencies[ansible_distribution | lower] |
   default(_icingaweb_user[ansible_os_family | lower] |
   default(_icingaweb_dependencies['default']))) }}"
+
+icingaweb_php_packages: "{{
+          _icingaweb_php_dependencies[ansible_os_family | lower] |
+  default(_icingaweb_php_dependencies['default']) }}"
+
 
 icingaweb_user: "{{
           _icingaweb_user[ansible_os_family | lower] |

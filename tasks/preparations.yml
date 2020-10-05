@@ -9,10 +9,11 @@
     mode: 0755
 
 - name: detect installed php version  # noqa 301 306
-  shell: "php -v 2> /dev/null | grep NTS | awk -F 'PHP ' '{printf $2}' | cut -d . -f 1-2"
+  shell: |
+    php -v 2> /dev/null | grep NTS | cut -d' ' -f 2 | cut -d . -f 1-2
   register: __installed_php_version
 
-- name: define php version.
+- name: define php_version
   set_fact:
     php_version: "{{ __installed_php_version.stdout }}"
   when:
@@ -20,7 +21,7 @@
     - __installed_php_version.rc is defined
     - __installed_php_version.rc == 0
 
-- name: assert PHP Version
+- name: assert php_version
   assert:
     that: php_version is version_compare('7.0', '>=')
     msg: "This role only works with PHP >= 7.0 .. found: {{ php_version }}"
@@ -43,7 +44,21 @@
     icingaweb_resources: "{{ icingaweb_resources_defaults |
       combine( icingaweb_resources, recursive=True ) }}"
 
+- name: set php_package_version
+  set_fact:
+    php_package_version: "{{ php_version | replace('.','') }}"
+
+# - debug:
+#     msg:
+#       - "icingaweb_dependencies      : {{ icingaweb_dependencies }}"
+#       - "icingaweb_php_dependencies  : {{ icingaweb_php_dependencies }}"
+#       - "icingaweb_php_packages      : {{ icingaweb_php_packages }}"
+
+- name: merge PHP dependencies between defaults and custom
+  set_fact:
+    icingaweb_php_dependencies: "{{ icingaweb_php_dependencies + icingaweb_php_packages }}"
+
 - name: install requirements
   package:
-    name: "{{ icingaweb_dependencies }}"
+    name: "{{ icingaweb_dependencies + icingaweb_php_dependencies }}"
     state: present

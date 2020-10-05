@@ -9,6 +9,10 @@
 
     mysql_python_package_debian: "{{ 'python3-mysqldb' if ansible_python.version.major == 3 else 'python-mysqldb' }}"
 
+    mysql_innodb_buffer_pool_size: 64M
+    mysql_innodb_log_file_size: 48M
+    mysql_innodb_lock_wait_timeout: 100
+
     mysql_bind_address: 127.0.0.1
     mysql_max_connections: 20
 
@@ -133,9 +137,7 @@
 
     # icingaweb
     #
-
     icingaweb_external_modules:
-
       - audit:
         enabled: true
         name: audit
@@ -164,7 +166,7 @@
         src: https://github.com/jschanz/icingaweb2-theme-batman-dark.git
         version: v1.0.0
 
-    icingaweb_themes_default: batman-dark
+    icingaweb_themes_default: unicorn
 
   roles:
     - role: mariadb
