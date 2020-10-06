@@ -6,7 +6,7 @@
     state: directory
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0660
+    mode: 0750
   loop:
     - /etc/icingaweb2
 
@@ -19,7 +19,7 @@
     state: directory
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0660
+    mode: 0750
   loop:
     - /etc/icingaweb2/modules
     - /etc/icingaweb2/enabledModules
@@ -30,7 +30,7 @@
     state: directory
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0644
+    mode: 0775
   loop:
     - /var/log/icingaweb2
 
@@ -40,7 +40,7 @@
     state: directory
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0660
+    mode: 0750
   loop:
     - /etc/icingaweb2/dashboards
 
@@ -50,7 +50,7 @@
     dest: "/etc/icingaweb2/{{ item }}"
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0660
+    mode: 0666
   loop:
     - resources.ini
     - config.ini
@@ -87,7 +87,7 @@
     dest: '/etc/icingaweb2/enabledModules/{{ item }}'
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0660
+    mode: 0750
     force: true
   loop:
     '{{ icingaweb_modules_enabled | list }}'
@@ -98,7 +98,7 @@
     dest: /etc/icingaweb2/modules/monitoring/{{ item }}.ini
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0660
+    mode: 0666
   loop:
     - config
     - backends
@@ -128,7 +128,7 @@
       template:
         src: create_user.sql.j2
         dest: /tmp/create_user.sql
-        mode: 0640
+        mode: 0666
       no_log: true
       loop:
         - "{{ icingaweb_users }}"
@@ -153,5 +153,5 @@
     state: directory
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0640
-    recurse: true
+    mode: 0750
+    # recurse: true
