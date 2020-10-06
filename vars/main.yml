@@ -27,14 +27,14 @@ _icingaweb_dependencies:
 
 _icingaweb_php_dependencies:
   default:
-    - php-db
+    # - php-db
     - php-gd
     - php-intl
     - php-json
     - php-mysql
     - php-pear
   debian:
-    - php-db
+    # - php-db
     - php-gd
     - php-intl
     - php-json

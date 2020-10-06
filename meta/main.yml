@@ -2,7 +2,6 @@
 
 dependencies: []
 
-
 galaxy_info:
   author: Bodo Schulz
   description: ansible role to install icingaweb2
@@ -11,12 +10,10 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - cosmic # 16.04
         - bionic # 18.04
         - focal  # 20.04
     - name: Debian
       versions:
-        - jessie # 8
         - etch   # 9
         - buster # 10
     - name: EL
@@ -28,3 +25,4 @@ galaxy_info:
     - monitoring
     - icinga
     - icingaweb
+    - web

@@ -172,4 +172,4 @@
     - role: mariadb
     - role: php-fpm
     - role: nginx
-    - role: bodsch.icingaweb2
+    - role: ansible-icingaweb2
