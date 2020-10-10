@@ -10,7 +10,8 @@ icingaweb_modules_disabled:
 icingaweb_modules_enabled: []
 #  - monitoring
 
-icingaweb_log_level: INFORMATION
+# Use one of DEBUG, INFO, WARNING, ERROR.
+icingaweb_log_level: INFO
 
 icingaweb_themes: []
 
