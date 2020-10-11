@@ -6,7 +6,6 @@
   vars:
     # ansible_python_interpreter: python3
 
-
     mysql_python_package_debian: "{{ 'python3-mysqldb' if ansible_python.version.major == 3 else 'python-mysqldb' }}"
 
     mysql_innodb_buffer_pool_size: 64M
@@ -69,6 +68,8 @@
     # php
     #
     php_enable_php_fpm: true
+
+    php_fpm_pool_user: nginx
 
     php_fpm_pools:
       - name: worker-01
@@ -170,6 +171,6 @@
 
   roles:
     - role: mariadb
-    - role: php-fpm
     - role: nginx
+    - role: php-fpm
     - role: bodsch.icingaweb2
