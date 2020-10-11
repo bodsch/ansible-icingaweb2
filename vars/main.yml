@@ -22,7 +22,10 @@ _icingaweb_dependencies:
   redhat:
     - mariadb
     - MySQL-python
-
+  redhat-8:
+    - mariadb
+    - python3-PyMySQL
+    # - python3-mysql
   # centos-7:
   #   - python36-PyMySQL
   #   - python2-PyMySQL
@@ -95,8 +98,9 @@ icingaweb_python_packages: []
 icingaweb_packages: "{{
           _icingaweb_dependencies[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
   default(_icingaweb_dependencies[ansible_distribution | lower] |
+  default(_icingaweb_dependencies[ansible_os_family | lower~ '-' ~ ansible_distribution_major_version] |
   default(_icingaweb_dependencies[ansible_os_family | lower] |
-  default(_icingaweb_dependencies['default']))) }}"
+  default(_icingaweb_dependencies['default'])))) }}"
 
 icingaweb_php_packages: "{{
           _icingaweb_php_dependencies[ansible_os_family | lower] |
