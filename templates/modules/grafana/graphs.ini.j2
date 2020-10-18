@@ -1,0 +1,20 @@
+; {{ ansible_managed }}
+
+{% if item.graphs is defined and item.graphs | count != 0 %}
+{% set graphs = item.graphs %}
+{% set _attr = ['dashboard','dashboarduid','panelId','orgId','repeatable'] %}
+{% for g in graphs %}
+[{{ g.graph }}]
+{% set _ = g.pop('graph') %}
+{% for k,v in g.items() | sort -%}
+{% if k in _attr %}
+{% if v is sameas true or v is sameas false %}
+{{ k }} = "{{ v | default('false') | bool | ternary( 'yes', 'no') }}"
+{% else %}
+{{ k }} = "{{ v }}"
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{% endfor %}
+{% endif %}

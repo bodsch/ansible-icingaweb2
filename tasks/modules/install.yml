@@ -2,7 +2,6 @@
 
 - name: icingaweb modules
   block:
-
     - name: create local temp directory
       become: false
       delegate_to: localhost
@@ -45,12 +44,14 @@
         mode: 0660
         remote_src: true
 
-    - name: copy themes in place
+    - name: copy modules in place
       become: true
       copy:
+        remote_src: true
         src: "/tmp/icingaweb_modules/{{ item.name }}/"
         dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
-        remote_src: true
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
         mode: 0750
       loop:
         "{{ icingaweb_external_modules }}"
@@ -60,9 +61,10 @@
       file:
         path: /etc/icingaweb2/modules/{{ item.name }}
         state: directory
+        recurse: true
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
-        mode: 0660
+        mode: 0755
       loop:
         "{{ icingaweb_external_modules }}"
       when: item.enabled and
@@ -82,6 +84,25 @@
       when: item.enabled and
         item.configuration is defined and
         item.configuration | count != 0
+
+    - name: create grafanas graphs.ini
+      become: true
+      template:
+        src: modules/{{ item.name }}/graphs.ini.j2
+        dest: /etc/icingaweb2/modules/{{ item.name }}/graphs.ini
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0660
+      loop:
+        "{{ icingaweb_external_modules }}"
+      when: item.enabled and
+        item.name == 'grafana' and
+        item.configuration is defined and
+        item.configuration | count != 0 and
+        item.graphs is defined and
+        item.graphs | count != 0
+
+    # grafana needs a graphs.ini
 
     - name: disable modules
       become: true

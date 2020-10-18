@@ -59,4 +59,39 @@ icingaweb_external_modules:
     name: grafana
     src: https://github.com/Mikesch-mp/icingaweb2-module-grafana.git
     version: v1.3.6
+    configuration:
+      # support_grafana_5: false
+      host: tsdb.icinga.local
+      # port: 3000
+      # protocol: http
+      # timerangeAll: 2d
+      defaultdashboard:
+        # name: icinga2-default
+        uid: Z-TfDRpGz
+        # panelid: 1
+      # defaultdashboard: icinga2-default
+      # defaultdashboarduid: "Zm47ngtMk"
+      # defaultdashboardpanelid: "1"
+      # defaultorgid: "1"
+      # shadows: "0"
+      # theme: "light"
+      # datasource: "influxdb"
+      # accessmode: "direct"
+      # directrefresh: "no"
+      # height: "280"
+      # width: "640"
+      enableLink: true
+      # debug: true
+
+    graphs:
+      - ping5:
+        dashboard: "hostalive"
+        panelId: "9"
+        orgId: "1"
+        repeatable: "no"
+        dashboard:
+          uid: "Z-TfDRpGz"    
+    
+    
+    
 ```

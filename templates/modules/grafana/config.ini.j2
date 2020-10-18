@@ -1,0 +1,49 @@
+; {{ ansible_managed }}
+
+{% if item.configuration is defined and item.configuration | count != 0 %}
+{% set grafana = item.configuration %}
+{% set _attr = ['host','port','user','password','ui','advanced'] %}
+
+[grafana]
+version = "{{ grafana.support_grafana_5 | default('true') | bool | ternary('1', '0') }}"
+host = "{{ grafana.host | default('127.0.0.1') }}:{{ grafana.port | default('3000') }}"
+protocol = "{{ grafana.protocol | default('http') }}"
+timerangeAll = "{{ grafana.timerange_all | default('2d') }}"
+defaultdashboard = "{{ grafana.defaultdashboard.name | default('icinga2-default') }}"
+{% if grafana.support_grafana_5 | default('true') | bool %}
+defaultdashboarduid = "{{ grafana.defaultdashboard.uid | default('') }}"
+{% endif %}
+defaultdashboardpanelid = "{{ grafana.defaultdashboard.panelid | default('1') }}"
+defaultorgid = "{{ grafana.defaultorgid | default('1') }}"
+shadows = "{{ grafana.shadows | default('false') | bool | ternary('1', '0') }}"
+theme = "{{ grafana.theme | default('light') }}"
+; TODO
+; support other datasources
+datasource = "{{ grafana.datasource | default('influxdb') }}"
+accessmode = "{{ grafana.accessmode | default('direct') }}"
+directrefresh = "{{ grafana.directrefresh | default('false') | bool | ternary('yes', 'no') }}"
+height = "{{ grafana.height | default('280') }}"
+width = "{{ grafana.width | default('640') }}"
+enableLink = "{{ grafana.enableLink | default('false') | bool | ternary('yes', 'no') }}"
+debug = "{{ grafana.debug | default('false') | bool | ternary('1', '0') }}"
+
+
+{% endif %}
+
+; version = "1"
+; host = "tsdb.icinga.local:3000"
+; protocol = "http"
+; timerangeAll = "2d"
+; defaultdashboard = "icinga2-default"
+; defaultdashboarduid = "Zm47ngtMk"
+; defaultdashboardpanelid = "1"
+; defaultorgid = "1"
+; shadows = "0"
+; theme = "light"
+; datasource = "influxdb"
+; accessmode = "direct"
+; directrefresh = "no"
+; height = "280"
+; width = "640"
+; enableLink = "no"
+; debug = "0"
