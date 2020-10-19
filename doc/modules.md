@@ -64,33 +64,42 @@ icingaweb_external_modules:
       host: tsdb.icinga.local
       # port: 3000
       # protocol: http
+      # timerange: 6h
       # timerangeAll: 2d
       defaultdashboard:
         # name: icinga2-default
         uid: Z-TfDRpGz
         # panelid: 1
-      # defaultdashboard: icinga2-default
-      # defaultdashboarduid: "Zm47ngtMk"
-      # defaultdashboardpanelid: "1"
+      # defaultdashboard:
+      #   name: icinga2-default
+      #   uid: "Zm47ngtMk"
+      #   panelid: "1"
       # defaultorgid: "1"
-      # shadows: "0"
+      # shadows: false
       # theme: "light"
       # datasource: "influxdb"
       # accessmode: "direct"
+      # authentication
+      # apitoken
+      # username
+      # password
+      # indirectproxyrefresh
+      # proxytimeout
       # directrefresh: "no"
       # height: "280"
       # width: "640"
       enableLink: true
+      # publichost
+      # publicprotocol
       # debug: true
 
     graphs:
       - ping5:
-        dashboard: "hostalive"
-        panelId: "9"
-        orgId: "1"
-        repeatable: "no"
-        dashboard:
-          uid: "Z-TfDRpGz"    
+        dashboard: hostalive
+        dashboarduid: Z-TfDRpGz    
+        panelId: 9
+        orgId: 1
+        repeatable: false
     
     
     

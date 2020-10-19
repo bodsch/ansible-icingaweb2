@@ -1,14 +1,36 @@
 ; {{ ansible_managed }}
-
 {% if item.configuration is defined and item.configuration | count != 0 %}
 {% set grafana = item.configuration %}
 {% set _attr = ['host','port','user','password','ui','advanced'] %}
+{% set _theme_attr = ['light','dark'] %}
+{% set _datasource_attr = ['influxdb','graphite','pnp'] %}
+{% set _timerange_attr = ['5m','15m','30m','45m',
+  '1h','3h','6h','8h','12h','24h',
+  '2d','7d','14d','30d',
+  '2M','6M','9M',
+  '1y','2y','3y',
+  '1d/d','2d/d',
+  '1w/w','1M/M','1Y/Y'] %}
+{% set _access_attr = ['direct','proxy','indirectproxy','iframe'] %}
+{% set _authentication_attr = ['anon','token','basic'] %}
 
 [grafana]
 version = "{{ grafana.support_grafana_5 | default('true') | bool | ternary('1', '0') }}"
 host = "{{ grafana.host | default('127.0.0.1') }}:{{ grafana.port | default('3000') }}"
 protocol = "{{ grafana.protocol | default('http') }}"
+
+{% if grafana.timerange is defined and grafana.timerange in _timerange_attr %}
+timerange = "{{ grafana.timerange | default('6h') }}"
+{% else %}
+timerange = "6h"
+{% endif %}
+
+{% if grafana.timerange_all  is defined and grafana.timerange_all in _timerange_attr %}
 timerangeAll = "{{ grafana.timerange_all | default('2d') }}"
+{% else %}
+timerangeAll = "2d"
+{% endif %}
+
 defaultdashboard = "{{ grafana.defaultdashboard.name | default('icinga2-default') }}"
 {% if grafana.support_grafana_5 | default('true') | bool %}
 defaultdashboarduid = "{{ grafana.defaultdashboard.uid | default('') }}"
@@ -16,34 +38,54 @@ defaultdashboarduid = "{{ grafana.defaultdashboard.uid | default('') }}"
 defaultdashboardpanelid = "{{ grafana.defaultdashboard.panelid | default('1') }}"
 defaultorgid = "{{ grafana.defaultorgid | default('1') }}"
 shadows = "{{ grafana.shadows | default('false') | bool | ternary('1', '0') }}"
+
+{% if grafana.theme is defined and grafana.theme in _theme_attr %}
 theme = "{{ grafana.theme | default('light') }}"
-; TODO
-; support other datasources
+{% else %}
+theme = "light"
+{% endif %}
+
+{% if grafana.datasource  is defined and grafana.datasource in _access_attr %}
 datasource = "{{ grafana.datasource | default('influxdb') }}"
-accessmode = "{{ grafana.accessmode | default('direct') }}"
+{% else %}
+datasource = "influxdb"
+{% endif %}
+
+{% if grafana.accessmode is defined and grafana.accessmode in _datasource_attr %}
+accessmode = "{{ grafana.accessmode }}"
+ {% if grafana.accessmode == "indirectproxy" or grafana.accessmode == "proxy" %}
+accessmode = "{{ grafana.accessmode  }}"
+
+  {% if grafana.authentication is defined and grafana.authentication in _authentication_attr %}
+authentication = "{{ grafana.authentication  }}"
+   {% if grafana.authentication == "token" %}
+apitoken = "{{ grafana.apitoken | default('') }}"
+   {% elif grafana.authentication == "basic" %}
+username = "{{ grafana.username | default('') }}"
+password = "{{ grafana.password | default('') }}"
+   {% endif %}
+  {% else %}
+authentication = "anon"
+  {% endif %}
+
+  {% if grafana.accessmode == "indirectproxy" %}
+indirectproxyrefresh = "{{ grafana.indirectproxyrefresh | default('false') | bool | ternary('yes', 'no') }}"
+  {% endif %}
+proxytimeout = "{{ grafana.accessmode | default('5') }}"
+ {% endif %}
+{% else %}
+accessmode = "direct"
+{% endif %}
+
 directrefresh = "{{ grafana.directrefresh | default('false') | bool | ternary('yes', 'no') }}"
 height = "{{ grafana.height | default('280') }}"
 width = "{{ grafana.width | default('640') }}"
 enableLink = "{{ grafana.enableLink | default('false') | bool | ternary('yes', 'no') }}"
+{% if grafana.usepublic is defined and grafana.usepublic | default('false') | bool %}
+usepublic = "yes"
+publichost = "{{ grafana.publichost }}"
+publicprotocol = "{{ grafana.publicprotocol | default('http') }}"
+{% endif %}
 debug = "{{ grafana.debug | default('false') | bool | ternary('1', '0') }}"
 
-
 {% endif %}
-
-; version = "1"
-; host = "tsdb.icinga.local:3000"
-; protocol = "http"
-; timerangeAll = "2d"
-; defaultdashboard = "icinga2-default"
-; defaultdashboarduid = "Zm47ngtMk"
-; defaultdashboardpanelid = "1"
-; defaultorgid = "1"
-; shadows = "0"
-; theme = "light"
-; datasource = "influxdb"
-; accessmode = "direct"
-; directrefresh = "no"
-; height = "280"
-; width = "640"
-; enableLink = "no"
-; debug = "0"
