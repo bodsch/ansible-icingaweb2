@@ -69,8 +69,6 @@
     #
     php_enable_php_fpm: true
 
-    php_fpm_pool_user: nginx
-
     php_fpm_pools:
       - name: worker-01
         user: "{{ php_fpm_pool_user }}"
@@ -138,7 +136,6 @@
 
 
   tasks:
-
     - block:
         - name: Install required packages on Debian
           apt:
