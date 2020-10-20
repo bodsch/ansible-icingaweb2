@@ -102,8 +102,6 @@
         item.graphs is defined and
         item.graphs | count != 0
 
-    # grafana needs a graphs.ini
-
     - name: disable modules
       become: true
       command: |
