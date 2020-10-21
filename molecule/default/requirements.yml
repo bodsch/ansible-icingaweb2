@@ -1,9 +1,7 @@
 ---
 
 - name: php-fpm
-  src: https://gitlab.com/bodsch/ansible-php.git
-  scm: git
-  version: master
+  src: bodsch.ansible_php
 
 - name: mariadb
   src: https://github.com/geerlingguy/ansible-role-mysql.git
