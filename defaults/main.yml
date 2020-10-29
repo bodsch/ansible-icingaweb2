@@ -62,6 +62,14 @@ icingaweb_auth_backend: "{{ icingaweb_resources.db.icingaweb }}"
 icingaweb_users:
   admin:
     password: admin
+    # TODO
+    preferences:
+      language: de_DE
+      timezone: Europe/Berlin
+      show_application_state_messages: false
+      show_stacktraces: false
+      show_benchmark: false
+      auto_refresh: true
 
 icingaweb_roles:
   - name: 'local admins'

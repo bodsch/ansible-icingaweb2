@@ -1,7 +1,9 @@
 ---
 
 - name: php-fpm
-  src: bodsch.ansible_php
+  src: https://github.com/bodsch/ansible-php.git
+  scm: git
+  version: fix/support-redhat-based
 
 - name: mariadb
   src: https://github.com/geerlingguy/ansible-role-mysql.git
@@ -10,3 +12,7 @@
 - name: nginx
   src: https://github.com/geerlingguy/ansible-role-nginx.git
   version: 2.7.0
+
+- name: icinga2
+  src: https://gitlab.com/bodsch/ansible-icinga2.git
+  scm: git

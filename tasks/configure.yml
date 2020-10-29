@@ -2,13 +2,11 @@
 
 - name: create /etc/icingaweb2 directory
   file:
-    name: '{{ item }}'
+    name: /etc/icingaweb2
     state: directory
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: 0750
-  loop:
-    - /etc/icingaweb2
+    mode: '0750'
 
 - name: install database
   include_tasks: database/mysql.yml

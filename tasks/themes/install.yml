@@ -66,6 +66,8 @@
       copy:
         src: "/tmp/icingaweb_themes/{{ item.name }}/"
         dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
         remote_src: true
         mode: 0750
       loop:

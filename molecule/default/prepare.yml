@@ -31,6 +31,66 @@
         password: icingaweb_config
         priv: "icingaweb_config.*:ALL"
 
+    # icinga2
+    icinga2_salt: 42T2fYT6kK0njvNMww8eWinBdEO5vh02xwC5qaNMMx77qNkYFE7bIxj5v291ajAW
+
+    icinga2_ha: false
+
+    icinga2_api:
+      user:
+        icinga2:
+          password: S0mh1TuFJI
+          permissions: '*'
+
+        icingaweb:
+          password: S0mh1TuFJI
+          permissions:
+            - "status/query"
+            - "actions/*"
+            - "objects/modify/*"
+            - "objects/query/*"
+
+    icinga2_masters:
+      instance: {}
+        # type: primary
+        # ip: 127.0.0.1
+
+    icinga2_ido:
+      user: icinga2_ido
+      password: icinga2
+      host: '127.0.0.1'
+      cleanup:
+        acknowledgements_age: 72h
+
+    icinga2_master_features_enabled:
+      - checker
+      - api
+      - ido-mysql
+      - mainlog
+      - notification
+
+
+    icinga2_host_object:
+
+      localhost:
+        # endpoint_name: master-1.icinga.local
+        # zone: master
+        display_name: localhost
+        import: generic-host
+        address: '{{ ansible_default_ipv4.address }}'
+        vars: |
+          os = "Linux"
+          dist = "{{ ansible_distribution }}"
+          dist_ver = "{{ ansible_distribution_version }}"
+          disks = {
+            "disk /" = {
+              disk_partitions = "/"
+            }
+          }
+          services = [ "icinga2", "uptime", "memory" ]
+          memory = true
+
+
     # nginx
     #
     nginx_server_tokens: "off"
@@ -90,6 +150,7 @@
         env:
           PATH: "/usr/local/bin:/usr/bin:/bin"
           TMPDIR: "/tmp"
+          LC_ALL: de_DE.UTF-8
         php_admin_value:
           date.timezone: "Europe/Berlin"
           max_execution_time: 300
@@ -173,5 +234,6 @@
 
   roles:
     - role: mariadb
+    - role: icinga2
     - role: nginx
     - role: php-fpm
