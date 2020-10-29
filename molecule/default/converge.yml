@@ -65,6 +65,22 @@
             show_legend: true
             path_prefix: '/icinga'
 
+    icingaweb_users:
+      admin:
+        password: admin
+        # TODO
+        preferences:
+          language: de_DE
+          timezone: Europe/Berlin
+          show_application_state_messages: false
+          show_stacktraces: false
+          show_benchmark: false
+          auto_refresh: true
+      bodsch:
+        password: xxx
+      dark:
+        password: s3cur3
+
       # https://github.com/zhmurko/icingaweb2-module-sla-reports.git
 
     # icingaweb_themes:
@@ -82,4 +98,4 @@
 
   roles:
     - role: bodsch.icingaweb2
-    #- role: ansible-icingaweb2
+    # - role: ansible-icingaweb2

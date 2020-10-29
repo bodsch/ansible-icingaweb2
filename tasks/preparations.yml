@@ -8,18 +8,32 @@
     state: directory
     mode: 0755
 
-- name: detect installed php version  # noqa 301 306
-  shell: |
-    php -v 2> /dev/null | grep NTS | cut -d' ' -f 2 | cut -d . -f 1-2
-  register: __installed_php_version
+- name: get the rpm or apt package facts
+  package_facts:
+    manager: "auto"
 
-- name: define php_version
+- name: define php version
   set_fact:
-    php_version: "{{ __installed_php_version.stdout }}"
-  when:
-    - __installed_php_version is defined
-    - __installed_php_version.rc is defined
-    - __installed_php_version.rc == 0
+    php_version: "{{ ansible_facts.packages[ 'php%s-php-fpm' % php_package_version ][0].version[0:3] }}"
+  when: ansible_os_family | lower == 'redhat'
+
+- name: define php version
+  set_fact:
+    php_version: "{{ ansible_facts.packages['php-fpm'][0].version.split(':')[1].split('+')[0] }}"
+  when: ansible_os_family | lower == 'debian' and ansible_facts.packages['php-fpm'] is defined
+
+# - name: detect installed php version  # noqa 301 306
+#   shell: |
+#     php -v 2> /dev/null | grep NTS | cut -d' ' -f 2 | cut -d . -f 1-2
+#   register: __installed_php_version
+#
+# - name: define php_version
+#   set_fact:
+#     php_version: "{{ __installed_php_version.stdout }}"
+#   when:
+#     - __installed_php_version is defined
+#     - __installed_php_version.rc is defined
+#     - __installed_php_version.rc == 0
 
 - name: assert php_version
   assert:

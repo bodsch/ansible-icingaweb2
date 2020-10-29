@@ -104,23 +104,9 @@
 
 # userhandling in database
 - block:
-    - name: create password hashes
-      shell: >
-        openssl passwd -1 {{ item.value.password }}
-      register: hashes
-      with_dict: "{{ icingaweb_users }}"
-      no_log: true
-
-    # https://stackoverflow.com/questions/48825583/in-ansible-how-do-you-change-a-existing-dictionary-hash-values-using-a-variable
     - name: merge icingaweb_users with password hashes
       set_fact:
-        icingaweb_users: "{{ icingaweb_users | combine(new_item, recursive=true) }}"
-      vars:
-        new_item: "{ '{{ item.0 }}': { 'hashed': '{{ item.1.stdout }}' } }"
-      no_log: true
-      with_together:
-        - "{{ icingaweb_users }}"
-        - "{{ hashes.results }}"
+        icingaweb_users: "{{ icingaweb_users | create_password_hash }}"
 
     - name: create temporary icingaweb_users statement
       template:
@@ -132,16 +118,15 @@
         - "{{ icingaweb_users }}"
 
     - name: import icingaweb users into database
-      shell: >
-        mysql \
-          --defaults-file=/etc/icingaweb2/.my.cnf \
-          --batch \
-          --verbose \
-          < /tmp/create_user.sql
+      mysql_db:
+        login_host: '{{ icingaweb_auth_backend.host }}'
+        config_file: /etc/icingaweb2/.my.cnf
+        restrict_config_file: true
+        state: import
+        name: "{{ icingaweb_auth_backend.dbname }}"
+        target: /tmp/create_user.sql
       register: icingaweb2_import_users
-      changed_when: false
-      check_mode: false
-      # no_log: true
+      no_log: true
 
   when: icingaweb_users is defined and icingaweb_users | count != 0
 
