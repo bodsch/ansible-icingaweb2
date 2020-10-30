@@ -97,5 +97,5 @@
     # icingaweb_themes_default: Icinga
 
   roles:
-    #- role: bodsch.icingaweb2
-    - role: ansible-icingaweb2
+    - role: bodsch.icingaweb2
+    # - role: ansible-icingaweb2
