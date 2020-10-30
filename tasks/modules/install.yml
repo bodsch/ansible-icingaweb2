@@ -123,12 +123,6 @@
         "{{ icingaweb_external_modules }}"
       when: not item.enabled | bool | default('false')
 
-#      command: |
-#        icingacli module disable {{ item.name }}
-#      loop:
-#        "{{ icingaweb_external_modules }}"
-#      when: not item.enabled | bool | default('false')
-
     - name: enable modules
       become: true
       icingaweb_module:
@@ -137,13 +131,6 @@
       loop:
         "{{ icingaweb_external_modules }}"
       when: item.enabled | bool | default('false')
-
-
-#       command: |
-#         icingacli module enable {{ item.name }}
-#       loop:
-#         "{{ icingaweb_external_modules }}"
-#       when: item.enabled
 
   when:
     - icingaweb_external_modules is defined

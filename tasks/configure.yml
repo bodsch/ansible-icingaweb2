@@ -6,7 +6,7 @@
     state: directory
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
-    mode: '0750'
+    mode: 0750
 
 - name: install database
   include_tasks: database/mysql.yml

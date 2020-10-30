@@ -3,7 +3,7 @@
 - name: php-fpm
   src: https://github.com/bodsch/ansible-php.git
   scm: git
-  version: fix/support-redhat-based
+  version: master
 
 - name: mariadb
   src: https://github.com/geerlingguy/ansible-role-mysql.git
