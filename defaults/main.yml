@@ -61,6 +61,7 @@ icingaweb_auth_backend: "{{ icingaweb_resources.db.icingaweb }}"
 
 icingaweb_users:
   admin:
+    username: admin
     password: admin
     # TODO
     preferences:
