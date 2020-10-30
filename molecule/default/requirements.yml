@@ -16,3 +16,7 @@
 - name: icinga2
   src: https://gitlab.com/bodsch/ansible-icinga2.git
   scm: git
+
+- name: monitoring-tools
+  src: https://github.com/bodsch/ansible-monitoring-plugins.git
+  version: 1.2.0

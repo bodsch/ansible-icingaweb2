@@ -66,9 +66,10 @@
             path_prefix: '/icinga'
 
     icingaweb_users:
-      admin:
+      - admin:
+        username: admin
         password: admin
-        # TODO
+        # force: true
         preferences:
           language: de_DE
           timezone: Europe/Berlin
@@ -76,9 +77,11 @@
           show_stacktraces: false
           show_benchmark: false
           auto_refresh: true
-      bodsch:
+      - bodsch:
+        username: bodsch
         password: xxx
-      dark:
+      - dark:
+        username: dark
         password: s3cur3
 
       # https://github.com/zhmurko/icingaweb2-module-sla-reports.git
@@ -98,4 +101,4 @@
 
   roles:
     - role: bodsch.icingaweb2
-    # - role: ansible-icingaweb2
+    #- role: ansible-icingaweb2
