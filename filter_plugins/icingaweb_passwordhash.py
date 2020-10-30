@@ -2,8 +2,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-# from ansible.errors import AnsibleError, AnsibleParserError
-# from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 import json
@@ -26,7 +24,9 @@ class FilterModule(object):
         }
 
     def password_hash(self, data):
-        result = ''
+        """
+
+        """
         password_hash = ''
 
         count = len(data.keys())
@@ -42,7 +42,8 @@ class FilterModule(object):
                     password_hash = self.__password_hash(password)
 
                 data[key]['hashed'] = password_hash
-        #display.vvv(json.dumps(data, indent=2, sort_keys=False))
+
+        display.vvv(json.dumps(data, indent=2, sort_keys=False))
 
         return data
 
