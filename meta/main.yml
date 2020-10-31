@@ -14,7 +14,6 @@ galaxy_info:
         - focal  # 20.04
     - name: Debian
       versions:
-        - etch   # 9
         - buster # 10
     - name: EL
       versions:
