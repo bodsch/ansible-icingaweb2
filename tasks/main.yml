@@ -1,19 +1,5 @@
 ---
 
-# - name: disable modules
-#   become: true
-#   icingaweb_database_user:
-#     state: "{{ item.state | default('present') }}"
-#     username: "{{ item.username }}"
-#     password: "{{ item.password }}"
-#     preferences: "{{ item.preferences | default(omit) }}"
-#     force: "{{ item.force | default(omit) }}"
-#     database_login_host: "{{ icingaweb_auth_backend.host }}"
-#     database_name: "{{ icingaweb_auth_backend.dbname }}"
-#   loop:
-#     "{{ icingaweb_users }}"
-
-
 - include: preparations.yml
   become: true
   tags:

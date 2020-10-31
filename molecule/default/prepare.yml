@@ -196,33 +196,34 @@
           extension=memcached.so
 
 
-  tasks:
-    - block:
-        - name: Install required packages on Debian
-          apt:
-            # name:
-            #   # required to add key to apt keyring
-            #   - gnupg
-            #   # required to verify icinga2 is running
-            #   - procps
-            update_cache: true
-
-        - name: Install Backports repository on Debian Stretch
-          apt_repository:
-            repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
-            state: present
-            update_cache: true
-          when:
-            - ansible_distribution_release == 'stretch'
-
-        - name: Install apt-transport-https on older Debian/Ubuntu versions
-          apt:
-            name:
-              - apt-transport-https
-          when:
-            - ansible_distribution_release in ['jessie', 'stretch', 'xenial']
-
-      when: ansible_os_family | lower == 'debian'
+  # pre_tasks:
+  #   - block:
+  #       - name: Install required packages on Debian
+  #         apt:
+  #           # name:
+  #           #   # required to add key to apt keyring
+  #           #   - gnupg
+  #           #   # required to verify icinga2 is running
+  #           #   - procps
+  #           update_cache: true
+  #
+  #       # https://github.com/Icinga/icinga-packaging/issues/153
+  #       - name: Install Backports repository on Debian Stretch
+  #         apt_repository:
+  #           repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
+  #           state: present
+  #           update_cache: true
+  #         when:
+  #           - ansible_distribution_release == 'stretch'
+  #
+  #       - name: Install apt-transport-https on older Debian/Ubuntu versions
+  #         apt:
+  #           name:
+  #             - apt-transport-https
+  #         when:
+  #           - ansible_distribution_release in ['jessie', 'stretch', 'xenial']
+  #
+  #     when: ansible_os_family | lower == 'debian'
 
     - debug:
         msg:

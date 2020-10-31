@@ -99,6 +99,15 @@
 
     # icingaweb_themes_default: Icinga
 
+  pre_tasks:
+    - name:  add python-apt package to requirements of package_facts
+      apt:
+        name:
+          - python-apt
+      when:
+        - ansible_distribution_release == 'stretch'
+
+
   roles:
     - role: bodsch.icingaweb2
     #- role: ansible-icingaweb2
