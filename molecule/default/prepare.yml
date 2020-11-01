@@ -196,7 +196,7 @@
           extension=memcached.so
 
 
-  # pre_tasks:
+  pre_tasks:
   #   - block:
   #       - name: Install required packages on Debian
   #         apt:
