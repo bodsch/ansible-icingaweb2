@@ -10,13 +10,13 @@ env:
     - MOLECULE_DISTRO: ubuntu2004
     - MOLECULE_DISTRO: ubuntu1804
     - MOLECULE_DISTRO: debian10
-    - MOLECULE_DISTRO: debian9
+    # - MOLECULE_DISTRO: debian9
 
 install:
   - pip install -r test-requirements.txt
 
 script:
-  - molecule test
+  - molecule test --scenario-name default
 
 # rename project directory to match Galaxy role name
 before_script:

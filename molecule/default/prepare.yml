@@ -31,6 +31,66 @@
         password: icingaweb_config
         priv: "icingaweb_config.*:ALL"
 
+    # icinga2
+    icinga2_salt: 42T2fYT6kK0njvNMww8eWinBdEO5vh02xwC5qaNMMx77qNkYFE7bIxj5v291ajAW
+
+    icinga2_ha: false
+
+    icinga2_api:
+      user:
+        icinga2:
+          password: S0mh1TuFJI
+          permissions: '*'
+
+        icingaweb:
+          password: S0mh1TuFJI
+          permissions:
+            - "status/query"
+            - "actions/*"
+            - "objects/modify/*"
+            - "objects/query/*"
+
+    icinga2_masters:
+      instance: {}
+        # type: primary
+        # ip: 127.0.0.1
+
+    icinga2_ido:
+      user: icinga2_ido
+      password: icinga2
+      host: '127.0.0.1'
+      cleanup:
+        acknowledgements_age: 72h
+
+    icinga2_master_features_enabled:
+      - checker
+      - api
+      - ido-mysql
+      - mainlog
+      - notification
+
+
+    icinga2_host_object:
+
+      localhost:
+        # endpoint_name: master-1.icinga.local
+        # zone: master
+        display_name: localhost
+        import: generic-host
+        address: '{{ ansible_default_ipv4.address }}'
+        vars: |
+          os = "Linux"
+          dist = "{{ ansible_distribution }}"
+          dist_ver = "{{ ansible_distribution_version }}"
+          disks = {
+            "disk /" = {
+              disk_partitions = "/"
+            }
+          }
+          services = [ "icinga2", "uptime", "memory" ]
+          memory = true
+
+
     # nginx
     #
     nginx_server_tokens: "off"
@@ -90,6 +150,7 @@
         env:
           PATH: "/usr/local/bin:/usr/bin:/bin"
           TMPDIR: "/tmp"
+          LC_ALL: de_DE.UTF-8
         php_admin_value:
           date.timezone: "Europe/Berlin"
           max_execution_time: 300
@@ -135,33 +196,34 @@
           extension=memcached.so
 
 
-  tasks:
-    - block:
-        - name: Install required packages on Debian
-          apt:
-            # name:
-            #   # required to add key to apt keyring
-            #   - gnupg
-            #   # required to verify icinga2 is running
-            #   - procps
-            update_cache: true
-
-        - name: Install Backports repository on Debian Stretch
-          apt_repository:
-            repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
-            state: present
-            update_cache: true
-          when:
-            - ansible_distribution_release == 'stretch'
-
-        - name: Install apt-transport-https on older Debian/Ubuntu versions
-          apt:
-            name:
-              - apt-transport-https
-          when:
-            - ansible_distribution_release in ['jessie', 'stretch', 'xenial']
-
-      when: ansible_os_family | lower == 'debian'
+  pre_tasks:
+  #   - block:
+  #       - name: Install required packages on Debian
+  #         apt:
+  #           # name:
+  #           #   # required to add key to apt keyring
+  #           #   - gnupg
+  #           #   # required to verify icinga2 is running
+  #           #   - procps
+  #           update_cache: true
+  #
+  #       # https://github.com/Icinga/icinga-packaging/issues/153
+  #       - name: Install Backports repository on Debian Stretch
+  #         apt_repository:
+  #           repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
+  #           state: present
+  #           update_cache: true
+  #         when:
+  #           - ansible_distribution_release == 'stretch'
+  #
+  #       - name: Install apt-transport-https on older Debian/Ubuntu versions
+  #         apt:
+  #           name:
+  #             - apt-transport-https
+  #         when:
+  #           - ansible_distribution_release in ['jessie', 'stretch', 'xenial']
+  #
+  #     when: ansible_os_family | lower == 'debian'
 
     - debug:
         msg:
@@ -173,5 +235,7 @@
 
   roles:
     - role: mariadb
+    - role: monitoring-tools
+    - role: icinga2
     - role: nginx
     - role: php-fpm

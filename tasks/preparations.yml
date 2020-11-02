@@ -8,18 +8,46 @@
     state: directory
     mode: 0755
 
-- name: detect installed php version  # noqa 301 306
-  shell: |
-    php -v 2> /dev/null | grep NTS | cut -d' ' -f 2 | cut -d . -f 1-2
-  register: __installed_php_version
+- name: get the rpm or apt package facts
+  package_facts:
+    manager: "auto"
 
-- name: define php_version
+- name: get php-fpm package name
   set_fact:
-    php_version: "{{ __installed_php_version.stdout }}"
-  when:
-    - __installed_php_version is defined
-    - __installed_php_version.rc is defined
-    - __installed_php_version.rc == 0
+    php_package_name: "{{ ansible_facts.packages | list | select('match', '^php.*fpm') | first }}"
+
+- name: assert php_package_name
+  assert:
+    that: php_package_name | length != 0
+    msg: "I can't found an installed php-fpm package :("
+
+- name: define php version
+  set_fact:
+    php_version: "{{ ansible_facts.packages[php_package_name][0].version[0:3] }}"
+  when: ansible_os_family | lower == 'redhat'
+
+- name: define php version
+  set_fact:
+    php_version: "{{ ansible_facts.packages[php_package_name][0].version.split(':')[1].split('+')[0] }}"
+  when: ansible_os_family | lower == 'debian'
+
+- name: set php_package_version
+  set_fact:
+    php_package_version: "{{ php_version | replace('.','') }}"
+
+# - debug:
+#     var="{{ item }}"
+#   when: item is defined
+#   loop:
+#     - php_version
+#     - php_package_version
+#     - ansible_facts.packages[php_package_name][0]
+
+# - debug:
+#     msg:
+#       - "php_package : {{ php_package_name }}"
+#       - "php_version : {{ php_version }}"
+#       - "php_package_version: {{ php_package_version }}"
 
 - name: assert php_version
   assert:
@@ -43,16 +71,6 @@
   set_fact:
     icingaweb_resources: "{{ icingaweb_resources_defaults |
       combine( icingaweb_resources, recursive=True ) }}"
-
-- name: set php_package_version
-  set_fact:
-    php_package_version: "{{ php_version | replace('.','') }}"
-
-# - debug:
-#     msg:
-#       - "icingaweb_dependencies      : {{ icingaweb_dependencies }}"
-#       - "icingaweb_php_dependencies  : {{ icingaweb_php_dependencies }}"
-#       - "icingaweb_php_packages      : {{ icingaweb_php_packages }}"
 
 - name: merge PHP dependencies between defaults and custom
   set_fact:

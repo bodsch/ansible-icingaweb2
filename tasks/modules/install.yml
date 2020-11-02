@@ -16,7 +16,7 @@
       git:
         depth: 1 # copy the least bit of history possible to get that repo.
         repo: "{{ item.src }}"
-        version: "{{ item.version }}"
+        version: "{{ item.version | default(omit) }}"
         dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_modules/{{ item.name }}"
         update: true
       loop:
@@ -44,7 +44,7 @@
         mode: 0660
         remote_src: true
 
-    - name: copy modules in place
+    - name: copy modules in place '{{ icingaweb_install_dir }}/modules/'
       become: true
       copy:
         remote_src: true
@@ -52,9 +52,21 @@
         dest: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
-        mode: 0750
+        mode: 0755
       loop:
         "{{ icingaweb_external_modules }}"
+
+    - name: fix rights for modules
+      become: true
+      file:
+        path: "{{ icingaweb_install_dir }}/modules/{{ item.name }}"
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        recurse: true
+      loop:
+        "{{ icingaweb_external_modules }}"
+
 
     - name: create directory for module configuration
       become: true
@@ -78,7 +90,7 @@
         dest: /etc/icingaweb2/modules/{{ item.name }}/config.ini
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
-        mode: 0660
+        mode: 0666
       loop:
         "{{ icingaweb_external_modules }}"
       when: item.enabled and
@@ -92,7 +104,7 @@
         dest: /etc/icingaweb2/modules/{{ item.name }}/graphs.ini
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
-        mode: 0660
+        mode: 0666
       loop:
         "{{ icingaweb_external_modules }}"
       when: item.enabled and
@@ -104,19 +116,21 @@
 
     - name: disable modules
       become: true
-      command: |
-        icingacli module disable {{ item.name }}
+      icingaweb_module:
+        state: absent
+        module: "{{ item.name }}"
       loop:
         "{{ icingaweb_external_modules }}"
       when: not item.enabled | bool | default('false')
 
     - name: enable modules
       become: true
-      command: |
-        icingacli module enable {{ item.name }}
+      icingaweb_module:
+        state: present
+        module: "{{ item.name }}"
       loop:
         "{{ icingaweb_external_modules }}"
-      when: item.enabled
+      when: item.enabled | bool | default('false')
 
   when:
     - icingaweb_external_modules is defined
