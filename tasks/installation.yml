@@ -61,3 +61,11 @@
         force: true
 
   when: not __stat_present_icingaweb2.stat.exists
+
+- name: install python packages for support databases
+  pip:
+    name: "{{ item }}"
+    executable: pip3
+    state: present
+  loop:
+    - "{{ icingaweb_python_packages }}"

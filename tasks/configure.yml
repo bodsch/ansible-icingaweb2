@@ -113,7 +113,8 @@
     force: "{{ item.force | default(omit) }}"
     database_login_host: "{{ icingaweb_auth_backend.host }}"
     database_name: "{{ icingaweb_auth_backend.dbname }}"
-  no_log: true
+    database_config_file: /etc/icingaweb2/.my.cnf
+  # no_log: true
   loop:
     "{{ icingaweb_users }}"
   when: icingaweb_users is defined and icingaweb_users | count != 0
