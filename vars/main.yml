@@ -60,7 +60,6 @@ _icingaweb_python_packages:
     - mysqlclient
   redhat:
     - PyMySQL
-    - mysqlclient
 
 icingaweb_modules_enabled_defaults:
   - monitoring
