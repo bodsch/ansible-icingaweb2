@@ -16,9 +16,10 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
 from ansible.module_utils._text import to_native
 
-from ansible_collections.community.mysql.plugins.module_utils.mysql import (
-    mysql_driver,
+from ansible.module_utils.mysql import (
+    mysql_driver
 )
+
 
 __metaclass__ = type
 
@@ -31,7 +32,7 @@ ANSIBLE_METADATA = {
 
 class IcingaWeb2DatabaseUser(object):
     """
-    Main Class to implement the Icinga2 API Client
+      Main Class to implement the Icinga2 API Client
     """
     module = None
 
@@ -113,7 +114,7 @@ class IcingaWeb2DatabaseUser(object):
         res['failed'] = not state
 
         # module.log(msg="write json")
-        with open("/tmp/.icingaweb2_user_{}.json".format(self.username), 'w') as fp:
+        with open(file_name, 'w') as fp:
             json.dump(data, fp)
 
         return res
@@ -121,7 +122,7 @@ class IcingaWeb2DatabaseUser(object):
     # https://docs.python.org/3/library/crypt.html
 
     def __password_hash(sef, plaintext):
-        result = crypt.crypt(plaintext, crypt.METHOD_MD5)
+        result = crypt.crypt(plaintext, crypt.METHOD_SHA256)
 
         return result
 

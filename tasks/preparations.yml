@@ -1,5 +1,14 @@
 ---
 
+# TODO
+# drop python2 support!
+# add assert
+
+- name: assert python version
+  assert:
+    that: ansible_python.version.major != 2
+    msg: "Sorry, we don't support python 2 anymore!"
+
 - name: create local temp directory
   become: false
   delegate_to: 127.0.0.1
@@ -14,7 +23,7 @@
 
 - name: get php-fpm package name
   set_fact:
-    php_package_name: "{{ ansible_facts.packages | list | select('match', '^php.*fpm') | first }}"
+    php_package_name: "{{ ansible_facts.packages | list | select('match', '^php.*fpm') | list | sort | first }}"
 
 - name: assert php_package_name
   assert:
@@ -26,6 +35,8 @@
     php_version: "{{ ansible_facts.packages[php_package_name][0].version[0:3] }}"
   when: ansible_os_family | lower == 'redhat'
 
+# debian9 : version: 7.0.33-0+deb9u10 / => version: 1:7.0+49
+#
 - name: define php version
   set_fact:
     php_version: "{{ ansible_facts.packages[php_package_name][0].version.split(':')[1].split('+')[0] }}"
@@ -34,20 +45,6 @@
 - name: set php_package_version
   set_fact:
     php_package_version: "{{ php_version | replace('.','') }}"
-
-# - debug:
-#     var="{{ item }}"
-#   when: item is defined
-#   loop:
-#     - php_version
-#     - php_package_version
-#     - ansible_facts.packages[php_package_name][0]
-
-# - debug:
-#     msg:
-#       - "php_package : {{ php_package_name }}"
-#       - "php_version : {{ php_version }}"
-#       - "php_package_version: {{ php_package_version }}"
 
 - name: assert php_version
   assert:

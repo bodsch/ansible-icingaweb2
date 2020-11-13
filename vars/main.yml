@@ -100,8 +100,6 @@ _icingaweb_group:
   default: www-data
   redhat: nginx
 
-icingaweb_python_packages: []
-
 icingaweb_packages: "{{
           _icingaweb_dependencies[ansible_os_family | lower~ '-' ~ ansible_distribution_major_version] |
   default(_icingaweb_dependencies[ansible_os_family | lower] |

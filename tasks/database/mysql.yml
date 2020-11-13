@@ -8,15 +8,31 @@
     group: "{{ icingaweb_group }}"
     mode: 0660
 
+# needs root rights
 - name: ensure table_schema is created
-  mysql_query:
-    login_host: "{{ icingaweb_auth_backend.host }}"
-    config_file: /etc/icingaweb2/.my.cnf
-    login_db: "{{ icingaweb_auth_backend.dbname }}"
-    query: SELECT count(TABLE_NAME) as count FROM information_schema.tables where TABLE_SCHEMA = %(schema_val)s
-    named_args:
-      schema_val: "{{ icingaweb_auth_backend.dbname }}"
+  shell: >
+    mysql \
+      --user={{ icingaweb_auth_backend.username }} \
+      --password={{ icingaweb_auth_backend.password }} \
+      --host={{ icingaweb_auth_backend.host }} \
+      --batch \
+      --skip-column-names \
+      --execute \
+      "SELECT count(TABLE_NAME) FROM information_schema.tables where TABLE_SCHEMA = '{{ icingaweb_auth_backend.dbname }}';"
   register: mysql_icingaweb2_schema
+  changed_when: false
+  check_mode: false
+  # no_log: true
+
+# - name: ensure table_schema is created
+#   mysql_query:
+#     login_host: "{{ icingaweb_auth_backend.host }}"
+#     config_file: /etc/icingaweb2/.my.cnf
+#     login_db: "{{ icingaweb_auth_backend.dbname }}"
+#     query: SELECT count(TABLE_NAME) as count FROM information_schema.tables where TABLE_SCHEMA = %(schema_val)s
+#     named_args:
+#       schema_val: "{{ icingaweb_auth_backend.dbname }}"
+#   register: mysql_icingaweb2_schema
 
 - name: import database schema
   mysql_db:
@@ -29,5 +45,6 @@
   register: icingaweb2_database_schema
   changed_when: false
   check_mode: false
-  when: mysql_icingaweb2_schema.rowcount[0] == 1 and
-    mysql_icingaweb2_schema.query_result[0][0].count != 4
+  when: mysql_icingaweb2_schema.stdout | int != 4
+  #when: mysql_icingaweb2_schema.rowcount[0] == 1 and
+  #  mysql_icingaweb2_schema.query_result[0][0].count != 4

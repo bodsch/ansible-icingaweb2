@@ -1,5 +1,10 @@
 ---
 
+# - name: python3
+#   src: https://github.com/darkwizard242/ansible-role-python3.git
+#   scm: git
+#   version: 1.0.8
+
 - name: php-fpm
   src: https://github.com/bodsch/ansible-php.git
   scm: git
@@ -13,11 +18,12 @@
   src: https://github.com/geerlingguy/ansible-role-nginx.git
   version: 2.7.0
 
-- name: icinga2
-  src: https://github.com/bodsch/ansible-icinga2.git
-  scm: git
-  version: 1.2.1
-
-- name: monitoring-tools
-  src: https://github.com/bodsch/ansible-monitoring-plugins.git
-  version: 1.2.0
+# - name: icinga2
+#   src: https://github.com/bodsch/ansible-icinga2.git
+#   scm: git
+#   version: 1.2.1
+#
+# - name: monitoring-tools
+#   src: https://github.com/bodsch/ansible-monitoring-plugins.git
+#   version: 1.2.0
+#

@@ -1,229 +1,75 @@
 ---
+
+- name: raw task to install python3
+  hosts: all
+  gather_facts: false
+
+  pre_tasks:
+    - name: Install python3 for Ansible
+      raw: test -e /usr/bin/python3 || (apt-get -y update && apt install -y python3)
+      register: output
+      changed_when: output.stdout != ""
+
+    - name: Install pip3 for Ansible
+      raw: test -e /usr/bin/pip3 || (apt-get -y update && apt install -y  python3-pip)
+      register: output
+      changed_when: output.stdout != ""
+
+  # tasks:
+  #   - name: Gathering Facts now
+  #     setup:
+  #
+  #   - name: set python3
+  #     set_fact:
+  #       ansible_python_interpreter: /usr/bin/python3
+  #     when:
+  #       ansible_python.version.major == 2
+
 - name: prepare container
   hosts: all
   gather_facts: true
 
-  vars:
-    # ansible_python_interpreter: python3
-
-    mysql_python_package_debian: "{{ 'python3-mysqldb' if ansible_python.version.major == 3 else 'python-mysqldb' }}"
-
-    mysql_innodb_buffer_pool_size: 64M
-    mysql_innodb_log_file_size: 48M
-    mysql_innodb_lock_wait_timeout: 100
-
-    mysql_bind_address: 127.0.0.1
-    mysql_max_connections: 20
-
-    mysql_root_password_update: true
-
-    mysql_databases:
-      - name: icinga2_ido
-      - name: icingaweb_config
-
-    mysql_users:
-      - name: icinga2_ido
-        host: 127.0.0.1
-        password: icinga2
-        priv: "icinga2_ido.*:ALL"
-      - name: icingaweb_config
-        host: 127.0.0.1
-        password: icingaweb_config
-        priv: "icingaweb_config.*:ALL"
-
-    # icinga2
-    icinga2_salt: 42T2fYT6kK0njvNMww8eWinBdEO5vh02xwC5qaNMMx77qNkYFE7bIxj5v291ajAW
-
-    icinga2_ha: false
-
-    icinga2_api:
-      user:
-        icinga2:
-          password: S0mh1TuFJI
-          permissions: '*'
-
-        icingaweb:
-          password: S0mh1TuFJI
-          permissions:
-            - "status/query"
-            - "actions/*"
-            - "objects/modify/*"
-            - "objects/query/*"
-
-    icinga2_masters:
-      instance: {}
-        # type: primary
-        # ip: 127.0.0.1
-
-    icinga2_ido:
-      user: icinga2_ido
-      password: icinga2
-      host: '127.0.0.1'
-      cleanup:
-        acknowledgements_age: 72h
-
-    icinga2_master_features_enabled:
-      - checker
-      - api
-      - ido-mysql
-      - mainlog
-      - notification
-
-
-    icinga2_host_object:
-
-      localhost:
-        # endpoint_name: master-1.icinga.local
-        # zone: master
-        display_name: localhost
-        import: generic-host
-        address: '{{ ansible_default_ipv4.address }}'
-        vars: |
-          os = "Linux"
-          dist = "{{ ansible_distribution }}"
-          dist_ver = "{{ ansible_distribution_version }}"
-          disks = {
-            "disk /" = {
-              disk_partitions = "/"
-            }
-          }
-          services = [ "icinga2", "uptime", "memory" ]
-          memory = true
-
-
-    # nginx
-    #
-    nginx_server_tokens: "off"
-    nginx_remove_default_vhost: true
-
-    nginx_extra_http_options: |
-      map_hash_max_size 128;
-      map_hash_bucket_size 128;
-
-    nginx_vhosts:
-      - listen: 80
-        server_name: _
-        extra_parameters: |
-          location /icinga {
-            root  /usr/share/icingaweb2/public;
-            index index.php;
-            location ~ ^/icinga/index\.php(.*)$ {
-              fastcgi_index          index.php;
-              fastcgi_param          ICINGAWEB_CONFIGDIR /etc/icingaweb2;
-              fastcgi_param          SCRIPT_FILENAME /usr/share/icingaweb2/public/index.php;
-              fastcgi_read_timeout   600;
-              fastcgi_pass           unix:/run/php/worker-01.sock;
-              include fastcgi_params;
-            }
-            location ~ ^/icinga(.+)? {
-              alias /usr/share/icingaweb2/public;
-              index index.php;
-              try_files $1 $uri $uri/ /icinga/index.php$is_args$args;
-            }
-            location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
-              expires 1d;
-            }
-          }
-
-    # php
-    #
-    php_enable_php_fpm: true
-
-    php_fpm_pools:
-      - name: worker-01
-        user: "{{ php_fpm_pool_user }}"
-        group: "{{ php_fpm_pool_group }}"
-        listen.owner: "{{ php_fpm_pool_user }}"
-        listen.group: "{{ php_fpm_pool_group }}"
-        listen: /run/php/worker-01.sock
-        pm: dynamic
-        pm.max_children: 10
-        pm.start_servers: 4
-        pm.min_spare_servers: 2
-        pm.max_spare_servers: 6
-        pm.status_path: /status
-        ping.path: /ping
-        ping.response: pong
-        access.log: /var/log/php-fpm/$pool_access.log
-        access.format: "%R - %n - %{HTTP_HOST}e - %u %t \"%m %r [%Q%q]\" %s %f %{mili}d %{kilo}M %C%%"
-        chdir: /
-        env:
-          PATH: "/usr/local/bin:/usr/bin:/bin"
-          TMPDIR: "/tmp"
-          LC_ALL: de_DE.UTF-8
-        php_admin_value:
-          date.timezone: "Europe/Berlin"
-          max_execution_time: 300
-
-    php_modules:
-      - name: opcache
-        enabled: true
-        priority: 10
-        content: |
-          zend_extension=opcache.so
-          opcache.enable=1
-          opcache.enable_cli=1
-          opcache.memory_consumption=128
-          opcache.interned_strings_buffer=16
-          opcache.max_accelerated_files=10000
-          opcache.max_wasted_percentage=5
-          opcache.validate_timestamps=1
-          opcache.revalidate_path=0
-          opcache.revalidate_freq=1
-          opcache.max_file_size=0
-      - name: pdo_mysql
-        enabled: true
-        priority: 20
-        content: |
-          extension=pdo_mysql.so
-      - name: apcu
-        enabled: false
-        priority: 20
-        content: |
-          extension=apcu.so
-          apc.shm_size=96M
-          apc.enable_cli=0
-          apc.rfc1867=1
-      - name: gd
-        enabled: true
-        priority: 20
-        content: |
-          extension=gd.so
-      - name: memcached
-        enabled: false
-        priority: 20
-        content: |
-          extension=memcached.so
-
-
   pre_tasks:
-  #   - block:
-  #       - name: Install required packages on Debian
-  #         apt:
-  #           # name:
-  #           #   # required to add key to apt keyring
-  #           #   - gnupg
-  #           #   # required to verify icinga2 is running
-  #           #   - procps
-  #           update_cache: true
-  #
-  #       # https://github.com/Icinga/icinga-packaging/issues/153
-  #       - name: Install Backports repository on Debian Stretch
-  #         apt_repository:
-  #           repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
-  #           state: present
-  #           update_cache: true
-  #         when:
-  #           - ansible_distribution_release == 'stretch'
-  #
-  #       - name: Install apt-transport-https on older Debian/Ubuntu versions
-  #         apt:
-  #           name:
-  #             - apt-transport-https
-  #         when:
-  #           - ansible_distribution_release in ['jessie', 'stretch', 'xenial']
-  #
-  #     when: ansible_os_family | lower == 'debian'
+    - name: detect python3
+      stat:
+        path: /usr/bin/python3
+      register: __stat_present_python3
+      changed_when: not __stat_present_python3.stat.exists
+
+    - name: set python3
+      set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+      when:
+        - ansible_python.version.major == 2
+        - __stat_present_python3.stat.exists
+
+    - block:
+        - name: Install required packages on Debian
+          apt:
+            # name:
+            #   # required to add key to apt keyring
+            #   - gnupg
+            #   # required to verify icinga2 is running
+            #   - procps
+            update_cache: true
+
+        # https://github.com/Icinga/icinga-packaging/issues/153
+        - name: Install Backports repository on Debian Stretch
+          apt_repository:
+            repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
+            state: present
+            update_cache: true
+          when:
+            - ansible_distribution_release == 'stretch'
+
+        - name: Install apt-transport-https on older Debian/Ubuntu versions
+          apt:
+            name:
+              - apt-transport-https
+          when:
+            - ansible_distribution_release in ['jessie', 'stretch', 'xenial']
+
+      when: ansible_os_family | lower == 'debian'
 
     - debug:
         msg:
@@ -235,7 +81,7 @@
 
   roles:
     - role: mariadb
-    - role: monitoring-tools
-    - role: icinga2
+    # - role: monitoring-tools
+    # - role: icinga2
     - role: nginx
     - role: php-fpm
