@@ -3,7 +3,9 @@ molecule-docker
 docker
 ansible-lint
 yamllint
-testinfra
 flake8
 jmespath
 pytest
+pytest-testinfra
+tox
+tox-gh-actions

@@ -21,7 +21,8 @@ _icingaweb_dependencies:
     - python3-mysqldb
     - default-mysql-client
   ubuntu-20:
-    - default-mysql-client-core
+    - mariadb-client
+    # - default-mysql-client-core
   redhat:
     - mariadb
     - MySQL-python
