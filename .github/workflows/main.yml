@@ -1,6 +1,7 @@
 ---
 name: CI
-'on':
+
+on:
   pull_request:
   push:
     branches:
@@ -14,27 +15,27 @@ defaults:
 
 jobs:
 
-  # lint:
-  #   name: Lint
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: check out the codebase.
-  #       uses: actions/checkout@v2
-  #       with:
-  #         path: 'ansible-icingaweb2'
-  #
-  #     - name: set up python.
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: '3.x'
-  #
-  #     - name: install test dependencies.
-  #       run: pip install -r test-requirements.txt
-  #
-  #     - name: Lint code.
-  #       run: |
-  #         yamllint .
-  #         ansible-lint
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out the codebase.
+        uses: actions/checkout@v2
+        with:
+          path: 'ansible-icingaweb2'
+
+      - name: set up python.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: install test dependencies.
+        run: pip install -r test-requirements.txt
+
+      - name: Lint code.
+        run: |
+          yamllint .
+          ansible-lint
 
   debian:
     name: debian
@@ -42,15 +43,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        distro:
-          - debian9
-          - debian10
+        distribution:
+          - image: debian
+            version: "9"
+          - image: debian
+            version: "10"
+          - image: debian
+            version: "testing"
         python-version:
-          - '3.7'
           - '3.8'
           - '3.9'
         ansible-version:
-          - '2.8'
           - '2.9'
           - '2.10'
 
@@ -80,95 +83,98 @@ jobs:
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
+          MOLECULE_DISTRO: ${{ matrix.distribution.image }}
+          MOLECULE_VERSION: ${{ matrix.distribution.version }}
 
-  ubuntu:
-    name: ubuntu
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        distro:
-          - ubuntu1804
-          - ubuntu2004
-        python-version:
-          - '3.7'
-          - '3.8'
-          - '3.9'
-        ansible-version:
-          - '2.8'
-          - '2.9'
-          - '2.10'
 
-    steps:
-      - name: check out the codebase.
-        uses: actions/checkout@v2
-        with:
-          path: 'ansible-icingaweb2'
-
-      - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: install dependencies
-        run: |
-          python -m pip install --upgrade pip
-
-      - name: install test dependencies.
-        run: pip install -r test-requirements.txt
-
-      - name: test with tox
-        run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule converge
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule verify
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule destroy
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
-
-  centos:
-    name: centos
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        distro:
-          - centos8
-        python-version:
-          - '3.7'
-          - '3.8'
-          - '3.9'
-        ansible-version:
-          - '2.8'
-          - '2.9'
-          - '2.10'
-
-    steps:
-      - name: check out the codebase.
-        uses: actions/checkout@v2
-        with:
-          path: 'ansible-icingaweb2'
-
-      - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: install dependencies
-        run: |
-          python -m pip install --upgrade pip
-
-      - name: install test dependencies.
-        run: pip install -r test-requirements.txt
-
-      - name: test with tox
-        run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule converge
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule verify
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule destroy
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
+#   ubuntu:
+#     name: ubuntu
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         distro:
+#           - ubuntu1804
+#           - ubuntu2004
+#         python-version:
+#           - '3.7'
+#           - '3.8'
+#           - '3.9'
+#         ansible-version:
+#           - '2.8'
+#           - '2.9'
+#           - '2.10'
+#
+#     steps:
+#       - name: check out the codebase.
+#         uses: actions/checkout@v2
+#         with:
+#           path: 'ansible-icingaweb2'
+#
+#       - name: set up python ${{ matrix.python-version }}
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{ matrix.python-version }}
+#
+#       - name: install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#
+#       - name: install test dependencies.
+#         run: pip install -r test-requirements.txt
+#
+#       - name: test with tox
+#         run: |
+#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule converge
+#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule verify
+#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule destroy
+#         env:
+#           PY_COLORS: '1'
+#           ANSIBLE_FORCE_COLOR: '1'
+#           MOLECULE_DISTRO: ${{ matrix.distro }}
+#
+#   centos:
+#     name: centos
+#     runs-on: ubuntu-latest
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         distro:
+#           - centos8
+#         python-version:
+#           - '3.7'
+#           - '3.8'
+#           - '3.9'
+#         ansible-version:
+#           - '2.8'
+#           - '2.9'
+#           - '2.10'
+#
+#     steps:
+#       - name: check out the codebase.
+#         uses: actions/checkout@v2
+#         with:
+#           path: 'ansible-icingaweb2'
+#
+#       - name: set up python ${{ matrix.python-version }}
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{ matrix.python-version }}
+#
+#       - name: install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#
+#       - name: install test dependencies.
+#         run: pip install -r test-requirements.txt
+#
+#       - name: test with tox
+#         run: |
+#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule converge
+#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule verify
+#           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule destroy
+#         env:
+#           PY_COLORS: '1'
+#           ANSIBLE_FORCE_COLOR: '1'
+#           MOLECULE_DISTRO: ${{ matrix.distro }}
+#
