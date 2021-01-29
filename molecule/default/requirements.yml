@@ -6,8 +6,10 @@
   version: 1.1.3
 
 - name: mariadb
-  src: https://github.com/geerlingguy/ansible-role-mysql.git
-  version: 3.3.0
+  #src: https://github.com/geerlingguy/ansible-role-mysql.git
+  #version: 3.3.0
+  src: https://github.com/bodsch/ansible-mariadb.git
+  scm: git
 
 - name: nginx
   src: https://github.com/geerlingguy/ansible-role-nginx.git
