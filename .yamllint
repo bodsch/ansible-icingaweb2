@@ -21,3 +21,4 @@ ignore: |
   .molecule/
   .travis.yml
   .tox
+  .github
