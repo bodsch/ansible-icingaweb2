@@ -35,22 +35,22 @@ icingaweb_commandtransport:
     username: icingaweb
     password: S0mh1TuFJI
 
-# https://github.com/zhmurko/icingaweb2-module-sla-reports.git
-icingaweb_external_modules:
-  - boxydash:
-    enabled: true
-    name: boxydash
-    src: https://github.com/tobiasstein/icingaweb2-module-boxydash.git
-    # https://github.com/pemontto/icingaweb2-module-boxydash
-    #
-    configuration:
-      settings:
-        setting_refresh: 10
-        setting_boxsize: 10
-        include_softstate: true
-        requires_authentication: false
-        show_legend: true
-        path_prefix: '/icinga'
+# # https://github.com/zhmurko/icingaweb2-module-sla-reports.git
+# icingaweb_external_modules:
+#   - boxydash:
+#     enabled: true
+#     name: boxydash
+#     src: https://github.com/tobiasstein/icingaweb2-module-boxydash.git
+#     # https://github.com/pemontto/icingaweb2-module-boxydash
+#     #
+#     configuration:
+#       settings:
+#         setting_refresh: 10
+#         setting_boxsize: 10
+#         include_softstate: true
+#         requires_authentication: false
+#         show_legend: true
+#         path_prefix: '/icinga'
 
 icingaweb_users:
   - admin:
