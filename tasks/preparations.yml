@@ -33,14 +33,16 @@
 - name: define php version
   set_fact:
     php_version: "{{ ansible_facts.packages[php_package_name][0].version[0:3] }}"
-  when: ansible_os_family | lower == 'redhat'
+  when:
+    - ansible_os_family | lower == 'redhat'
 
 # debian9 : version: 7.0.33-0+deb9u10 / => version: 1:7.0+49
 #
 - name: define php version
   set_fact:
     php_version: "{{ ansible_facts.packages[php_package_name][0].version.split(':')[1].split('+')[0] }}"
-  when: ansible_os_family | lower == 'debian'
+  when:
+    - ansible_os_family | lower == 'debian'
 
 - name: set php_package_version
   set_fact:
@@ -54,6 +56,16 @@
 - name: merge dependencies between defaults and custom
   set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
+
+- name: get database package name
+  set_fact:
+    data_package_name: "{{ ansible_facts.packages | list | select('match', '^mariadb-client-core.*') | list | sort }}"
+
+- name: remove mariadb-client-core from dependency list if it already installed
+  set_fact:
+    icingaweb_dependencies: "{{ icingaweb_dependencies | reject('search', 'default-mysql-client-core') | list }}"
+  when:
+    - data_package_name | select('match', '^mariadb-client-core.*')
 
 - name: merge dependencies between defaults and custom for enabled icingaweb modules
   set_fact:

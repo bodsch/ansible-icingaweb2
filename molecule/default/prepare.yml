@@ -81,7 +81,5 @@
 
   roles:
     - role: mariadb
-    # - role: monitoring-tools
-    # - role: icinga2
     - role: nginx
     - role: php-fpm

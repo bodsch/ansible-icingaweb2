@@ -298,7 +298,7 @@ def main():
             database_login_host=dict(type='str', default='localhost'),
             database_login_port=dict(type='int', default=3306),
             database_login_unix_socket=dict(type='str'),
-            database_config_file=dict(type='path', default='~/.my.cnf'),
+            database_config_file=dict(type='path'),
             database_name=dict(required=True, type='str'),
         ),
         supports_check_mode=False,

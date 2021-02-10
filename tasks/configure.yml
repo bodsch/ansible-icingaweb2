@@ -114,42 +114,10 @@
     database_login_host: "{{ icingaweb_auth_backend.host }}"
     database_name: "{{ icingaweb_auth_backend.dbname }}"
     database_config_file: /etc/icingaweb2/.my.cnf
-  # no_log: true
+  no_log: true
   loop:
     "{{ icingaweb_users }}"
   when: icingaweb_users is defined and icingaweb_users | count != 0
-
-# - block:
-#     - name: merge icingaweb_users with password hashes
-#       set_fact:
-#         icingaweb_users: "{{ icingaweb_users | create_password_hash }}"
-#
-#     - name: merge icingaweb_users with password hashes
-#       set_fact:
-#         icingaweb_users: "{{ icingaweb_users | create_password_hash }}"
-#
-#
-#     - name: create temporary icingaweb_users statement
-#       template:
-#         src: create_user.sql.j2
-#         dest: /tmp/create_user.sql
-#         mode: 0666
-#       no_log: true
-#       loop:
-#         - "{{ icingaweb_users }}"
-#
-#     - name: import icingaweb users into database
-#       mysql_db:
-#         login_host: '{{ icingaweb_auth_backend.host }}'
-#         config_file: /etc/icingaweb2/.my.cnf
-#         restrict_config_file: true
-#         state: import
-#         name: "{{ icingaweb_auth_backend.dbname }}"
-#         target: /tmp/create_user.sql
-#       register: icingaweb2_import_users
-#       no_log: true
-#
-#   when: icingaweb_users is defined and icingaweb_users | count != 0
 
 - name: change ownership of /etc/icingaweb2 directory
   file:
