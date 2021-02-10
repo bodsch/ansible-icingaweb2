@@ -10,18 +10,14 @@ _icingaweb_dependencies:
   debian:
     - python3-mysqldb
     - python3-pip
-    # - mysql-client-core
     - default-mysql-client-core
-  # debian-9:
-  #   - default-mysql-client-core
-  # debian-10:
-  #   - default-mysql-client-core
   ubuntu: []
   ubuntu-18:
     - python3-mysqldb
     - default-mysql-client
   ubuntu-20:
-    - default-mysql-client-core
+    - mariadb-client
+    # - default-mysql-client-core
   redhat:
     - mariadb
     - MySQL-python
@@ -37,7 +33,6 @@ _icingaweb_php_dependencies:
     - php-mysql
     - php-pear
   debian:
-
     - php-gd
     - php-intl
     - php-json

@@ -1,11 +1,17 @@
-# ansible role for icingaweb2
 
-Install an Iicngaweb2 from the sources.
+Install an icingaweb2 from [sources](https://github.com/Icinga/icingaweb2).
 
 Supports various external modules and themes.
 
-Supports an Icinga2 HA cluster.
+Supports also an Icinga2 HA cluster.
 
+![CI](https://github.com/bodsch/ansible-icingaweb2/workflows/CI/badge.svg)
+
+## Why from sources?
+
+The package offered by Icinga has a hard (and in my eyes unnecessary) dependency on Apache2.
+
+This role also supports other distributions like ArchLinux, Gentoo by using the sources.
 
 ## Requirements & Dependencies
 
@@ -20,6 +26,7 @@ Tested on
 * Debian 9 / 10
 * Ubuntu 18.04 / 20.04
 * CentOS 7 / 8
+* OracleLinux 8
 
 ## Contribution
 
@@ -49,7 +56,7 @@ Please read the following documention for configuration points.
 
 ## Examples
 
-A complete test setup can be found in the GitLab under [icinga2-infrastructure](https://gitlab.com/icinga2-infrastructure/deployment).
+A complete test setup can be found in GitLab under [icinga2-infrastructure](https://gitlab.com/icinga2-infrastructure/deployment).
 
 Or take e look into the [molecule](molecule/defaults/converge.yml) test.
 
@@ -59,7 +66,7 @@ Or take e look into the [molecule](molecule/defaults/converge.yml) test.
 For Example
 
 ```
-MOLECULE_DISTRO=debian10 molecule converge
+$ tox -e py39-ansible210 -- molecule test
 ```
 
 ## License
