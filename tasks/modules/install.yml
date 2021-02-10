@@ -67,7 +67,6 @@
       loop:
         "{{ icingaweb_external_modules }}"
 
-
     - name: create directory for module configuration
       become: true
       file:
