@@ -3,6 +3,7 @@
 dependencies: []
 
 galaxy_info:
+  role_name: ansible-icingaweb2
   author: Bodo Schulz
   description: ansible role to install icingaweb2
   license: BSD
