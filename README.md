@@ -31,10 +31,10 @@ This role also supports other distributions like ArchLinux, Gentoo by using the 
 
 Tested on
 
-* Debian 9 / 10
+* Debian 10
 * Ubuntu 18.04 / 20.04
 * CentOS 7 / 8
-* OracleLinux 8
+* OracleLinux 7 / 8
 
 ## Contribution
 

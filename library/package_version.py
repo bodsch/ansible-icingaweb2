@@ -35,8 +35,18 @@ class PackageVersion(object):
             """
               redhat based
             """
+            package_mgr = self.module.get_bin_path('yum', False)
+
+            if(not package_mgr):
+                package_mgr = self.module.get_bin_path('dnf', True)
+
+            if(not package_mgr):
+                return True, "", "no valid package manager (yum or dnf) found"
+
+            self.module.log(msg="  '{0}'".format(package_mgr))
+
             rc, out, err = self.module.run_command(
-                ["yum", "list", "installed", "--cacheonly", "*{0}*".format(self.package_name)],
+                [package_mgr, "list", "installed", "--cacheonly", "*{0}*".format(self.package_name)],
                 check_rc=False)
 
             pattern = re.compile(r".*{0}.*(?P<version>[0-9]+\.[0-9]+)\..*@(?P<repo>.*)".format(self.package_name))
