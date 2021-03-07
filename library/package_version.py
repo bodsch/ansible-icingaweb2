@@ -10,6 +10,7 @@ import re
 from ansible.module_utils import distro
 from ansible.module_utils.basic import AnsibleModule
 
+
 class PackageVersion(object):
 
     def __init__(self, module):
@@ -35,7 +36,7 @@ class PackageVersion(object):
               redhat based
             """
             rc, out, err = self.module.run_command(
-                ["yum", "list", "installed", "--cacheonly", "*{0}*".format(self.package_name) ],
+                ["yum", "list", "installed", "--cacheonly", "*{0}*".format(self.package_name)],
                 check_rc=False)
 
             pattern = re.compile(r".*{0}.*(?P<version>[0-9]+\.[0-9]+)\..*@(?P<repo>.*)".format(self.package_name))
@@ -102,7 +103,7 @@ class PackageVersion(object):
             """
             result = dict(
                 failed=False,
-                msg = "unknown distribution: {0}".format(distribution),
+                msg="unknown distribution: {0}".format(distribution),
                 version=""
             )
 
