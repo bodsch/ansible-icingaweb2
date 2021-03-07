@@ -2,58 +2,32 @@
 
 - name: raw task to install python3
   hosts: all
-  gather_facts: false
+  gather_facts: true
 
   pre_tasks:
-    - name: Install python3 for Ansible
-      raw: test -e /usr/bin/python3 || (apt-get -y update && apt install -y python3)
-      register: output
-      changed_when: output.stdout | length != 0
+    - block:
+        - name: Install python3 for Ansible
+          raw: test -e /usr/bin/python3 || (apt-get -y update && apt install -y python3)
+          register: output
+          changed_when: output.stdout | length != 0
 
-    - name: Install pip3 for Ansible
-      raw: test -e /usr/bin/pip3 || (apt-get -y update && apt install -y  python3-pip)
-      register: output
-      changed_when: output.stdout | length != 0
-
-  # tasks:
-  #   - name: Gathering Facts now
-  #     setup:
-  #
-  #   - name: set python3
-  #     set_fact:
-  #       ansible_python_interpreter: /usr/bin/python3
-  #     when:
-  #       ansible_python.version.major == 2
+        - name: Install pip3 for Ansible
+          raw: test -e /usr/bin/pip3 || (apt-get -y update && apt install -y  python3-pip)
+          register: output
+          changed_when: output.stdout | length != 0
+      when:
+        - ansible_os_family | lower == 'debian'
 
 - name: prepare container
   hosts: all
   gather_facts: true
 
   pre_tasks:
-    - name: detect python3
-      stat:
-        path: /usr/bin/python3
-      register: __stat_present_python3
-      changed_when: not __stat_present_python3.stat.exists
-
-    - name: set python3
-      set_fact:
-        ansible_python_interpreter: /usr/bin/python3
-      when:
-        - ansible_python.version.major == 2
-        - __stat_present_python3.stat.exists
-
     - block:
-        - name: Install required packages on Debian
+        - name: update package cache
           apt:
-            # name:
-            #   # required to add key to apt keyring
-            #   - gnupg
-            #   # required to verify icinga2 is running
-            #   - procps
             update_cache: true
 
-        # https://github.com/Icinga/icinga-packaging/issues/153
         - name: Install Backports repository on Debian Stretch
           apt_repository:
             repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
@@ -68,8 +42,51 @@
               - apt-transport-https
           when:
             - ansible_distribution_release in ['jessie', 'stretch', 'xenial']
+      when:
+        - ansible_os_family | lower == 'debian'
 
-      when: ansible_os_family | lower == 'debian'
+    # only for ubuntu .. with enabled apparmor, the mysql will not start!
+    #
+    - name: disable app armor
+      block:
+        # - name: teardown apparmor
+        #   shell:
+        #     /etc/init.d/apparmor stop
+        #     /etc/init.d/apparmor teardown
+        #     update-rc.d apparmor remove
+        #     apt purge -y apparmor
+        #   when:
+        #     - ansible_distribution_major_version | int == 18
+
+        - name: teardown apparmor
+          shell: |
+            /etc/init.d/apparmor stop
+            update-rc.d apparmor remove
+            /etc/init.d/apparmor teardown
+            systemctl stop snapd.apparmor
+            systemctl disable snapd.apparmor
+            systemctl mask snapd.apparmor
+            systemctl stop snapd
+            systemctl disable snapd
+            systemctl mask snapd
+            systemctl stop snapd.socket
+            systemctl disable snapd.socket
+            systemctl mask snapd.socket
+            aa-teardown
+            apt purge -y apparmor
+            apt purge -y snapd
+        #  when:
+        #    - ansible_distribution_major_version | int == 20
+
+      when:
+        - ansible_distribution | lower == 'ubuntu'
+
+    - name: install netstat
+      package:
+        name: [ net-tools, iproute2 ]
+        state: present
+      when:
+        - ansible_os_family | lower in [ 'archlinux', 'debian' ]
 
     - debug:
         msg:
@@ -83,3 +100,4 @@
     - role: mariadb
     - role: nginx
     - role: php-fpm
+    # - role: python3

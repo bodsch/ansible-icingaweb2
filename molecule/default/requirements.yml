@@ -3,14 +3,14 @@
 - name: php-fpm
   src: https://github.com/bodsch/ansible-php.git
   scm: git
-  version: 1.2.0
+  version: 1.2.1
 
 - name: mariadb
-  # src: https://github.com/geerlingguy/ansible-role-mysql.git
-  # version: 3.3.0
-  src: https://github.com/bodsch/ansible-mariadb.git
-  scm: git
-  version: 1.0.0
+  src: https://github.com/geerlingguy/ansible-role-mysql.git
+  version: 3.3.0
+  #src: https://github.com/bodsch/ansible-mariadb.git
+  #scm: git
+  #version: 1.0.0
 
 - name: nginx
   src: https://github.com/geerlingguy/ansible-role-nginx.git
@@ -24,4 +24,8 @@
 # - name: monitoring-tools
 #   src: https://github.com/bodsch/ansible-monitoring-plugins.git
 #   version: 1.2.0
-#
+
+# - name: python3
+#   src: https://github.com/mdklatt/ansible-python3-role.git
+#   scm: git
+#   version: v0.4.1
