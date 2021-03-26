@@ -20,7 +20,7 @@ Supports also an Icinga2 HA cluster.
 **Version 1.3.x to 1.4.x**
 
 | 1.3.x | 1.4.x |
-|: ---- | :---- |
+| :---- | :---- |
 | `icingaweb_resources.db.icingaweb` | `icingaweb_resources.icingaweb` |
 | `icingaweb_auth_backend`           | `icingaweb_auth_backend.database` |
 
