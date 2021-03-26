@@ -14,7 +14,18 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
 from ansible.module_utils._text import to_native
 
-import pymysql as mysql_driver
+try:
+    import pymysql as mysql_driver
+    _mysql_cursor_param = 'cursor'
+except ImportError:
+    try:
+        import MySQLdb as mysql_driver
+        import MySQLdb.cursors
+        _mysql_cursor_param = 'cursorclass'
+    except ImportError:
+        mysql_driver = None
+
+mysql_driver_fail_msg = 'The PyMySQL (Python 2.7 and Python 3.X) or MySQL-python (Python 2.X) module is required.'
 
 
 __metaclass__ = type
