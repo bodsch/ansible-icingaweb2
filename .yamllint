@@ -24,9 +24,6 @@ rules:
     type: unix
 
 ignore: |
-  tests/
-  molecule/
-  .molecule/
-  .travis.yml
+  # molecule/
   .tox
   .github

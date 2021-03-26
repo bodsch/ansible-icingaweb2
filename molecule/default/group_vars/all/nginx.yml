@@ -31,4 +31,3 @@ nginx_vhosts:
           expires 1d;
         }
       }
-

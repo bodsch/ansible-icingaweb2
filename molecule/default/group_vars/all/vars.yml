@@ -58,7 +58,6 @@ icingaweb_users:
     username: dark
     password: s3cur3
 
-
 # icingaweb_themes:
 #   - unicorn:
 #     name: unicorn

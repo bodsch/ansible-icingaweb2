@@ -37,9 +37,7 @@ icinga2_master_features_enabled:
   - mainlog
   - notification
 
-
 icinga2_host_object:
-
   localhost:
     # endpoint_name: master-1.icinga.local
     # zone: master
