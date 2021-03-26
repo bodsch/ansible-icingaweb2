@@ -25,7 +25,13 @@ icingaweb_resources:
       password: icinga2
       charset: utf8
 
-icingaweb_auth_backend: "{{ icingaweb_resources.db.icingaweb }}"
+icingaweb_auth_backend:
+  database:
+    host: 127.0.0.1
+    port: 3306
+    dbname: icingaweb_config
+    username: icingaweb_config
+    password: icingaweb_config
 
 icingaweb_commandtransport:
   master-1:
