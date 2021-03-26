@@ -30,47 +30,53 @@ icingaweb_preferences_store: db
 
 # /etc/icingaweb2/config.ini
 # types are: 'ini' or 'db'
-# for type 'db' use the config_resource: 'icingaweb' (see below)
+# for type 'db' use the config_resource: 'icingaweb' (see below under 'icingaweb_groups')
 icingaweb_config_backend: db
 icingaweb_config_resource: icingaweb
 
 # /etc/icingaweb2/authentication.ini
 icingaweb_authentication: {}
 
+# icingaweb_groups_backend: db
+# icingaweb_groups_resource: icingaweb
+
 # /etc/icingaweb2/groups.ini
-icingaweb_groups_backend: db
-icingaweb_groups_resource: icingaweb
+icingaweb_groups: {}
+# DEFAULT (see icingaweb_groups_defaults in vars/main.yml):
+#   icingaweb:
+#     backend: db
+#     resource: icingaweb
 
-icingaweb_groups:
-  icingaweb2:
-    backend: db
-    resource: icingaweb
-  ldap_groups:
-    backend: "ldpa" # msldap
-    resource: "ldap"
-    user_backend: "auth_ldap"
-    base_dn: "dc=ldap,dc=icinga,dc=local"
-    group_class: "*"
-    group_name_attribute: "gid"
-    group_member_attribute: "memberUid"
+#   ldap_groups:
+#     backend: "ldpa" # msldap
+#     resource: "ldap"
+#     user_backend: "auth_ldap"
+#     base_dn: "dc=ldap,dc=icinga,dc=local"
+#     group_class: "*"
+#     group_name_attribute: "gid"
+#     group_member_attribute: "memberUid"
 
-# the 'icingaweb' is used for database import and should NOT CHANGED!
 icingaweb_resources:
-  db:
-    icingaweb:
-      type: db
-      db: mysql
-      host: 127.0.0.1
-      port: 3306
-      # dbname: "{{ icingaweb_auth_dba_database }}"
-      # username: "{{ icingaweb_auth_dba_username }}"
-      # password: "{{ icingaweb_auth_dba_password }}"
-      prefix: icingaweb_
-      charset: utf8
-  ldap: {}
-  ssh: {}
+  icingaweb:
+    type: db
+    db: mysql
+    host: 127.0.0.1
+    port: 3306
+    # dbname: "{{ icingaweb_auth_dba_database }}"
+    # username: "{{ icingaweb_auth_dba_username }}"
+    # password: "{{ icingaweb_auth_dba_password }}"
+    prefix: icingaweb_
+    charset: utf8
 
-icingaweb_auth_backend: "{{ icingaweb_resources.db.icingaweb }}"
+icingaweb_auth_backend:
+  database:
+    host: 127.0.0.1
+    port: 3306
+    dbname: "{{ icingaweb_auth_dba_database }}"
+    username: "{{ icingaweb_auth_dba_username }}"
+    password: "{{ icingaweb_auth_dba_password }}"
+
+# "{{ icingaweb_resources.icingaweb }}"
 
 icingaweb_users:
   admin:

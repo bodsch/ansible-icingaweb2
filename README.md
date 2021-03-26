@@ -15,6 +15,16 @@ Supports also an Icinga2 HA cluster.
 [releases]: https://github.com/bodsch/ansible-icingaweb2/releases
 
 
+## BREAKING CHANGES
+
+**Version 1.3.x to 1.4.x**
+
+| 1.3.x | 1.4.x |
+|: ---- | :---- |
+| `icingaweb_resources.db.icingaweb` | `icingaweb_resources.icingaweb` |
+| `icingaweb_auth_backend`           | `icingaweb_auth_backend.database` |
+
+
 ## Why from sources?
 
 The package offered by Icinga has a hard (and in my eyes unnecessary) dependency on Apache2.

@@ -1,14 +1,11 @@
 ; {{ ansible_managed }}
 
-[icingaweb2]
-backend  = "{{ icingaweb_groups_backend }}"
-resource = "{{ icingaweb_groups_resource }}"
+{% if icingaweb_groups is defined and icingaweb_groups | count != 0 -%}
+{% for key  in icingaweb_groups -%}
+[{{ key }}]
+{% for k,v in icingaweb_groups[key].items() -%}
+{{ "%-10s" | format(k,) }} = "{{ v }}"
+{% endfor %}
 
-; [ldap_groups]
-; backend = "ldap"
-; resource = "ldap"
-; user_backend = "auth_ldap"
-; base_dn = "dc=ldap,dc=cm,dc=local"
-; group_class = "*"
-; group_name_attribute = "gid"
-; group_member_attribute = "memberUid"
+{% endfor %}
+{% endif %}

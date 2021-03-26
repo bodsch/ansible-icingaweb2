@@ -53,16 +53,21 @@
 
 - name: merge dependencies between defaults and custom for enabled icingaweb modules
   set_fact:
-    icingaweb_modules_enabled: "{{ icingaweb_modules_enabled_defaults + icingaweb_modules_enabled }}"
+    icingaweb_modules_enabled: "{{ icingaweb_defaults_modules_enabled + icingaweb_modules_enabled }}"
+
+- name: merge icingaweb_groups configuration between defaults and custom
+  set_fact:
+    icingaweb_groups: "{{ icingaweb_defaults_groups |
+      combine( icingaweb_groups, recursive=True ) }}"
 
 - name: merge icingaweb_authentication configuration between defaults and custom
   set_fact:
-    icingaweb_authentication: "{{ icingaweb_authentication_defaults |
+    icingaweb_authentication: "{{ icingaweb_defaults_authentication |
       combine( icingaweb_authentication, recursive=True ) }}"
 
 - name: merge icingaweb_resources configuration between defaults and custom
   set_fact:
-    icingaweb_resources: "{{ icingaweb_resources_defaults |
+    icingaweb_resources: "{{ icingaweb_defaults_resources |
       combine( icingaweb_resources, recursive=True ) }}"
 
 # TODO

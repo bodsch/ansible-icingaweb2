@@ -1,11 +1,11 @@
 
 [client]
 
-{% if icingaweb_auth_backend.username is defined %}
-user = {{ icingaweb_auth_backend.username }}
+{% if icingaweb_auth_backend.database.username is defined %}
+user = {{ icingaweb_auth_backend.database.username }}
 {% endif %}
-password = {{ icingaweb_auth_backend.password }}
-host = {{ icingaweb_auth_backend.host }}
-{% if icingaweb_database_socket is defined %}
-socket = {{ icingaweb_database_socket }}
+password = {{ icingaweb_auth_backend.database.password }}
+host = {{ icingaweb_auth_backend.database.host }}
+{% if icingaweb_auth_backend.database.socket is defined %}
+socket = {{ icingaweb_auth_backend.database.socket }}
 {%endif %}
