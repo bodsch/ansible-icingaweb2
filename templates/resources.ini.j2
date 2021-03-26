@@ -7,7 +7,7 @@
 
 {% for key in icingaweb_resources -%}
 [{{- key -}}]
-{%- set values = icingaweb_resources[key] %}
+{% set values = icingaweb_resources[key] %}
 {% set type = values.type %}
 type       = {{ type }}
 {% if type == 'db' %}
