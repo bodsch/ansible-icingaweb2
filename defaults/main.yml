@@ -41,6 +41,19 @@ icingaweb_authentication: {}
 icingaweb_groups_backend: db
 icingaweb_groups_resource: icingaweb
 
+icingaweb_groups:
+  icingaweb2:
+    backend: db
+    resource: icingaweb
+  ldap_groups:
+    backend: "ldpa" # msldap
+    resource: "ldap"
+    user_backend: "auth_ldap"
+    base_dn: "dc=ldap,dc=icinga,dc=local"
+    group_class: "*"
+    group_name_attribute: "gid"
+    group_member_attribute: "memberUid"
+
 # the 'icingaweb' is used for database import and should NOT CHANGED!
 icingaweb_resources:
   db:
@@ -79,7 +92,6 @@ icingaweb_roles:
     permissions: '*'
 
 # API connection
-
 icingaweb_commandtransport:
   icinga2:
     transport: api
@@ -91,6 +103,7 @@ icingaweb_commandtransport:
 icingaweb_dependencies:
   - jq
 
+# maybe obsolete
 icingaweb_php_dependencies: []
   # attention ... use the right PHP version!
   # - php-ldap

@@ -65,6 +65,9 @@
     icingaweb_resources: "{{ icingaweb_resources_defaults |
       combine( icingaweb_resources, recursive=True ) }}"
 
+# TODO
+# move the PHP dependencies into the php role
+# and check here only for the neededed packages
 - name: merge PHP dependencies between defaults and custom
   set_fact:
     icingaweb_php_dependencies: "{{ icingaweb_php_dependencies + icingaweb_php_packages }}"
