@@ -13,12 +13,12 @@ from ansible.module_utils.six.moves import configparser
 
 try:
     import pymysql as mysql_driver
-    _mysql_cursor_param = 'cursor'
+#     _mysql_cursor_param = 'cursor'
 except ImportError:
     try:
         import MySQLdb as mysql_driver
-        import MySQLdb.cursors
-        _mysql_cursor_param = 'cursorclass'
+#         import MySQLdb.cursors
+#         _mysql_cursor_param = 'cursorclass'
     except ImportError:
         mysql_driver = None
 
