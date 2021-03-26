@@ -1,31 +1,35 @@
 ---
 
-icingaweb_log_level: DEBUG
+icingaweb_log_level: WARN
 
 icingaweb_resources:
-  db:
-    icingaweb:
-      type: db
-      db: mysql
-      host: 127.0.0.1
-      port: 3306
-      dbname: icingaweb_config
-      username: icingaweb_config
-      password: icingaweb_config
-      prefix: icingaweb_
-      charset: utf8
+  icingaweb:
+    type: db
+    db: mysql
+    host: 127.0.0.1
+    port: 3306
+    dbname: icingaweb_config
+    username: icingaweb_config
+    password: icingaweb_config
+    prefix: icingaweb_
+    charset: utf8
+  icinga_ido:
+    type: db
+    db: mysql
+    host: 127.0.0.1
+    port: 3306
+    dbname: icinga2_ido
+    username: icinga2_ido
+    password: icinga2
+    charset: utf8
 
-    icinga_ido:
-      type: db
-      db: mysql
-      host: 127.0.0.1
-      port: 3306
-      dbname: icinga2_ido
-      username: icinga2_ido
-      password: icinga2
-      charset: utf8
-
-icingaweb_auth_backend: "{{ icingaweb_resources.db.icingaweb }}"
+icingaweb_auth_backend:
+  database:
+    host: 127.0.0.1
+    port: 3306
+    dbname: icingaweb_config
+    username: icingaweb_config
+    password: icingaweb_config
 
 icingaweb_commandtransport:
   master-1:
@@ -34,23 +38,6 @@ icingaweb_commandtransport:
     port: 5665
     username: icingaweb
     password: S0mh1TuFJI
-
-# # https://github.com/zhmurko/icingaweb2-module-sla-reports.git
-# icingaweb_external_modules:
-#   - boxydash:
-#     enabled: true
-#     name: boxydash
-#     src: https://github.com/tobiasstein/icingaweb2-module-boxydash.git
-#     # https://github.com/pemontto/icingaweb2-module-boxydash
-#     #
-#     configuration:
-#       settings:
-#         setting_refresh: 10
-#         setting_boxsize: 10
-#         include_softstate: true
-#         requires_authentication: false
-#         show_legend: true
-#         path_prefix: '/icinga'
 
 icingaweb_users:
   - admin:

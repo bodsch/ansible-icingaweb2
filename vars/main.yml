@@ -56,36 +56,40 @@ _icingaweb_python_packages:
   redhat:
     - PyMySQL
 
-icingaweb_modules_enabled_defaults:
+icingaweb_defaults_modules_enabled:
   - monitoring
 
-icingaweb_authentication_defaults:
+icingaweb_defaults_authentication:
   auth_db:
     backend: db
     resource: icingaweb
 
-icingaweb_resources_defaults:
-  db:
-    icingaweb:
-      type: db
-      db: mysql
-      host: 127.0.0.1
-      port: 3306
-      dbname: icingaweb_config
-      username: icingaweb_config
-      password: icingaweb_config
-      prefix: icingaweb_
-      charset: utf8
+icingaweb_defaults_groups:
+  icingaweb:
+    backend: db
+    resource: icingaweb
 
-    icinga_ido:
-      type: db
-      db: mysql
-      host: 127.0.0.1
-      port: 3306
-      dbname: icinga2_ido
-      username: icinga2_ido
-      password: icinga2_ido
-      charset: utf8
+icingaweb_defaults_resources:
+  icingaweb:
+    type: db
+    db: mysql
+    host: 127.0.0.1
+    port: 3306
+    dbname: icingaweb_config
+    username: icingaweb_config
+    password: icingaweb_config
+    prefix: icingaweb_
+    charset: utf8
+
+  icinga_ido:
+    type: db
+    db: mysql
+    host: 127.0.0.1
+    port: 3306
+    dbname: icinga2_ido
+    username: icinga2_ido
+    password: icinga2_ido
+    charset: utf8
 
 _icingaweb_user:
   default: www-data

@@ -3,7 +3,7 @@
 # get file or directory stats
 - name: detect installed icingaweb2
   stat:
-    path: '/usr/share/icingaweb2-{{ icingaweb_version }}'
+    path: '/usr/share/icingaweb2-{{ icingaweb_version }}/library/Icinga/Application/Icinga.php'
     get_checksum: false
     get_md5: false
     get_mime: false

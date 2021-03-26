@@ -1,51 +1,26 @@
 ; {{ ansible_managed }}
 
-{% if icingaweb_resources['db'] is defined and icingaweb_resources['db'] | count != 0 %}
-{%- set _valid_attr = ['username','password','host','port','db','dbname','charset',
-  'ssl_do_not_verify_server_cert','ssl_cert','ssl_key','ssl_ca','ssl_capath','ssl_cipher',
-'type'] %}
-{%- set db = icingaweb_resources['db'] %}
-{% for item in db %}
-{%- set _x = db[item].__setitem__('type','db') -%}
-{%- set _data = db[item] -%}
-[{{ item }}]
-{% for k,v in db[item].items() -%}
-{%- if k in _valid_attr -%}
-{{ "%-10s" | format(k,) }} = {{ v }}
-{% endif -%}
-{% endfor %}
+{%- set _attr_db = ['username','password','host','port','db','dbname','charset',
+  'ssl_do_not_verify_server_cert','ssl_cert','ssl_key','ssl_ca','ssl_capath','ssl_cipher', 'type'] %}
+{%- set _attr_ldap = ['hostname','port','root_dn','bind_dn','bind_pw','encryption','timeout','type'] %}
+{%- set _attr_ssh = ['user','private_key','type'] %}
 
-{% endfor %}
-{% endif %}
-
-{% if icingaweb_resources['ldap'] is defined and icingaweb_resources['ldap'] | count != 0 %}
-{%- set _valid_attr = ['hostname','port','root_dn','bind_dn','bind_pw','encryption','timeout','type'] %}
-{%- set ldap = icingaweb_resources['ldap'] %}
-{% for item in ldap %}
-{%- set _x = ldap[item].__setitem__('type','ldap') %}
-{%- set _data = ldap[item] %}
-[{{ item }}]
-{% for k,v in ldap[item].items() %}
-{% if k in _valid_attr %}
+{% for key in icingaweb_resources -%}
+[{{- key -}}]
+{% set values = icingaweb_resources[key] %}
+{% set type = values.type %}
+type       = {{ type }}
+{% if type == 'db' %}
+{%- set _attr = _attr_db %}
+{%- elif type == 'ldap' or type == 'msldap' %}
+{%- set _attr = _attr_ldap %}
+{%- elif type == 'ssh' %}
+{%- set _attr = _attr_ssh %}
+{%- endif %}
+{%- for k, v in values.items() | sort %}
+{%- if k != 'type' %}
 {{ "%-10s" | format(k,) }} = {{ v }}
 {% endif %}
 {% endfor %}
 
 {% endfor %}
-{% endif %}
-
-{% if icingaweb_resources['ssh'] is defined and icingaweb_resources['ssh'] | count != 0 %}
-{%- set _valid_attr = ['user','private_key','type'] %}
-{%- set ssh = icingaweb_resources['ssh'] %}
-{% for item in ssh %}
-{%- set _x = ssh[item].__setitem__('type','ssh') -%}
-{%- set _data = ssh[item] -%}
-[{{ item }}]
-{% for k,v in ssh[item].items() -%}
-{%- if k in _valid_attr -%}
-{{ "%-10s" | format(k,) }} = {{ v }}
-{% endif -%}
-{% endfor %}
-
-{% endfor %}
-{% endif %}

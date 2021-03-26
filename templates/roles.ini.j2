@@ -3,10 +3,12 @@
 {% if icingaweb_roles is defined and icingaweb_roles | count != 0 %}
 {% for u in icingaweb_roles %}
 [{{ u.name }}]
+{% if u.users is defined -%}
 users               = "{{ u.users | join(',') }}"
+{% endif %}
 permissions         = "{{ u.permissions }}"
 {% if u.groups is defined -%}
-groups              = "{{ u.groups }}"
+groups              = "{{ u.groups | join(',') }}"
 {% endif %}
 {%- endfor %}
 {% endif %}
