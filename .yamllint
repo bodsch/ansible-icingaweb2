@@ -24,6 +24,6 @@ rules:
     type: unix
 
 ignore: |
-  # molecule/
   .tox
   .github
+  .cache
