@@ -26,7 +26,7 @@ icinga2_masters:
 icinga2_ido:
   user: icinga2_ido
   password: icinga2
-  host: '127.0.0.1'
+  host: database
   cleanup:
     acknowledgements_age: 72h
 
@@ -41,7 +41,7 @@ icinga2_host_object:
   localhost:
     # endpoint_name: master-1.icinga.local
     # zone: master
-    display_name: localhost
+    display_name: "{{ ansible_fqdn }}"
     import: generic-host
     address: '{{ ansible_default_ipv4.address }}'
     vars: |

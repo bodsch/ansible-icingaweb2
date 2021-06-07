@@ -83,6 +83,28 @@
           - "python version       : {{ ansible_python.version.major }}"
 
   roles:
+    - role: monitoring-tools
+
+- name: prepare container
+  hosts: database
+  gather_facts: true
+
+  roles:
     - role: mariadb
+
+- name: prepare container
+  hosts: instance
+  gather_facts: true
+
+  roles:
     - role: nginx
     - role: php-fpm
+
+# - name: prepare icinga2
+#   hosts: icinga2
+#   gather_facts: true
+#
+#   roles:
+#     - role: icinga2
+
+...

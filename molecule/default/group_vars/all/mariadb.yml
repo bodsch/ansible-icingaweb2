@@ -6,7 +6,7 @@ mariadb_innodb_buffer_pool_size: 64M
 mariadb_innodb_log_file_size: 48M
 mariadb_innodb_lock_wait_timeout: 100
 
-mariadb_bind_address: 127.0.0.1
+mariadb_bind_address: 0.0.0.0
 mariadb_max_connections: 20
 
 mariadb_root_password_update: true
