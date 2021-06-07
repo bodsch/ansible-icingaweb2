@@ -83,3 +83,5 @@
   when:
     - icingaweb_themes is defined
     - icingaweb_themes | flatten(1) | count != 0
+
+...
