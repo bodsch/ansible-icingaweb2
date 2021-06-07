@@ -1,24 +1,29 @@
 ---
 
-- include: preparations.yml
+- include: prepare.yml
   become: true
   tags:
-    - preparations
+    - icingaweb_prepare
+    - icingaweb_configure
 
 - include: installation.yml
   become: true
   tags:
-    - installation
+    - icingaweb_install
 
 - include: configure.yml
   become: true
   tags:
-    - configure
+    - icingaweb_configure
 
 - name: install themes
   include_tasks: themes/install.yml
+  tags:
+    - icingaweb_themes
 
 - name: external modules
   include_tasks: modules/install.yml
+  tags:
+    - icingaweb_modules
 
 ...
