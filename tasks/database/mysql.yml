@@ -47,3 +47,5 @@
     - mysql_icingaweb2_schema is defined
     - mysql_icingaweb2_schema.exists is defined
     - not mysql_icingaweb2_schema.exists
+
+...
