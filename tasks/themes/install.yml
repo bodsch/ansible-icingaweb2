@@ -73,12 +73,23 @@
       loop:
         "{{ icingaweb_themes }}"
 
+    # - name: enable themes
+    #   become: true
+    #   command: |
+    #     icingacli module enable {{ item.name }}
+    #   loop:
+    #     "{{ icingaweb_themes }}"
+
     - name: enable themes
       become: true
-      command: |
-        icingacli module enable {{ item.name }}
+      icingacli:
+        state: "{{ 'enable' if item.enabled | default('true') else 'disable' }}"
+        command: module
+        module_name: "{{ item.name }}"
       loop:
         "{{ icingaweb_themes }}"
+      loop_control:
+        label: "  theme: {{ item.name }} - enabled: {{ item.enabled | default('true') }}"
 
   when:
     - icingaweb_themes is defined
