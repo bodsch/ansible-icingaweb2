@@ -36,16 +36,6 @@
       when:
         - ansible_os_family | lower in [ 'archlinux', 'debian' ]
 
-    - name: prepare for centos7 and python2
-      package:
-        name:
-          - python-setuptools
-          - python2-pip
-        state: present
-      when:
-        - ansible_os_family | lower == 'redhat'
-        - ansible_python.version.major | int == 2
-
     - debug:
         msg:
           - "os family            : {{ ansible_os_family }}"
