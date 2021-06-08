@@ -97,9 +97,6 @@ jobs:
 
       - name: test with tox
         run: |
-          cd ../
-          mv ansible-icingaweb2 bodsch.icingaweb2
-          cd bodsch.icingaweb2
           tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- molecule test
         env:
           PY_COLORS: '1'
