@@ -5,8 +5,8 @@
 # BSD 2-clause (see LICENSE or https://opensource.org/licenses/BSD-2-Clause)
 
 from __future__ import absolute_import, print_function
-import os
-import re
+# import os
+# import re
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -74,16 +74,15 @@ class IcingaCLI(object):
                 failed=False,
                 changed=True,
                 msg="module {0} is successful {1}".format(self.module_name, self.state)
-              )
+            )
         else:
             result = dict(
                 failed=True,
                 changed=False,
                 msg="module {0} is not successful {1}".format(self.module_name, self.state)
-              )
+            )
 
         return result
-
 
     def _list_modules(self, module):
         """
@@ -107,7 +106,6 @@ class IcingaCLI(object):
 
         return found
 
-
     def _exec(self, args):
         """
         """
@@ -124,7 +122,6 @@ class IcingaCLI(object):
         return rc, out, err
 
 
-
 # ===========================================
 # Module execution.
 #
@@ -139,8 +136,8 @@ def main():
             # state=dict(default="enable", choices=["enable", "disable"]),
             command=dict(default="module", choices=["module", "version", "web"]),
             state=dict(default="enable", choices=[
-              "enable", "disable", "install", "list", "permissions",
-              "purge", "remove", "restrictions", "search"]),
+                "enable", "disable", "install", "list", "permissions",
+                "purge", "remove", "restrictions", "search"]),
             module_name=dict(required=True),
         ),
         supports_check_mode=False,
@@ -157,4 +154,3 @@ def main():
 # import module snippets
 if __name__ == '__main__':
     main()
-
