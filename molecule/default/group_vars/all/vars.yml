@@ -72,3 +72,12 @@ icingaweb_themes:
     enabled: false
 
 icingaweb_themes_default: Icinga
+
+icingaweb_external_modules:
+  - audit:
+    enabled: true
+    name: audit
+    src: https://github.com/Icinga/icingaweb2-module-audit.git
+    version: v1.0.1
+
+...

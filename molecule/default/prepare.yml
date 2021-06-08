@@ -23,56 +23,28 @@
   gather_facts: true
 
   pre_tasks:
-    - block:
-        - name: update package cache
-          apt:
-            update_cache: true
-
-        - name: Install Backports repository on Debian Stretch
-          apt_repository:
-            repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main
-            state: present
-            update_cache: true
-          when:
-            - ansible_distribution_release == 'stretch'
-
-        - name: Install apt-transport-https on older Debian/Ubuntu versions
-          apt:
-            name:
-              - apt-transport-https
-          when:
-            - ansible_distribution_release in ['jessie', 'stretch', 'xenial']
-      when:
-        - ansible_os_family | lower == 'debian'
-
-    # only for ubuntu .. with enabled apparmor, the mysql will not start!
-    #
-    - name: disable and teardown apparmor
-      shell: |
-        /etc/init.d/apparmor stop
-        update-rc.d apparmor remove
-        /etc/init.d/apparmor teardown
-        systemctl stop snapd.apparmor
-        systemctl disable snapd.apparmor
-        systemctl mask snapd.apparmor
-        systemctl stop snapd
-        systemctl disable snapd
-        systemctl mask snapd
-        systemctl stop snapd.socket
-        systemctl disable snapd.socket
-        systemctl mask snapd.socket
-        aa-teardown
-        apt purge -y apparmor
-        apt purge -y snapd
-      when:
-        - ansible_distribution | lower == 'ubuntu'
+    - name: update package cache
+      package:
+        update_cache: true
 
     - name: install netstat
       package:
-        name: [ net-tools, iproute2 ]
+        name:
+          - net-tools
+          - iproute2
         state: present
       when:
         - ansible_os_family | lower in [ 'archlinux', 'debian' ]
+
+    - name: prepare for centos7 and python2
+      package:
+        name:
+          - python-setuptools
+          - python2-pip
+        state: present
+      when:
+        - ansible_os_family | lower == 'redhat'
+        - ansible_python.version.major | int == 2
 
     - debug:
         msg:
@@ -83,6 +55,8 @@
           - "python version       : {{ ansible_python.version.major }}"
 
   roles:
+    - role: apparmor
+    - role: snapd
     - role: mariadb
     - role: nginx
     - role: php-fpm

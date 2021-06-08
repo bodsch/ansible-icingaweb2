@@ -6,7 +6,7 @@
 
 from __future__ import absolute_import, print_function
 # import os
-# import re
+import re
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -49,43 +49,55 @@ class IcingaCLI(object):
 
         state = self._list_modules(self.module_name)
 
-        self.module.log(msg="  - '{}' {}'".format(self.module_name, state))
+        # self.module.log(msg="  - '{}' {}'".format(self.module_name, state))
 
         if self.state == "enable" and state:
             return dict(
-                changed=False
+                changed=False,
+                msg="module {0} is already enabled".format(self.module_name)
             )
 
         if self.state == "disable" and not state:
             return dict(
-                changed=False
+                changed=False,
+                msg="module {0} is already disabled".format(self.module_name)
             )
 
-        args_list = [
-            self.command,
-            self.state,
-            self.module_name
-        ]
+        if self.state == "enable" or self.state == "disable":
 
-        rc, out, err = self._exec(args_list)
+            args_list = [
+                self.command,
+                self.state,
+                self.module_name
+            ]
 
-        if rc == 0:
-            result = dict(
-                failed=False,
-                changed=True,
-                msg="module {0} is successful {1}".format(self.module_name, self.state)
-            )
+            rc, out, err = self._exec(args_list)
+
+            if rc == 0:
+                result = dict(
+                    failed=False,
+                    changed=True,
+                    msg="module {0} is successful {1}d".format(self.module_name, self.state)
+                )
+            else:
+                result = dict(
+                    failed=True,
+                    changed=False,
+                    msg="module {0} is not successful {1}d".format(self.module_name, self.state)
+                )
         else:
             result = dict(
-                failed=True,
                 changed=False,
-                msg="module {0} is not successful {1}".format(self.module_name, self.state)
+                failed=True,
+                msg="unsupported state: '{}'".format(self.state)
             )
 
         return result
 
     def _list_modules(self, module):
         """
+          returns True if the module listed
+          otherwise returns False
         """
         args_list = [
             self.command,
@@ -97,10 +109,9 @@ class IcingaCLI(object):
         found = False
         for line in out.splitlines():
             if line.startswith(module):
-                line = "|".join(line.split())
+                line = re.sub(r"\s+", "|", line)
                 module_name = line.split("|")[0]
                 state = line.split("|")[2]
-                self.module.log(msg="  - '{}' {}'".format(module_name, state))
                 found = True
                 break
 
@@ -111,7 +122,7 @@ class IcingaCLI(object):
         """
         cmd = [self._icingacli] + args
 
-        self.module.log(msg="cmd: {}".format(cmd))
+        # self.module.log(msg="cmd: {}".format(cmd))
 
         rc, out, err = self.module.run_command(cmd, check_rc=True)
 
@@ -133,7 +144,6 @@ def main():
     """
     module = AnsibleModule(
         argument_spec=dict(
-            # state=dict(default="enable", choices=["enable", "disable"]),
             command=dict(default="module", choices=["module", "version", "web"]),
             state=dict(default="enable", choices=[
                 "enable", "disable", "install", "list", "permissions",
