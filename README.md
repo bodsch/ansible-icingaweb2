@@ -63,7 +63,7 @@ Please read the following documention for configuration points.
 
 ## Documentation
 
-- [Authentication](doc/athentication.md)
+- [Authentication](doc/authentication.md)
 - [commandtransports](doc/commandtransports.md)
 - [modules](doc/modules.md)
 - [resources](doc/resources.md)
