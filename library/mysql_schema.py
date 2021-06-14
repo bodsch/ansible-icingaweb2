@@ -69,14 +69,15 @@ class MysqlSchema(object):
         self.db_connect_timeout = 30
 
     def run(self):
-        '''  ...  '''
+        """
+        """
         self.module.log(msg="-------------------------------------------------------------")
         self.module.log(msg="user         : {}".format(self.login_user))
         self.module.log(msg="password     : {}".format(self.login_password))
         self.module.log(msg="table_schema : {}".format(self.table_schema))
         self.module.log(msg="------------------------------")
 
-        state, count, error, error_message = self._information_schema()
+        state, error, error_message = self._information_schema()
 
         if error:
             res = dict(
@@ -88,8 +89,7 @@ class MysqlSchema(object):
             res = dict(
                 failed=False,
                 changed=False,
-                exists=state,
-                count=count
+                exists=state
             )
 
         self.module.log(msg="result: {}".format(res))
@@ -100,13 +100,19 @@ class MysqlSchema(object):
     def _information_schema(self):
         """
           get informations about schema
+
+          return:
+            state: bool (exists or not)
+            count: int
+            error: boot (error or not)
+            error_message string  error message
         """
         cursor, conn, error, message = self.__mysql_connect()
 
         self.module.log(msg="  - error: {0} | msg: {1}".format(error, message))
 
         if error:
-            return None, 0, error, message
+            return None, error, message
 
         query = "SELECT count(TABLE_NAME) FROM information_schema.tables where TABLE_SCHEMA = '{schema}'"
         query = query.format(schema=self.table_schema)
@@ -119,20 +125,23 @@ class MysqlSchema(object):
         except mysql_driver.ProgrammingError as e:
             (errcode, message) = e.args
 
-            self.module.fail_json(
-                msg="Cannot execute SQL '%s' : %s" % (query, to_native(e))
-            )
+            message = "Cannot execute SQL '{0}' : {1}".format(query, to_native(e))
+            self.module.log(msg="ERROR: {}".format(message))
+
+            return False, True, message
 
         exists, = cursor.fetchone()
         cursor.close()
         conn.close()
 
-        self.module.log(msg="  - exists {0}".format(exists))
+        message = "table schema exists {0}".format(exists)
+
+        self.module.log(msg="  - {0}".format(message))
 
         if(int(exists) >= 4):
-            return True, exists
+            return True, False, None
 
-        return False, 0
+        return False, False, None
 
     def __mysql_connect(self):
         """

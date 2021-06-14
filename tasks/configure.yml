@@ -118,9 +118,11 @@
     database_login_host: "{{ icingaweb_auth_backend.database.host }}"
     database_name: "{{ icingaweb_auth_backend.database.dbname }}"
     database_config_file: /etc/icingaweb2/.my.cnf
-  no_log: true
+  # no_log: true
   loop:
     "{{ icingaweb_users }}"
+  loop_control:
+    label: " username: {{ item.username }}, state: {{ item.state | default('present') }}"
   when:
     - icingaweb_users is defined
     - icingaweb_users | count != 0

@@ -9,7 +9,7 @@ import pprint
 pp = pprint.PrettyPrinter()
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
+    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('instance')
 
 
 def base_directory():
@@ -68,7 +68,6 @@ def get_vars(host):
 def test_directories(host, dirs):
     d = host.file(dirs)
     assert d.is_directory
-    assert d.exists
 
 
 @pytest.mark.parametrize("files", [
@@ -84,7 +83,6 @@ def test_directories(host, dirs):
 def test_files(host, files):
     f = host.file(files)
     assert f.exists
-    assert f.is_file
 
 
 @pytest.mark.parametrize("links", [
@@ -93,5 +91,4 @@ def test_files(host, files):
 ])
 def test_links(host, links):
     f = host.file(links)
-    assert f.exists
     assert f.is_symlink
