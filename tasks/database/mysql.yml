@@ -16,7 +16,7 @@
     table_schema: "{{ icingaweb_auth_backend.database.dbname }}"
   no_log: true
   register: mysql_icingaweb2_schema
-  check_mode: false
+  # check_mode: false
   when:
     - icingaweb_auth_backend is defined
     - icingaweb_auth_backend.database is defined
@@ -36,8 +36,8 @@
     target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
   no_log: true
   register: icingaweb2_database_schema
-  changed_when: false
-  check_mode: false
+  # changed_when: false
+  # check_mode: false
   when:
     - icingaweb_auth_backend is defined
     - icingaweb_auth_backend.database is defined
