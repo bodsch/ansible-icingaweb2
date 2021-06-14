@@ -17,7 +17,7 @@
 
 - name: mariadb
   src: https://github.com/geerlingguy/ansible-role-mysql.git
-  version: 3.3.0
+  version: 3.3.1
   #src: https://github.com/bodsch/ansible-mariadb.git
   #scm: git
   #version: 1.0.0
