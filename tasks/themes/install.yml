@@ -22,6 +22,8 @@
         update: true
       loop:
         "{{ icingaweb_themes }}"
+      loop_control:
+        label: "  theme: {{ item.name }} - version: {{ item.version | default('', true) }}"
 
     - name: download external images for themes to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_themes
       become: false
@@ -37,7 +39,10 @@
       check_mode: false
       loop:
         "{{ icingaweb_themes }}"
-      when: item.image is defined
+      loop_control:
+        label: "  theme: {{ item.name }} - version: {{ item.version | default('', true) }}"
+      when:
+        - item.image is defined
 
     - name: create transfer archive
       become: false
@@ -72,14 +77,22 @@
         mode: 0750
       loop:
         "{{ icingaweb_themes }}"
+      loop_control:
+        label: "  theme: {{ item.name }}"
 
-    - name: enable themes
+    - name: enable / disable themes
       become: true
-      command: |
-        icingacli module enable {{ item.name }}
+      icingacli:
+        state: "{{ 'enable' if item.enabled | default('true') else 'disable' }}"
+        command: module
+        module_name: "{{ item.name }}"
       loop:
         "{{ icingaweb_themes }}"
+      loop_control:
+        label: "  theme: {{ item.name }} - enabled: {{ item.enabled | default('true', true) }}"
 
   when:
     - icingaweb_themes is defined
     - icingaweb_themes | flatten(1) | count != 0
+
+...

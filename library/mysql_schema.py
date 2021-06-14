@@ -76,13 +76,21 @@ class MysqlSchema(object):
         self.module.log(msg="table_schema : {}".format(self.table_schema))
         self.module.log(msg="------------------------------")
 
-        state, count = self._information_schema()
+        state, count, error, error_message = self._information_schema()
 
-        res = dict(
-            failed=False,
-            changed=False,
-            exists=state,
-            count=count)
+        if error:
+            res = dict(
+                failed=True,
+                changed=False,
+                msg=error_message
+            )
+        else:
+            res = dict(
+                failed=False,
+                changed=False,
+                exists=state,
+                count=count
+            )
 
         self.module.log(msg="result: {}".format(res))
         self.module.log(msg="-------------------------------------------------------------")
@@ -90,8 +98,15 @@ class MysqlSchema(object):
         return res
 
     def _information_schema(self):
-        ''' ... '''
-        cursor, conn = self.__mysql_connect()
+        """
+          get informations about schema
+        """
+        cursor, conn, error, message = self.__mysql_connect()
+
+        self.module.log(msg="  - error: {0} | msg: {1}".format(error, message))
+
+        if error:
+            return None, 0, error, message
 
         query = "SELECT count(TABLE_NAME) FROM information_schema.tables where TABLE_SCHEMA = '{schema}'"
         query = query.format(schema=self.table_schema)
@@ -100,14 +115,19 @@ class MysqlSchema(object):
 
         try:
             cursor.execute(query)
+
         except mysql_driver.ProgrammingError as e:
             (errcode, message) = e.args
 
-            self.module.fail_json(msg="Cannot execute SQL '%s' : %s" % (query, to_native(e)))
+            self.module.fail_json(
+                msg="Cannot execute SQL '%s' : %s" % (query, to_native(e))
+            )
 
         exists, = cursor.fetchone()
         cursor.close()
         conn.close()
+
+        self.module.log(msg="  - exists {0}".format(exists))
 
         if(int(exists) >= 4):
             return True, exists
@@ -147,12 +167,17 @@ class MysqlSchema(object):
             db_connection = mysql_driver.connect(**config)
 
         except Exception as e:
-            self.module.log(
-                msg="unable to connect to database, check login_user and "
-                "login_password are correct or %s has the credentials. "
-                "Exception message: %s" % (config_file, to_native(e)))
+            message = "unable to connect to database. "
+            message += "check login_host, login_user and login_password are correct "
+            message += "or {0} has the credentials. "
+            message += "Exception message: {1}"
+            message = message.format(config_file, to_native(e))
 
-        return db_connection.cursor(), db_connection
+            self.module.log(msg=message)
+
+            return None, None, True, message
+
+        return db_connection.cursor(), db_connection, False, "successful connected"
 
     def __parse_from_mysql_config_file(self, cnf):
         cp = configparser.ConfigParser()

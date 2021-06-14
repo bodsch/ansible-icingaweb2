@@ -77,6 +77,8 @@
     path: "/etc/icingaweb2/enabledModules/{{ item }}"
   loop:
     '{{ icingaweb_modules_disabled }}'
+  loop_control:
+    label: "  module: {{ item }}"
 
 - name: enable icingaweb modules
   file:
@@ -89,6 +91,8 @@
     force: true
   loop:
     '{{ icingaweb_modules_enabled | list }}'
+  loop_control:
+    label: "  module: {{ item }}"
 
 - name: create monitoring modules configuration
   template:
@@ -133,3 +137,5 @@
     group: "{{ icingaweb_group }}"
     mode: 0750
     # recurse: true
+
+...

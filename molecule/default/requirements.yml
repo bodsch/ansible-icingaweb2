@@ -1,5 +1,15 @@
 ---
 
+- name: snapd
+  src: https://github.com/bodsch/ansible-snapd.git
+  scm: git
+  version: 1.0.0
+
+- name: apparmor
+  src: https://github.com/bodsch/ansible-apparmor.git
+  scm: git
+  version: 1.0.0
+
 - name: php-fpm
   src: https://github.com/bodsch/ansible-php.git
   scm: git
@@ -14,7 +24,7 @@
 
 - name: nginx
   src: https://github.com/geerlingguy/ansible-role-nginx.git
-  version: 2.7.0
+  version: 3.0.0
 
 - name: monitoring-tools
   src: https://github.com/bodsch/ansible-monitoring-plugins.git

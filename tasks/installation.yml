@@ -60,7 +60,8 @@
         state: link
         force: true
 
-  when: not __stat_present_icingaweb2.stat.exists
+  when:
+    - not __stat_present_icingaweb2.stat.exists
 
 - name: install python packages for support databases
   pip:
@@ -69,3 +70,5 @@
     state: present
   loop:
     - "{{ icingaweb_python_packages }}"
+
+...

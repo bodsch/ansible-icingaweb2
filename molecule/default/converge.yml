@@ -1,27 +1,18 @@
 ---
 
-- hosts: all
+- hosts: instance
   any_errors_fatal: false
   environment:
     NETRC: ''
 
-  pre_tasks:
-    - block:
-        - name: prepare for centos7 and python2
-          package:
-            name: [ "python-setuptools", "python2-pip" ]
-            state: present
-      when:
-        - ansible_os_family | lower == 'redhat'
-        - ansible_python.version.major | int == 2
-
-    - debug:
-        msg:
-          - "os family            : {{ ansible_os_family }}"
-          - "distribution         : {{ ansible_distribution }}"
-          - "distribution version : {{ ansible_distribution_major_version }}"
-          - "ansible version      : {{ ansible_version.full }}"
-          - "python version       : {{ ansible_python.version.major }}"
+  # pre_tasks:
+  #   - debug:
+  #       msg:
+  #         - "os family            : {{ ansible_os_family }}"
+  #         - "distribution         : {{ ansible_distribution }}"
+  #         - "distribution version : {{ ansible_distribution_major_version }}"
+  #         - "ansible version      : {{ ansible_version.full }}"
+  #         - "python version       : {{ ansible_python.version.major }}"
 
   roles:
-    - role: bodsch.icingaweb2
+    - role: ansible-icingaweb2

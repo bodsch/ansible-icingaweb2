@@ -21,6 +21,8 @@
         update: true
       loop:
         "{{ icingaweb_external_modules }}"
+      loop_control:
+        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
 
     - name: create transfer archive
       become: false
@@ -55,6 +57,8 @@
         mode: 0755
       loop:
         "{{ icingaweb_external_modules }}"
+      loop_control:
+        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
 
     - name: fix rights for modules
       become: true
@@ -66,6 +70,8 @@
         recurse: true
       loop:
         "{{ icingaweb_external_modules }}"
+      loop_control:
+        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
 
     - name: create directory for module configuration
       become: true
@@ -78,9 +84,12 @@
         mode: 0755
       loop:
         "{{ icingaweb_external_modules }}"
-      when: item.enabled and
-        item.configuration is defined and
-        item.configuration | count != 0
+      loop_control:
+        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
+      when:
+        - item.enabled
+        - item.configuration is defined
+        - item.configuration | count > 0
 
     - name: configure module
       become: true
@@ -92,9 +101,12 @@
         mode: 0666
       loop:
         "{{ icingaweb_external_modules }}"
-      when: item.enabled and
-        item.configuration is defined and
-        item.configuration | count != 0
+      loop_control:
+        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
+      when:
+        - item.enabled
+        - item.configuration is defined
+        - item.configuration | count > 0
 
     - name: create grafanas graphs.ini
       become: true
@@ -106,12 +118,15 @@
         mode: 0666
       loop:
         "{{ icingaweb_external_modules }}"
-      when: item.enabled and
-        item.name == 'grafana' and
-        item.configuration is defined and
-        item.configuration | count != 0 and
-        item.graphs is defined and
-        item.graphs | count != 0
+      loop_control:
+        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
+      when:
+        - item.enabled
+        - item.name == 'grafana'
+        - item.configuration is defined
+        - item.configuration | count > 0
+        - item.graphs is defined
+        - item.graphs | count > 0
 
     - name: disable modules
       become: true
@@ -120,7 +135,10 @@
         module: "{{ item.name }}"
       loop:
         "{{ icingaweb_external_modules }}"
-      when: not item.enabled | bool | default('false')
+      loop_control:
+        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
+      when:
+        - not item.enabled | bool | default('false')
 
     - name: enable modules
       become: true
@@ -129,8 +147,13 @@
         module: "{{ item.name }}"
       loop:
         "{{ icingaweb_external_modules }}"
-      when: item.enabled | bool | default('false')
+      loop_control:
+        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
+      when:
+        - item.enabled | bool | default('false')
 
   when:
     - icingaweb_external_modules is defined
-    - icingaweb_external_modules | flatten(1) | count != 0
+    - icingaweb_external_modules | flatten(1) | count > 0
+
+...

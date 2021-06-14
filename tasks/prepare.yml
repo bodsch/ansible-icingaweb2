@@ -81,3 +81,5 @@
   package:
     name: "{{ icingaweb_dependencies + icingaweb_php_dependencies }}"
     state: present
+
+...

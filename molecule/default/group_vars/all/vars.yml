@@ -6,7 +6,7 @@ icingaweb_resources:
   icingaweb:
     type: db
     db: mysql
-    host: 127.0.0.1
+    host: database
     port: 3306
     dbname: icingaweb_config
     username: icingaweb_config
@@ -16,7 +16,7 @@ icingaweb_resources:
   icinga_ido:
     type: db
     db: mysql
-    host: 127.0.0.1
+    host: database
     port: 3306
     dbname: icinga2_ido
     username: icinga2_ido
@@ -25,7 +25,7 @@ icingaweb_resources:
 
 icingaweb_auth_backend:
   database:
-    host: 127.0.0.1
+    host: database
     port: 3306
     dbname: icingaweb_config
     username: icingaweb_config
@@ -34,7 +34,7 @@ icingaweb_auth_backend:
 icingaweb_commandtransport:
   master-1:
     transport: api
-    host: 127.0.0.1
+    host: icinga
     port: 5665
     username: icingaweb
     password: S0mh1TuFJI
@@ -58,15 +58,26 @@ icingaweb_users:
     username: dark
     password: s3cur3
 
-# icingaweb_themes:
-#   - unicorn:
-#     name: unicorn
-#     src: https://github.com/Mikesch-mp/icingaweb2-theme-unicorn.git
-#     version: v1.0.2
-#     image: { name: "unicorn.png", "url": "http://i.imgur.com/SCfMd.png" }
-#   - batman-dark:
-#     name: batman-dark
-#     src: https://github.com/jschanz/icingaweb2-theme-batman-dark.git
-#     version: v1.0.0
+icingaweb_themes:
+  - unicorn:
+    name: unicorn
+    src: https://github.com/Mikesch-mp/icingaweb2-theme-unicorn.git
+    version: v1.0.2
+    image: { name: "unicorn.png", "url": "http://i.imgur.com/SCfMd.png" }
+    enabled: true
+  - batman-dark:
+    name: batman-dark
+    src: https://github.com/jschanz/icingaweb2-theme-batman-dark.git
+    version: v1.0.0
+    enabled: false
 
-# icingaweb_themes_default: Icinga
+icingaweb_themes_default: Icinga
+
+icingaweb_external_modules:
+  - audit:
+    enabled: true
+    name: audit
+    src: https://github.com/Icinga/icingaweb2-module-audit.git
+    version: v1.0.1
+
+...

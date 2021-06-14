@@ -14,9 +14,11 @@
     login_user: "{{ icingaweb_auth_backend.database.username }}"
     login_password: "{{ icingaweb_auth_backend.database.password }}"
     table_schema: "{{ icingaweb_auth_backend.database.dbname }}"
+  # no_log: true
   register: mysql_icingaweb2_schema
   changed_when: false
   check_mode: false
+  failed_when: true
   when:
     - icingaweb_auth_backend is defined
     - icingaweb_auth_backend.database is defined
@@ -34,6 +36,7 @@
     config_file: ''
     name: "{{ icingaweb_auth_backend.database.dbname }}"
     target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
+  no_log: true
   register: icingaweb2_database_schema
   changed_when: false
   check_mode: false
@@ -47,3 +50,5 @@
     - mysql_icingaweb2_schema is defined
     - mysql_icingaweb2_schema.exists is defined
     - not mysql_icingaweb2_schema.exists
+
+...
