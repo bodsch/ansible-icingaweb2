@@ -118,7 +118,7 @@
     database_login_host: "{{ icingaweb_auth_backend.database.host }}"
     database_name: "{{ icingaweb_auth_backend.database.dbname }}"
     database_config_file: /etc/icingaweb2/.my.cnf
-  # no_log: true
+  no_log: true
   register: import_icingaweb2_users
   loop:
     "{{ icingaweb_users }}"

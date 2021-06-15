@@ -25,7 +25,6 @@
       when:
         - ansible_os_family | lower == 'debian'
 
-
   # pre_tasks:
   #   - debug:
   #       msg:
