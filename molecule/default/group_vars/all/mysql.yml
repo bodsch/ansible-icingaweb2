@@ -6,7 +6,7 @@ mysql_innodb_buffer_pool_size: 64M
 mysql_innodb_log_file_size: 48M
 mysql_innodb_lock_wait_timeout: 100
 
-mysql_bind_address: 127.0.0.1
+mysql_bind_address: 0.0.0.0
 mysql_max_connections: 20
 
 mysql_root_password_update: true
@@ -17,10 +17,10 @@ mysql_databases:
 
 mysql_users:
   - name: icinga2_ido
-    host: 127.0.0.1
+    host: "%"
     password: icinga2
     priv: "icinga2_ido.*:ALL"
   - name: icingaweb_config
-    host: 127.0.0.1
+    host: "%"
     password: icingaweb_config
     priv: "icingaweb_config.*:ALL"

@@ -13,12 +13,9 @@ from ansible.module_utils.six.moves import configparser
 
 try:
     import pymysql as mysql_driver
-#     _mysql_cursor_param = 'cursor'
 except ImportError:
     try:
         import MySQLdb as mysql_driver
-#         import MySQLdb.cursors
-#         _mysql_cursor_param = 'cursorclass'
     except ImportError:
         mysql_driver = None
 
@@ -69,20 +66,34 @@ class MysqlSchema(object):
         self.db_connect_timeout = 30
 
     def run(self):
-        '''  ...  '''
+        """
+        """
         self.module.log(msg="-------------------------------------------------------------")
         self.module.log(msg="user         : {}".format(self.login_user))
         self.module.log(msg="password     : {}".format(self.login_password))
         self.module.log(msg="table_schema : {}".format(self.table_schema))
         self.module.log(msg="------------------------------")
 
-        state, count = self._information_schema()
+        if not mysql_driver:
+            return dict(
+                failed=True,
+                error=mysql_driver_fail_msg
+            )
 
-        res = dict(
-            failed=False,
-            changed=False,
-            exists=state,
-            count=count)
+        state, error, error_message = self._information_schema()
+
+        if error:
+            res = dict(
+                failed=True,
+                changed=False,
+                msg=error_message
+            )
+        else:
+            res = dict(
+                failed=False,
+                changed=False,
+                exists=state
+            )
 
         self.module.log(msg="result: {}".format(res))
         self.module.log(msg="-------------------------------------------------------------")
@@ -90,8 +101,21 @@ class MysqlSchema(object):
         return res
 
     def _information_schema(self):
-        ''' ... '''
-        cursor, conn = self.__mysql_connect()
+        """
+          get informations about schema
+
+          return:
+            state: bool (exists or not)
+            count: int
+            error: boot (error or not)
+            error_message string  error message
+        """
+        cursor, conn, error, message = self.__mysql_connect()
+
+        self.module.log(msg="  - error: {0} | msg: {1}".format(error, message))
+
+        if error:
+            return None, error, message
 
         query = "SELECT count(TABLE_NAME) FROM information_schema.tables where TABLE_SCHEMA = '{schema}'"
         query = query.format(schema=self.table_schema)
@@ -100,19 +124,27 @@ class MysqlSchema(object):
 
         try:
             cursor.execute(query)
+
         except mysql_driver.ProgrammingError as e:
             (errcode, message) = e.args
 
-            self.module.fail_json(msg="Cannot execute SQL '%s' : %s" % (query, to_native(e)))
+            message = "Cannot execute SQL '{0}' : {1}".format(query, to_native(e))
+            self.module.log(msg="ERROR: {}".format(message))
+
+            return False, True, message
 
         exists, = cursor.fetchone()
         cursor.close()
         conn.close()
 
-        if(int(exists) >= 4):
-            return True, exists
+        message = "table schema exists {0}".format(exists)
 
-        return False, 0
+        self.module.log(msg="  - {0}".format(message))
+
+        if(int(exists) >= 4):
+            return True, False, None
+
+        return False, False, None
 
     def __mysql_connect(self):
         """
@@ -147,12 +179,17 @@ class MysqlSchema(object):
             db_connection = mysql_driver.connect(**config)
 
         except Exception as e:
-            self.module.log(
-                msg="unable to connect to database, check login_user and "
-                "login_password are correct or %s has the credentials. "
-                "Exception message: %s" % (config_file, to_native(e)))
+            message = "unable to connect to database. "
+            message += "check login_host, login_user and login_password are correct "
+            message += "or {0} has the credentials. "
+            message += "Exception message: {1}"
+            message = message.format(config_file, to_native(e))
 
-        return db_connection.cursor(), db_connection
+            self.module.log(msg=message)
+
+            return None, None, True, message
+
+        return db_connection.cursor(), db_connection, False, "successful connected"
 
     def __parse_from_mysql_config_file(self, cnf):
         cp = configparser.ConfigParser()

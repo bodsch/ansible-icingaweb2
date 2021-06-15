@@ -6,7 +6,7 @@ icingaweb_resources:
   icingaweb:
     type: db
     db: mysql
-    host: 127.0.0.1
+    host: database
     port: 3306
     dbname: icingaweb_config
     username: icingaweb_config
@@ -16,7 +16,7 @@ icingaweb_resources:
   icinga_ido:
     type: db
     db: mysql
-    host: 127.0.0.1
+    host: database
     port: 3306
     dbname: icinga2_ido
     username: icinga2_ido
@@ -25,7 +25,7 @@ icingaweb_resources:
 
 icingaweb_auth_backend:
   database:
-    host: 127.0.0.1
+    host: database
     port: 3306
     dbname: icingaweb_config
     username: icingaweb_config
@@ -34,7 +34,7 @@ icingaweb_auth_backend:
 icingaweb_commandtransport:
   master-1:
     transport: api
-    host: 127.0.0.1
+    host: icinga
     port: 5665
     username: icingaweb
     password: S0mh1TuFJI

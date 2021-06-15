@@ -17,11 +17,17 @@
 
 - name: mariadb
   src: https://github.com/geerlingguy/ansible-role-mysql.git
-  version: 3.3.0
+  version: 3.3.1
   #src: https://github.com/bodsch/ansible-mariadb.git
   #scm: git
   #version: 1.0.0
 
 - name: nginx
   src: https://github.com/geerlingguy/ansible-role-nginx.git
-  version: 2.7.0
+  version: 3.0.0
+
+- name: monitoring-tools
+  src: https://github.com/bodsch/ansible-monitoring-plugins.git
+  version: 1.3.0
+
+...

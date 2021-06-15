@@ -58,7 +58,7 @@ class IcingaWeb2Modules(object):
                       create link from '/usr/share/icingaweb2/modules/$MODULE' to '/etc/icingaweb2/enabledModules/$MODULE'
                     """
                     if(os.path.islink(destination) and os.readlink(destination) == source):
-                        #                        module.log(msg="link exists and is valid")
+                        # module.log(msg="link exists and is valid")
                         pass
                     else:
                         if(not os.path.islink(destination)):
