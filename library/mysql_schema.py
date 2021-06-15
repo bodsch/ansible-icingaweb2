@@ -13,12 +13,9 @@ from ansible.module_utils.six.moves import configparser
 
 try:
     import pymysql as mysql_driver
-#     _mysql_cursor_param = 'cursor'
 except ImportError:
     try:
         import MySQLdb as mysql_driver
-#         import MySQLdb.cursors
-#         _mysql_cursor_param = 'cursorclass'
     except ImportError:
         mysql_driver = None
 
@@ -76,6 +73,12 @@ class MysqlSchema(object):
         self.module.log(msg="password     : {}".format(self.login_password))
         self.module.log(msg="table_schema : {}".format(self.table_schema))
         self.module.log(msg="------------------------------")
+
+        if not mysql_driver:
+            return dict(
+                failed=True,
+                error=mysql_driver_fail_msg
+            )
 
         state, error, error_message = self._information_schema()
 

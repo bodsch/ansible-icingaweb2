@@ -16,7 +16,6 @@
     table_schema: "{{ icingaweb_auth_backend.database.dbname }}"
   no_log: true
   register: mysql_icingaweb2_schema
-  # check_mode: false
   when:
     - icingaweb_auth_backend is defined
     - icingaweb_auth_backend.database is defined
@@ -24,6 +23,15 @@
     - icingaweb_auth_backend.database.username is defined
     - icingaweb_auth_backend.database.password is defined
     - icingaweb_auth_backend.database.dbname is defined
+
+- name: error
+  fail:
+    msg:
+      - "ERROR: {{ mysql_icingaweb2_schema }}"
+  when:
+    - mysql_icingaweb2_schema is defined
+    - mysql_icingaweb2_schema.failed is defined
+    - mysql_icingaweb2_schema.failed
 
 - name: import database schema
   mysql_db:
@@ -36,8 +44,6 @@
     target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
   no_log: true
   register: icingaweb2_database_schema
-  # changed_when: false
-  # check_mode: false
   when:
     - icingaweb_auth_backend is defined
     - icingaweb_auth_backend.database is defined
@@ -49,4 +55,12 @@
     - mysql_icingaweb2_schema.exists is defined
     - not mysql_icingaweb2_schema.exists
 
+- name: error
+  fail:
+    msg:
+      - "ERROR: {{ icingaweb2_database_schema }}"
+  when:
+    - icingaweb2_database_schema is defined
+    - icingaweb2_database_schema.failed is defined
+    - icingaweb2_database_schema.failed
 ...

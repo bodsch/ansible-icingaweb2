@@ -6,6 +6,7 @@
 
 from __future__ import absolute_import, print_function
 import os
+import errno
 import json
 import crypt
 import hashlib
@@ -68,7 +69,7 @@ class IcingaWeb2DatabaseUser(object):
         try:
             # Create target Directory
             os.mkdir(self.state_directory)
-        except FileExistsError:
+        except OSError as e:
             pass
 
     def run(self):
