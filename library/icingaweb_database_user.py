@@ -133,7 +133,19 @@ class IcingaWeb2DatabaseUser(object):
                 msg=message
             )
 
-        state, error, error_message = self.__insert_user(self.username, password_hash)
+        state, error, error_message = self.__list_user(self.username)
+
+        if error:
+            return dict(
+                failed=True,
+                msg=error_message
+            )
+
+        if state:
+            state, error, error_message = self.__update_user(self.username, password_hash)
+        else:
+            state, error, error_message = self.__insert_user(self.username, password_hash)
+
         if error:
             return dict(
                 failed=True,
@@ -183,31 +195,52 @@ class IcingaWeb2DatabaseUser(object):
         password_hash = hashlib.sha256(password_bytes)
         return password_hash.hexdigest()
 
-    def __insert_user(self, username, password_hash):
+    def __list_user(self, user):
         """
-
         """
-        q = "insert ignore into icingaweb_user (name, active, password_hash) VALUES ('{}', {}, '{}');"
-        q = q.format(username, '1', password_hash)
+        number_of_rows = 0
 
         cursor, conn, error, message = self.__mysql_connect()
-
-        self.module.log(msg="  - error: {0} | msg: {1}".format(error, message))
 
         if error:
             return False, error, message
 
-        try:
-            self.module.log(msg="query      : {}".format(q))
-            cursor.execute(q)
-        except Exception as e:
-            if not self.db_autocommit:
-                conn.rollback()
+        q = "select name from icingaweb_user where name = '{}'"
+        q = q.format(user)
 
+        try:
+            number_of_rows = cursor.execute(q)
+            cursor.fetchone()
             cursor.close()
+
+        except Exception as e:
             self.module.fail_json(msg="Cannot execute SQL '%s' : %s" % (q, to_native(e)))
 
-        conn.close()
+        if number_of_rows == 1:
+            return True, False, ""
+        else:
+            return False, False, ""
+
+    def __insert_user(self, username, password_hash):
+        """
+
+        """
+        cursor, conn, error, message = self.__mysql_connect()
+
+        if error:
+            return False, error, message
+
+        q = "insert ignore into icingaweb_user (name, active, password_hash) VALUES ('{}', {}, '{}');"
+        q = q.format(username, '1', password_hash)
+
+        try:
+            cursor.execute(q)
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            self.module.fail_json(msg="Cannot execute SQL '%s' : %s" % (q, to_native(e)))
+        finally:
+            cursor.close()
 
         return True, False, None
 
@@ -215,26 +248,22 @@ class IcingaWeb2DatabaseUser(object):
         """
 
         """
-        q = "update icingaweb_user set password_hash = '{}' where name = '{}';".format(password_hash, username)
-
-        self.module.log(msg=" => {}".format(q))
+        q = "update icingaweb_user set active = {}, password_hash = '{}' where name = '{}';"
+        q = q.format(1, password_hash, username)
 
         cursor, conn, error, message = self.__mysql_connect()
-
-        self.module.log(msg="  - error: {0} | msg: {1}".format(error, message))
 
         if error:
             return None, error, message
 
         try:
-            self.module.log(msg="query      : {}".format(q))
             cursor.execute(q)
+            conn.commit()
         except Exception as e:
-            if not self.db_autocommit:
-                conn.rollback()
-
-            cursor.close()
+            conn.rollback()
             self.module.fail_json(msg="Cannot execute SQL '%s' : %s" % (q, to_native(e)))
+        finally:
+            cursor.close()
 
         conn.close()
 
@@ -261,6 +290,7 @@ class IcingaWeb2DatabaseUser(object):
             _show_benchmark = self.__int_from_bool(preferences.get('show_benchmark', False))
             _show_stacktraces = self.__int_from_bool(preferences.get('show_stacktraces', False))
 
+            queries.append("delete from icingaweb_user_preference where username = {}".format(username))
             queries.append(q.format(username, 'auto_refresh', _auto_refresh))
             queries.append(q.format(username, 'show_application_state_messages', _show_application_msg))
             queries.append(q.format(username, 'show_benchmark', _show_benchmark))
@@ -283,6 +313,10 @@ class IcingaWeb2DatabaseUser(object):
                 self.module.log(msg=" => {}".format(q))
                 try:
                     cursor.execute(q)
+
+                    if not self.db_autocommit:
+                        conn.commit()
+
                 except Exception as e:
                     if not self.db_autocommit:
                         conn.rollback()
