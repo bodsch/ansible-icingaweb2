@@ -140,7 +140,7 @@ class IcingaWeb2DatabaseUser(object):
                 msg=error_message
             )
 
-        if self.preferences: # and not preferences_up2date and self.force:
+        if self.preferences:
             state, error, error_message = self.__insert_preferences(self.username, self.preferences)
             if error:
                 return dict(
