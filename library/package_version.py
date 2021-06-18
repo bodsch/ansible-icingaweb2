@@ -10,6 +10,30 @@ import re
 from ansible.module_utils import distro
 from ansible.module_utils.basic import AnsibleModule
 
+__metaclass__ = type
+
+ANSIBLE_METADATA = {
+    'metadata_version': '0.1',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
+
+DOCUMENTATION = """
+---
+module: package_version.py
+author:
+    - 'Bodo Schulz'
+short_description: tries to determine the version of a package to be installed.
+description: ''
+"""
+
+EXAMPLES = """
+- name: get version of installed php-fpm
+  package_version:
+    package_name: "php-fpm"
+  register: package_version
+"""
+
 
 class PackageVersion(object):
 

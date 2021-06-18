@@ -113,6 +113,7 @@
     state: "{{ item.state | default('present') }}"
     username: "{{ item.username }}"
     password: "{{ item.password }}"
+    active: "{{ item.active | default(omit) }}"
     preferences: "{{ item.preferences | default(omit) }}"
     force: "{{ item.force | default(omit) }}"
     database_login_host: "{{ icingaweb_auth_backend.database.host }}"
@@ -123,7 +124,7 @@
   loop:
     "{{ icingaweb_users }}"
   loop_control:
-    label: " username: {{ item.username }}, state: {{ item.state | default('present') }}"
+    label: "username: {{ item.username }}, active: {{ item.active | default(omit) }}, state: {{ item.state | default('present') }}"
   when:
     - icingaweb_users is defined
     - icingaweb_users | count != 0
