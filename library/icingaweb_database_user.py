@@ -125,11 +125,33 @@ class IcingaWeb2DatabaseUser(object):
         user_should_active = 0
         password_checksum_exists = ''
         preferences_checksum_exists = ''
-
         user_up2date = False
         preferences_up2date = False
 
-        if(os.path.exists(file_name)):
+        # first step:
+        # take a lock into the database
+        user_exists, error, error_message = self.__list_user(self.username)
+
+        if error:
+            return dict(
+                failed=True,
+                msg=error_message
+            )
+        # second step:
+        # check checksum file
+        local_checksum_file = os.path.exists(file_name)
+
+        if not user_exists and local_checksum_file:
+            """
+              hupps!?
+            """
+            self.module.log(msg=" WARNING user '{}' exists not in database but has a local checksum file".format(self.username))
+            os.remove(file_name)
+            local_checksum_file = False
+
+        # ------------------------------------------------------------
+
+        if local_checksum_file:
             """
             """
             with open(file_name) as f:
@@ -161,14 +183,6 @@ class IcingaWeb2DatabaseUser(object):
                 changed=False,
                 failed=False,
                 msg=message
-            )
-
-        user_exists, error, error_message = self.__list_user(self.username)
-
-        if error:
-            return dict(
-                failed=True,
-                msg=error_message
             )
 
         if user_exists:
