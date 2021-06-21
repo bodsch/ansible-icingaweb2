@@ -13,7 +13,7 @@
 - name: php-fpm
   src: https://github.com/bodsch/ansible-php.git
   scm: git
-  version: 1.4.0
+  version: 1.5.0
 
 - name: mariadb
   src: https://github.com/geerlingguy/ansible-role-mysql.git

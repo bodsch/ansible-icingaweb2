@@ -33,7 +33,9 @@
 
 - name: assert php_version
   assert:
-    that: php_version is version_compare('7.0', '>=')
+    that:
+      - php_version is defined
+      - php_version is version_compare('7.0', '>=')
     msg: "This role only works with PHP >= 7.0 .. found: {{ php_version }}"
 
 - name: merge dependencies between defaults and custom

@@ -18,6 +18,23 @@ ANSIBLE_METADATA = {
     'supported_by': 'community'
 }
 
+DOCUMENTATION = """
+---
+module: icingawweb_module.py
+author:
+    - 'Bodo Schulz'
+short_description: enable / disable icingaweb modules.
+description: ''
+"""
+
+EXAMPLES = """
+- name: disable modules
+  become: true
+  icingaweb_module:
+    state: absent
+    module: dark_lord
+"""
+
 
 class IcingaWeb2Modules(object):
     """

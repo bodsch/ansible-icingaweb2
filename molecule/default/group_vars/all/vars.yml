@@ -43,7 +43,6 @@ icingaweb_users:
   - admin:
     username: admin
     password: admin
-    # force: true
     preferences:
       language: de_DE
       timezone: Europe/Berlin
@@ -57,6 +56,8 @@ icingaweb_users:
   - dark:
     username: dark
     password: s3cur3
+    active: false
+    force: true
 
 icingaweb_themes:
   - unicorn:
