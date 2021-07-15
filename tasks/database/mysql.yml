@@ -14,7 +14,7 @@
     login_user: "{{ icingaweb_auth_backend.database.username }}"
     login_password: "{{ icingaweb_auth_backend.database.password }}"
     table_schema: "{{ icingaweb_auth_backend.database.dbname }}"
-  no_log: true
+  # no_log: true
   register: mysql_icingaweb2_schema
   when:
     - icingaweb_auth_backend is defined

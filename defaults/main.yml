@@ -2,6 +2,9 @@
 
 icingaweb_version: 2.8.2
 
+icingaweb_php_library: 0.6.0
+icingaweb_php_thirdparty: 0.10.0
+
 icingaweb_install_dir: /usr/share/icingaweb2
 
 icingaweb_modules_disabled:

@@ -1,5 +1,7 @@
 ---
 
+icingaweb_version: 2.9.0
+
 icingaweb_log_level: WARN
 
 icingaweb_resources:

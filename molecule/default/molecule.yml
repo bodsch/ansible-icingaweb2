@@ -20,6 +20,8 @@ platforms:
     pre_build_image: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - database
     docker_networks:
       - name: icinga
         ipam_config:
@@ -37,6 +39,8 @@ platforms:
     pre_build_image: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - icinga
     networks:
       - name: icinga
         ipv4_address: "10.11.0.2"
@@ -49,6 +53,8 @@ platforms:
     pre_build_image: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    published_ports:
+      - 80:80
     networks:
       - name: icinga
         ipv4_address: "10.11.0.3"
@@ -57,7 +63,7 @@ provisioner:
   name: ansible
   ansible_args:
     - --diff
-    - -v
+    # - -v
   config_options:
     defaults:
       deprecation_warnings: True

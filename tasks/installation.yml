@@ -59,9 +59,97 @@
         mode: 0755
         state: link
         force: true
-
   when:
     - not __stat_present_icingaweb2.stat.exists
+
+- debug:
+    msg:
+      - "{{ icingaweb_version }}"
+      - "{{ icingaweb_version is version('2.9.0', '>=', strict=True) }}"
+      - "{{ '2.8.4' is version('2.9.0', '>=', strict=True) }}"
+      - "{{ '2.9.1' is version('2.9.0', '>=', strict=True) }}"
+
+- block:
+    - name:
+      debug:
+        msg: "install version {{ icingaweb_version }} dependencies"
+
+    - name: create directory for PHP libraries
+      file:
+        path: /usr/share/icinga-php
+        state: directory
+        mode: 0755
+
+    - name: download icinga-php-library v{{ icingaweb_php_library }}.tar.gz to local directory {{ icingaweb_local_tmp_directory }}
+      become: false
+      get_url:
+        url: https://github.com/Icinga/icinga-php-library/archive/v{{ icingaweb_php_library }}.tar.gz
+        dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
+        mode: 0660
+      register: _download_artefact
+      until: _download_artefact is succeeded
+      retries: 5
+      delay: 2
+      check_mode: false
+      delegate_to: localhost
+
+    - name: download icinga-php-library v{{ icingaweb_php_thirdparty }}.tar.gz to local directory {{ icingaweb_local_tmp_directory }}
+      become: false
+      get_url:
+        url: https://github.com/Icinga/icinga-php-thirdparty/archive/v{{ icingaweb_php_thirdparty }}.tar.gz
+        dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
+        mode: 0660
+      register: _download_artefact
+      until: _download_artefact is succeeded
+      retries: 5
+      delay: 2
+      check_mode: false
+      delegate_to: localhost
+
+    - name: deploy library archives
+      copy:
+        src: "{{ icingaweb_local_tmp_directory }}/{{ item }}"
+        dest: /tmp
+        mode: 0700
+      loop:
+        - "icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
+        - "icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
+
+    - name: extract library archives
+      unarchive:
+        src: "/tmp/{{ item }}"
+        dest: /usr/share/icinga-php/
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        remote_src: true
+      loop:
+        - "icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
+        - "icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
+
+    - name: create link from icinga-php-library to ipl
+      file:
+        src: "/usr/share/icinga-php/icinga-php-library-{{ icingaweb_php_library }}"
+        dest: "/usr/share/icinga-php/ipl"
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        state: link
+        force: true
+
+    - name: create link from icinga-php-thirdparty to vendor
+      file:
+        src: "/usr/share/icinga-php/icinga-php-thirdparty-{{ icingaweb_php_thirdparty }}"
+        dest: "/usr/share/icinga-php/vendor"
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        state: link
+        force: true
+
+  when:
+    - icingaweb_version is version('2.9.0', '>=', strict=True)
+
 
 - name: install python packages for support databases
   pip:

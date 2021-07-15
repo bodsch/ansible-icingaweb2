@@ -1,5 +1,7 @@
 ---
 
+monitoring_plugins_directory: /usr/lib/monitoring-plugins
+
 icinga2_salt: 42T2fYT6kK0njvNMww8eWinBdEO5vh02xwC5qaNMMx77qNkYFE7bIxj5v291ajAW
 
 icinga2_ha: false
@@ -19,9 +21,9 @@ icinga2_api:
         - "objects/query/*"
 
 icinga2_masters:
-  instance: {}
+  icinga2:
     # type: primary
-    # ip: 127.0.0.1
+    ip: 10.11.0.2
 
 icinga2_ido:
   user: icinga2_ido
