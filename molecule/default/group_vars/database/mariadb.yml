@@ -28,4 +28,3 @@ mariadb_config_mysqld:
   performance_schema: 1
   expire_logs_days: 2
   max_connections: 20
-
