@@ -2,8 +2,6 @@
 
 # mariadb_python_package_debian: "{{ 'python3-mysqldb' if ansible_python.version.major == 3 else 'python-mysqldb' }}"
 
-# ansible_python_interpreter: /usr/bin/python3
-
 mariadb_root_password_update: true
 
 mariadb_databases:

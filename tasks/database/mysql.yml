@@ -121,4 +121,14 @@
     cmd: /usr/local/bin/icingaweb-database-upgrade.sh
   changed_when: false
 
+- name: update database version information
+  mysql_db:
+    state: import
+    login_host: "{{ icingaweb_auth_backend.database.host }}"
+    login_user: "{{ icingaweb_auth_backend.database.username }}"
+    login_password: "{{ icingaweb_auth_backend.database.password }}"
+    config_file: ''
+    name: "{{ icingaweb_auth_backend.database.dbname }}"
+    target: '{{ icingaweb_install_dir }}/etc/schema/mysql.dbversion_{{ icingaweb_version }}.sql'
+
 ...

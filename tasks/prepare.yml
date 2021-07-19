@@ -9,6 +9,37 @@
 #     that: ansible_python.version.major != 2
 #     msg: "Sorry, we don't support python 2 anymore!"
 
+- name: include OS specific configuration
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      paths:
+        - "vars"
+      files:
+        # eg. debian-10 / ubuntu-20.04 / centos-8 / oraclelinux-8
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+        # eg. debian / ubuntu / centos / oraclelinux
+        - "{{ ansible_distribution | lower }}.yaml"
+        # eg. redhat / debian
+        - "{{ ansible_os_family | lower }}.yaml"
+        - default.yaml
+      skip: true
+
+- block:
+    - name: make sure dnf is installed (only redhat based <8)
+      package:
+        name:
+          - dnf
+          - iproute
+        state: present
+
+    - name: get latest system information
+      setup:
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution | lower == 'centos'
+    - ansible_distribution_version | int < 8
+
 - name: create local temp directory
   become: false
   delegate_to: 127.0.0.1
@@ -71,6 +102,37 @@
   set_fact:
     icingaweb_resources: "{{ icingaweb_defaults_resources |
       combine( icingaweb_resources, recursive=True ) }}"
+
+- name: ensure the ansible_python_interpreter is set to python2 (only redhat based <8)
+  set_fact:
+    ansible_python_interpreter: python2
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_version | int < 8
+
+- name: detect python3
+  stat:
+    path: /usr/bin/python3
+  register: python3_bin_present
+  changed_when: not python3_bin_present.stat.exists
+
+- name: ensure the ansible_python_interpreter is set to python3
+  set_fact:
+    ansible_python_interpreter: /usr/bin/python3
+  when:
+    - ansible_python.version.major == 2
+    - python3_bin_present.stat.exists
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution | lower == 'centos'
+    - ansible_distribution_version | int >= 8
+#   when:
+#     - ansible_python.version.major == 2
+#     - python3_bin_present.stat.exists
+#     - (ansible_os_family | lower == 'redhat' and ansible_distribution_version | int >= 8) or
+#       ansible_os_family | lower == 'debian'
+
+- name: do facts module to get latest information
+  setup:
 
 # # TODO
 # # move the PHP dependencies into the php role

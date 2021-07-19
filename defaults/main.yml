@@ -26,9 +26,6 @@ icingaweb_themes_default: Icinga
 
 icingaweb_external_modules: []
 
-# icingaweb_config_backend: db
-# icingaweb_config_resource: icingaweb_db
-
 icingaweb_preferences_store: db
 
 # /etc/icingaweb2/config.ini
@@ -39,9 +36,6 @@ icingaweb_config_resource: icingaweb
 
 # /etc/icingaweb2/authentication.ini
 icingaweb_authentication: {}
-
-# icingaweb_groups_backend: db
-# icingaweb_groups_resource: icingaweb
 
 # /etc/icingaweb2/groups.ini
 icingaweb_groups: {}
@@ -79,13 +73,10 @@ icingaweb_auth_backend:
     username: "{{ icingaweb_auth_dba_username }}"
     password: "{{ icingaweb_auth_dba_password }}"
 
-# "{{ icingaweb_resources.icingaweb }}"
-
 icingaweb_users:
   admin:
     username: admin
     password: admin
-    # TODO
     preferences:
       language: de_DE
       timezone: Europe/Berlin

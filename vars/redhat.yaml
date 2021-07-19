@@ -1,0 +1,11 @@
+---
+
+icingaweb_packages:
+  - mariadb
+  - iproute
+  - python3-PyMySQL
+
+icingaweb_user: nginx
+icingaweb_group: nginx
+
+...

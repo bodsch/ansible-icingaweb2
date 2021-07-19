@@ -1,0 +1,16 @@
+---
+
+icingaweb_packages:
+  # - python-pymysql
+  - python3-pymysql
+  - python3-mysqldb
+  - python3-pip
+  - python3-setuptools
+  - mariadb-client
+  - iproute2
+  - libmariadb-dev
+
+icingaweb_user: www-data
+icingaweb_group: www-data
+
+...

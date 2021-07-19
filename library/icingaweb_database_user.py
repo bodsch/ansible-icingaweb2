@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+
 # -*- coding: utf-8 -*-
 
 # (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
@@ -6,25 +7,15 @@
 
 from __future__ import absolute_import, print_function
 import os
-# import errno
+import warnings
 import json
-import crypt
-import hashlib
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
 from ansible.module_utils._text import to_native
-
-try:
-    import pymysql as mysql_driver
-except ImportError:
-    try:
-        import MySQLdb as mysql_driver
-    except ImportError:
-        mysql_driver = None
-
-mysql_driver_fail_msg = 'The PyMySQL (Python 2.7 and Python 3.X) or MySQL-python (Python 2.X) module is required.'
-
+from ansible.module_utils.mysql import (
+    mysql_driver, mysql_driver_fail_msg
+)
 
 __metaclass__ = type
 
@@ -99,23 +90,24 @@ class IcingaWeb2DatabaseUser(object):
         except OSError as e:
             pass
 
+        # self.module.log(msg="------------------------------")
+        # self.module.log(msg="version {}".format(sys.version_info))
+        # self.module.log(msg="------------------------------")
+
     def run(self):
         """
         """
+        # self.module.log(msg="- run()")
+
         res = dict(
             changed=False,
             failed=False
         )
 
-        if not mysql_driver:
-            return dict(
-                failed=True,
-                error=mysql_driver_fail_msg
-            )
-
-        # self.module.log(msg="------------------------------")
-        # self.module.log(msg="user: {}".format(self.username))
-        # self.module.log(msg="------------------------------")
+        if mysql_driver is None:
+            self.module.fail_json(msg=mysql_driver_fail_msg)
+        else:
+            warnings.filterwarnings('error', category=mysql_driver.Warning)
 
         file_name = "{}/user_{}.json".format(self.state_directory, self.username)
 
@@ -163,10 +155,6 @@ class IcingaWeb2DatabaseUser(object):
         # user_active = (user_should_active == self.active)
         preferences_up2date = (preferences_checksum_exists == preferences_checksum)
         user_up2date = (password_checksum_exists == password_checksum and user_should_active == self.active)
-
-        # self.module.log(msg="user_up2date       : {}".format(user_up2date))
-        # self.module.log(msg="preferences_up2date: {}".format(preferences_up2date))
-        # self.module.log(msg="force              : {}".format(self.force))
 
         if preferences_up2date and user_up2date and not self.force:
             msg = []
@@ -232,16 +220,24 @@ class IcingaWeb2DatabaseUser(object):
             msg=message
         )
 
-    # https://docs.python.org/3/library/crypt.html
+    def __password_hash(self, plaintext):
+        """
+          https://docs.python.org/3/library/crypt.html
+        """
+        # self.module.log(msg="- __password_hash({})".format(plaintext))
 
-    def __password_hash(sef, plaintext):
-        """
-        """
-        return crypt.crypt(plaintext, crypt.METHOD_SHA256)
+        import crypt
+        return crypt.crypt(
+            plaintext,
+            crypt.mksalt(crypt.METHOD_SHA512)
+        )
 
     def __checksum(self, plaintext):
         """
         """
+        # self.module.log(msg="- __checksum({})".format(plaintext))
+
+        import hashlib
         password_bytes = plaintext.encode('utf-8')
         password_hash = hashlib.sha256(password_bytes)
         return password_hash.hexdigest()
@@ -415,9 +411,9 @@ class IcingaWeb2DatabaseUser(object):
 
             self.module.log(msg=message)
 
-            return None, None, True, message
+            return (None, None, True, message)
 
-        return db_connection.cursor(), db_connection, False, "successful connected"
+        return (db_connection.cursor(), db_connection, False, "successful connected")
 
     def __parse_from_mysql_config_file(self, cnf):
         cp = configparser.ConfigParser()
