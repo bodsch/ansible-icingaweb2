@@ -41,8 +41,6 @@ icingaweb_packages: []
 
 icingaweb_php_packages: []
 
-icingaweb_python_packages: []
-
 icingaweb_user: ""
 
 icingaweb_group: ""
