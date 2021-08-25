@@ -1,4 +1,6 @@
 
+# Ansible Role:  `icingaweb2`
+
 Install an icingaweb2 from [sources](https://github.com/Icinga/icingaweb2).
 
 Supports various external modules and themes.
