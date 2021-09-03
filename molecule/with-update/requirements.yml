@@ -18,7 +18,7 @@
 - name: mariadb
   src: https://github.com/bodsch/ansible-mariadb.git
   scm: git
-  version: 2.2.3
+  version: 2.2.4
 
 - name: nginx
   src: https://github.com/geerlingguy/ansible-role-nginx.git
@@ -31,6 +31,6 @@
 - name: icinga2
   src: https://github.com/bodsch/ansible-icinga2.git
   scm: git
-  version: 1.5.0
+  version: 1.5.1
 
 ...

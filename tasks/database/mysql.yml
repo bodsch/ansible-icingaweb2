@@ -94,28 +94,6 @@
     - mysql_icingaweb2_schema.exists is defined
     - not mysql_icingaweb2_schema.exists
 
-# - block:
-#     # TODO
-#     # install upgrade for existing installation
-#     - name:
-#       debug:
-#         msg: "install version {{ icingaweb_version }} dependencies"
-#
-#     # '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
-#
-#     - name: import database upgrade
-#       mysql_db:
-#         state: import
-#         login_host: "{{ icingaweb_auth_backend.database.host }}"
-#         login_user: "{{ icingaweb_auth_backend.database.username }}"
-#         login_password: "{{ icingaweb_auth_backend.database.password }}"
-#         config_file: ''
-#         name: "{{ icingaweb_auth_backend.database.dbname }}"
-#         target: '{{ icingaweb_install_dir }}/etc/schema/mysql-upgrades/2.9.0.sql'
-#
-#   when:
-#     - icingaweb_version is version('2.9.0', '>=', strict=True)
-
 - name: update database schema  # noqa 'command-instead-of-shell'
   command:
     cmd: /usr/local/bin/icingaweb-database-upgrade.sh
