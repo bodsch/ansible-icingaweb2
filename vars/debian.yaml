@@ -2,6 +2,7 @@
 
 icingaweb_packages:
   # - python-pymysql
+  - python3-apt
   - python3-pymysql
   - python3-mysqldb
   - python3-pip
