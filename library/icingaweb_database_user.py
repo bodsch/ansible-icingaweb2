@@ -227,9 +227,19 @@ class IcingaWeb2DatabaseUser(object):
         # self.module.log(msg="- __password_hash({})".format(plaintext))
 
         import crypt
+        salt = ""
+        try:
+            salt = crypt.mksalt(crypt.METHOD_SHA512)
+        except Exception as e:
+            import random
+            CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            salt = ''.join(random.choice(CHARACTERS) for i in range(16))
+            # Use SHA512
+            # return '$6$' + salt
+
         return crypt.crypt(
             plaintext,
-            crypt.mksalt(crypt.METHOD_SHA512)
+            salt
         )
 
     def __checksum(self, plaintext):
