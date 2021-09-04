@@ -26,19 +26,33 @@
       skip: true
 
 - block:
-    - name: make sure dnf is installed (only redhat based <8)
+    - name: make sure python3-apt is installed (only debian based)
       package:
         name:
-          - dnf
-          - iproute
+          - python3-apt
         state: present
 
-    - name: get latest system information
-      setup:
+    - name: clean apt cache
+      command: apt-get clean
+      args:
+        warn: false
   when:
-    - ansible_os_family | lower == 'redhat'
-    - ansible_distribution | lower == 'centos'
-    - ansible_distribution_version | int < 8
+    - ansible_os_family | lower == 'debian'
+
+# - block:
+#     - name: make sure dnf is installed (only redhat based <8)
+#       package:
+#         name:
+#           - dnf
+#           - iproute
+#         state: present
+#
+#     - name: get latest system information
+#       setup:
+#   when:
+#     - ansible_os_family | lower == 'redhat'
+#     - ansible_distribution | lower == 'centos'
+#     - ansible_distribution_version | int < 8
 
 - name: create local temp directory
   become: false
