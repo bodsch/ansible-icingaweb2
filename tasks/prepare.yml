@@ -16,7 +16,7 @@
       paths:
         - "vars"
       files:
-        # eg. debian-10 / ubuntu-20.04 / centos-8 / oraclelinux-8
+        # eg. debian-10 / ubuntu-20 / centos-8 / oraclelinux-8
         - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
         # eg. debian / ubuntu / centos / oraclelinux
         - "{{ ansible_distribution | lower }}.yaml"
@@ -24,6 +24,21 @@
         - "{{ ansible_os_family | lower }}.yaml"
         - default.yaml
       skip: true
+
+- block:
+    - name: detect python3 binary
+      stat:
+        path: "/usr/bin/python3"
+      register: python3_binary
+
+    - name: set fact for ansible_python_interpreter
+      set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+      when:
+        python3_binary.stat.exists
+
+    - name: get latest system information
+      setup:
 
 - block:
     - name: make sure python3-apt is installed (only debian based)
