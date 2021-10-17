@@ -1,60 +1,8 @@
 ---
 
+package_version: ""
+
 icingaweb_local_tmp_directory: /tmp/ansible/icingaweb
-
-_icingaweb_dependencies:
-  default:
-    - python3-mysqldb
-    - python3-pip
-    - mysql-client-core
-  debian:
-    - python3-mysqldb
-    - python3-pip
-    - default-mysql-client-core
-  ubuntu: []
-  ubuntu-18:
-    - python3-mysqldb
-    - default-mysql-client
-  ubuntu-20:
-    - mariadb-client
-    # - default-mysql-client-core
-  redhat:
-    - mariadb
-    - MySQL-python
-  redhat-8:
-    - mariadb
-    - python3-PyMySQL
-
-_icingaweb_php_dependencies:
-  default:
-    - php-gd
-    - php-intl
-    - php-json
-    - php-mysql
-    - php-pear
-  debian:
-    - php-gd
-    - php-intl
-    - php-json
-    - php-mysql
-    - php-pear
-  redhat:
-    - php{{ php_package_version }}-php-gd
-    - php{{ php_package_version }}-php-intl
-    - php{{ php_package_version }}-php-json
-    - php{{ php_package_version }}-php-mysqlnd
-    - php{{ php_package_version }}-php-pear
-    - php{{ php_package_version }}-php-pdo
-
-_icingaweb_python_packages:
-  default:
-    - PyMySQL
-    - mysqlclient
-  debian:
-    - PyMySQL
-    - mysqlclient
-  redhat:
-    - PyMySQL
 
 icingaweb_defaults_modules_enabled:
   - monitoring
@@ -91,35 +39,18 @@ icingaweb_defaults_resources:
     password: icinga2_ido
     charset: utf8
 
-_icingaweb_user:
-  default: www-data
-  redhat: nginx
+icingaweb_packages: []
 
-_icingaweb_group:
-  default: www-data
-  redhat: nginx
+icingaweb_php_packages: []
 
-icingaweb_packages: "{{
-          _icingaweb_dependencies[ansible_os_family | lower~ '-' ~ ansible_distribution_major_version] |
-  default(_icingaweb_dependencies[ansible_os_family | lower] |
-  default(_icingaweb_dependencies[ansible_distribution | lower~ '-' ~ ansible_distribution_major_version] |
-  default(_icingaweb_dependencies[ansible_distribution | lower] |
-  default(_icingaweb_dependencies['default'])))) }}"
+icingaweb_user: ""
 
-icingaweb_php_packages: "{{
-          _icingaweb_php_dependencies[ansible_os_family | lower] |
-  default(_icingaweb_php_dependencies['default']) }}"
+icingaweb_group: ""
 
-icingaweb_python_packages: "{{
-          _icingaweb_python_packages[ansible_os_family | lower] |
-  default(_icingaweb_python_packages[ansible_distribution | lower ~ '-' ~ ansible_distribution_major_version] |
-  default(_icingaweb_python_packages[ansible_distribution | lower] |
-  default(_icingaweb_python_packages['default']))) }}"
+icingaweb_python_packages:
+  - name: mysqlclient
+    version: 2.0.3
 
-icingaweb_user: "{{
-          _icingaweb_user[ansible_os_family | lower] |
-  default(_icingaweb_user['default']) }}"
+icingaweb_build_packages: []
 
-icingaweb_group: "{{
-          _icingaweb_group[ansible_os_family | lower] |
-  default(_icingaweb_group['default']) }}"
+...

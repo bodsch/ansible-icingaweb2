@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+
 # -*- coding: utf-8 -*-
 
 # (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
@@ -57,7 +58,7 @@ class IcingaWeb2Modules(object):
             ansible_module_results="none"
         )
 
-        module.log(msg="Module: {} - {}".format(self.module, self.state))
+        # module.log(msg="Module: {} - {}".format(self.module, self.state))
 
         if(os.path.isdir(self.module_path)):
             """

@@ -7,6 +7,7 @@
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
     mode: 0660
+  no_log: true
 
 - name: ensure table_schema is created
   mysql_schema:
@@ -14,7 +15,7 @@
     login_user: "{{ icingaweb_auth_backend.database.username }}"
     login_password: "{{ icingaweb_auth_backend.database.password }}"
     table_schema: "{{ icingaweb_auth_backend.database.dbname }}"
-  no_log: true
+  # no_log: true
   register: mysql_icingaweb2_schema
   when:
     - icingaweb_auth_backend is defined
@@ -23,6 +24,12 @@
     - icingaweb_auth_backend.database.username is defined
     - icingaweb_auth_backend.database.password is defined
     - icingaweb_auth_backend.database.dbname is defined
+
+- name: create database upgrade script
+  template:
+    src: database-upgrade.sh.j2
+    dest: /usr/local/bin/icingaweb-database-upgrade.sh
+    mode: 0750
 
 - name: error
   fail:
@@ -33,17 +40,50 @@
     - mysql_icingaweb2_schema.failed is defined
     - mysql_icingaweb2_schema.failed
 
-- name: import database schema
-  mysql_db:
-    state: import
-    login_host: "{{ icingaweb_auth_backend.database.host }}"
-    login_user: "{{ icingaweb_auth_backend.database.username }}"
-    login_password: "{{ icingaweb_auth_backend.database.password }}"
-    config_file: ''
-    name: "{{ icingaweb_auth_backend.database.dbname }}"
-    target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
-  no_log: true
-  register: icingaweb2_database_schema
+- block:
+    - name: import database schema
+      mysql_db:
+        state: import
+        login_host: "{{ icingaweb_auth_backend.database.host }}"
+        login_user: "{{ icingaweb_auth_backend.database.username }}"
+        login_password: "{{ icingaweb_auth_backend.database.password }}"
+        config_file: ''
+        name: "{{ icingaweb_auth_backend.database.dbname }}"
+        target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
+      no_log: true
+      register: icingaweb2_database_schema
+
+    - name: error
+      fail:
+        msg:
+          - "ERROR: {{ icingaweb2_database_schema }}"
+      when:
+        - icingaweb2_database_schema is defined
+        - icingaweb2_database_schema.failed is defined
+        - icingaweb2_database_schema.failed
+
+    - name: import dbversion schema
+      mysql_db:
+        state: import
+        login_host: "{{ icingaweb_auth_backend.database.host }}"
+        login_user: "{{ icingaweb_auth_backend.database.username }}"
+        login_password: "{{ icingaweb_auth_backend.database.password }}"
+        config_file: ''
+        name: "{{ icingaweb_auth_backend.database.dbname }}"
+        target: '{{ icingaweb_install_dir }}/etc/schema/mysql.dbversion.sql'
+      no_log: true
+      register: icingaweb2_dbversion_schema
+
+    - name: import dbversion
+      mysql_db:
+        state: import
+        login_host: "{{ icingaweb_auth_backend.database.host }}"
+        login_user: "{{ icingaweb_auth_backend.database.username }}"
+        login_password: "{{ icingaweb_auth_backend.database.password }}"
+        config_file: ''
+        name: "{{ icingaweb_auth_backend.database.dbname }}"
+        target: '{{ icingaweb_install_dir }}/etc/schema/mysql.dbversion_{{ icingaweb_version }}.sql'
+
   when:
     - icingaweb_auth_backend is defined
     - icingaweb_auth_backend.database is defined
@@ -55,12 +95,19 @@
     - mysql_icingaweb2_schema.exists is defined
     - not mysql_icingaweb2_schema.exists
 
-- name: error
-  fail:
-    msg:
-      - "ERROR: {{ icingaweb2_database_schema }}"
-  when:
-    - icingaweb2_database_schema is defined
-    - icingaweb2_database_schema.failed is defined
-    - icingaweb2_database_schema.failed
+- name: update database schema  # noqa 'command-instead-of-shell'
+  command:
+    cmd: /usr/local/bin/icingaweb-database-upgrade.sh
+  changed_when: false
+
+- name: update database version information
+  mysql_db:
+    state: import
+    login_host: "{{ icingaweb_auth_backend.database.host }}"
+    login_user: "{{ icingaweb_auth_backend.database.username }}"
+    login_password: "{{ icingaweb_auth_backend.database.password }}"
+    config_file: ''
+    name: "{{ icingaweb_auth_backend.database.dbname }}"
+    target: '{{ icingaweb_install_dir }}/etc/schema/mysql.dbversion_{{ icingaweb_version }}.sql'
+
 ...

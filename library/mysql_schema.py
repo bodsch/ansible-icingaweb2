@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
 # -*- coding: utf-8 -*-
 
 # (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
@@ -6,20 +7,14 @@
 
 from __future__ import absolute_import, division, print_function
 import os
+import warnings
 
 from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
-
-try:
-    import pymysql as mysql_driver
-except ImportError:
-    try:
-        import MySQLdb as mysql_driver
-    except ImportError:
-        mysql_driver = None
-
-mysql_driver_fail_msg = 'The PyMySQL (Python 2.7 and Python 3.X) or MySQL-python (Python 2.X) module is required.'
+from ansible.module_utils.mysql import (
+    mysql_driver, mysql_driver_fail_msg
+)
 
 
 DOCUMENTATION = """
@@ -65,14 +60,20 @@ class MysqlSchema(object):
 
         self.db_connect_timeout = 30
 
-    def run(self):
-        """
-        """
         self.module.log(msg="-------------------------------------------------------------")
         self.module.log(msg="user         : {}".format(self.login_user))
         self.module.log(msg="password     : {}".format(self.login_password))
         self.module.log(msg="table_schema : {}".format(self.table_schema))
-        self.module.log(msg="------------------------------")
+        self.module.log(msg="-------------------------------------------------------------")
+
+    def run(self):
+        """
+        """
+
+        if mysql_driver is None:
+            self.module.fail_json(msg=mysql_driver_fail_msg)
+        else:
+            warnings.filterwarnings('error', category=mysql_driver.Warning)
 
         if not mysql_driver:
             return dict(
@@ -175,6 +176,9 @@ class MysqlSchema(object):
 
         self.module.log(msg="config : {}".format(config))
 
+        if mysql_driver is None:
+            self.module.fail_json(msg=mysql_driver_fail_msg)
+
         try:
             db_connection = mysql_driver.connect(**config)
 
@@ -187,7 +191,9 @@ class MysqlSchema(object):
 
             self.module.log(msg=message)
 
-            return None, None, True, message
+            return (None, None, True, message)
+
+        # return (db_connection.cursor(**{_mysql_cursor_param: mysql_driver.cursors.DictCursor}), db_connection, False, "successful connected")
 
         return db_connection.cursor(), db_connection, False, "successful connected"
 

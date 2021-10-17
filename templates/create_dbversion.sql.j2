@@ -3,7 +3,5 @@
       icingaweb_auth_backend.database.dbname is defined %}
 USE {{ icingaweb_auth_backend.database.dbname }};
 
-{% for k in item %}
-INSERT IGNORE INTO icingaweb_user (name, active, password_hash) VALUES ('{{ k }}', 1, '{{ icingaweb_users[k].hashed }}');
-{% endfor %}
+replace INTO icingaweb_dbversion (name, version, modify_time) VALUES ('icingaweb', '{{ icingaweb_version }}', now());
 {% endif %}

@@ -104,7 +104,6 @@ class PackageVersion(object):
 
             try:
                 pkg = cache[self.package_name]
-
                 # debian:10 / buster:
                 #  [php-fpm=2:7.3+69]
                 # ubuntu:20.04 / focal
