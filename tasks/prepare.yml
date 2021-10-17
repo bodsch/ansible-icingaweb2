@@ -82,9 +82,6 @@
     package_name: "php-fpm"
   register: package_version
 
-- debug:
-    msg: "{{ package_version }}"
-
 - name: define php version
   set_fact:
     php_version: "{{ package_version.version }}"
