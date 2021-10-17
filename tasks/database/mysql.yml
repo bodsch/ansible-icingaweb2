@@ -7,6 +7,7 @@
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
     mode: 0660
+  no_log: true
 
 - name: ensure table_schema is created
   mysql_schema:

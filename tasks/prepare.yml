@@ -25,20 +25,20 @@
         - default.yaml
       skip: true
 
-- block:
-    - name: detect python3 binary
-      stat:
-        path: "/usr/bin/python3"
-      register: python3_binary
-
-    - name: set fact for ansible_python_interpreter
-      set_fact:
-        ansible_python_interpreter: /usr/bin/python3
-      when:
-        python3_binary.stat.exists
-
-    - name: get latest system information
-      setup:
+# - block:
+#     - name: detect python3 binary
+#       stat:
+#         path: "/usr/bin/python3"
+#       register: python3_binary
+#
+#     - name: set fact for ansible_python_interpreter to /usr/bin/python3
+#       set_fact:
+#         ansible_python_interpreter: /usr/bin/python3
+#       when:
+#         python3_binary.stat.exists
+#
+#     - name: get latest system information
+#       setup:
 
 - block:
     - name: make sure python3-apt is installed (only debian based)
@@ -81,6 +81,9 @@
   package_version:
     package_name: "php-fpm"
   register: package_version
+
+- debug:
+    msg: "{{ package_version }}"
 
 - name: define php version
   set_fact:
@@ -137,4 +140,18 @@
     name: "{{ icingaweb_dependencies }}"
     state: present
 
+- block:
+    - name: "find primary group for user '{{ icingaweb_user }}'"
+      getent:
+        database: group
+        key: "{{ icingaweb_user }}"
+        split: ':'
+
+    - name: "set icingaweb_group '{{ getent_group | list | first }}'"
+      set_fact:
+        icingaweb_group: "{{ getent_group | list | first }}"
+      when:
+        - getent_group is defined
+  when:
+    - not icingaweb_group is defined or icingaweb_group | length > 0
 ...

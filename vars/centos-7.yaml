@@ -1,6 +1,7 @@
 ---
 
 icingaweb_packages:
+  - rpm-python
   - mariadb
   - iproute
   - MySQL-python
