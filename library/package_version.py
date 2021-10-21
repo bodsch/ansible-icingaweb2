@@ -198,7 +198,7 @@ class PackageVersion(object):
         """
         self.module.log(msg="= {function_name}()".format(function_name="_search_pacman"))
 
-        pattern = re.compile(r'^(?P<repository>extra|world)\/php7[\w -](?P<version>\d\.\d).*-.*', re.MULTILINE)
+        pattern = re.compile(r'^(?P<repository>extra|world)\/{}[\w -](?P<version>\d\.\d).*-.*'.format(self.package_name), re.MULTILINE)
 
         pacman_bin = self.module.get_bin_path('pacman', True)
 

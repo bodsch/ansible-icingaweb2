@@ -25,21 +25,6 @@
         - default.yaml
       skip: true
 
-# - block:
-#     - name: detect python3 binary
-#       stat:
-#         path: "/usr/bin/python3"
-#       register: python3_binary
-#
-#     - name: set fact for ansible_python_interpreter to /usr/bin/python3
-#       set_fact:
-#         ansible_python_interpreter: /usr/bin/python3
-#       when:
-#         python3_binary.stat.exists
-#
-#     - name: get latest system information
-#       setup:
-
 - block:
     - name: make sure python3-apt is installed (only debian based)
       package:
@@ -54,21 +39,6 @@
   when:
     - ansible_os_family | lower == 'debian'
 
-# - block:
-#     - name: make sure dnf is installed (only redhat based <8)
-#       package:
-#         name:
-#           - dnf
-#           - iproute
-#         state: present
-#
-#     - name: get latest system information
-#       setup:
-#   when:
-#     - ansible_os_family | lower == 'redhat'
-#     - ansible_distribution | lower == 'centos'
-#     - ansible_distribution_version | int < 8
-
 - name: create local temp directory
   become: false
   delegate_to: 127.0.0.1
@@ -77,9 +47,9 @@
     state: directory
     mode: 0755
 
-- name: get version of installed php-fpm
+- name: get version of installed php
   package_version:
-    package_name: "php-fpm"
+    package_name: "php"
   register: package_version
 
 - name: define php version
@@ -91,12 +61,16 @@
     - package_version.version is defined
     - package_version.version_compressed is defined
 
+- debug:
+    msg: "{{ package_version }}"
+
 - name: assert php_version
   assert:
     that:
       - php_version is defined
       - php_version is version_compare('7.0', '>=')
-    msg: "This role only works with PHP >= 7.0 .. found: {{ php_version }}"
+      - php_version is version_compare('8', '<')
+    msg: "This role only works with PHP >= 7.0 and < 8.x .. found: {{ php_version }}"
 
 - name: merge dependencies between defaults and custom
   set_fact:
