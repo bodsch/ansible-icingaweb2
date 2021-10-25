@@ -53,4 +53,6 @@ icingaweb_python_packages:
 
 icingaweb_build_packages: []
 
+_icingaweb_package_mariadb_clients: mariadb-client-core
+
 ...

@@ -62,18 +62,6 @@
   when:
     - not __stat_present_icingaweb2.stat.exists
 
-- name: copy dbversion statement
-  copy:
-    src: "dbversion.sql"
-    dest: "{{ icingaweb_install_dir }}/etc/schema/mysql.dbversion.sql"
-    mode: 0660
-
-- name: create insert dbversion statement
-  template:
-    src: "create_dbversion.sql.j2"
-    dest: "{{ icingaweb_install_dir }}/etc/schema/mysql.dbversion_{{ icingaweb_version }}.sql"
-    mode: 0660
-
 - name: icingaweb_version version is '2.9.0'
   block:
     - name: create directory for PHP libraries

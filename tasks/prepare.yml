@@ -79,7 +79,8 @@
 
 - name: get version of installed php-fpm
   package_version:
-    package_name: "php-fpm"
+    package_name: "php"
+    state: installed
   register: package_version
 
 - name: define php version
@@ -98,13 +99,35 @@
       - php_version is version_compare('7.0', '>=')
     msg: "This role only works with PHP >= 7.0 .. found: {{ php_version }}"
 
+# - name: fix missing php binary or link
+#   block:
+#       - name: detect /usr/bin/php
+#         shell: |
+#           command -v php
+#         args:
+#           warn: false
+#         register: _installed_php
+#
+#       - debug:
+#           msg:
+#             - "{{ _installed_php.stdout }}"
+#
+#       - name: create link
+#         file:
+#           src: "{{ _installed_php.stdout }}"
+#           dest:
+#           state: link
+#         when:
+#           - _installed_php.stdout
+
 - name: merge dependencies between defaults and custom
   set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
 
 - name: get database package name
   package_version:
-    package_name: "mariadb-client-core"
+    package_name: "{{ _icingaweb_package_mariadb_clients }}"
+    state: installed
   register: package_version
 
 - name: remove mariadb-client-core from dependency list if it already installed

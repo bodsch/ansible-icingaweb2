@@ -54,7 +54,7 @@ update_schema() {
   if [[ -z "${db_version}" ]]
   then
     echo "no database version found. skip database upgrade."
-    exit 1
+    exit 0
 #    insert_schema
 #    update_schema
   else
