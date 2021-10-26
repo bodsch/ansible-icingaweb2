@@ -41,7 +41,9 @@ class PackageVersion(object):
 
         self.module = module
 
+        self.state = module.params.get("state")
         self.package_name = module.params.get("package_name")
+
         (self.distribution, self.version, self.codename) = distro.linux_distribution(
           full_distribution_name=False
         )
@@ -164,17 +166,43 @@ class PackageVersion(object):
         """
         self.module.log(msg="= {function_name}()".format(function_name="_search_pacman"))
 
-        pattern = re.compile(r'^(?P<repository>extra|world)\/{}[\w -](?P<version>\d\.\d).*-.*'.format(self.package_name), re.MULTILINE)
+        # pattern for matching
+        #  - local/php 8.0.21-1 and
+        #  - local/php7 7.4.24-1
+        # (?P<repository>extra|world|local)\/php[0-9\s]*(?P<version>\d\.\d).*-.*
+
+        pattern = re.compile(
+            r'^(?P<repository>extra|world|local)\/{}[0-9\s]*(?P<version>\d\.\d).*-.*'.format(self.package_name),
+            re.MULTILINE
+        )
+
+        # pattern = re.compile(r'^(?P<repository>extra|world)\/{}[\w -](?P<version>\d\.\d).*-.*'.format(self.package_name), re.MULTILINE)
 
         pacman_bin = self.module.get_bin_path('pacman', True)
+
+        # pacman --query --search php*
 
         results = []
         args = []
         args.append(pacman_bin)
-        args.append("--noconfirm")
-        args.append("--sync")
+
+        if self.state == "installed":
+            """
+              installed
+            """
+            # args.append("--query")
+            # args.append("--noconfirm")
+            # args.append("--search")
+            args.append("--query")
+        else:
+            """
+              available
+            """
+            args.append("--noconfirm")
+            args.append("--sync")
+
         args.append("--search")
-        args.append("php")
+        args.append(self.package_name)
 
         rc, out, err = self._pacman(args)
 
@@ -203,7 +231,7 @@ class PackageVersion(object):
         """
         self.module.log(msg="cmd: {}".format(cmd))
 
-        rc, out, err = self.module.run_command(cmd, check_rc=True)
+        rc, out, err = self.module.run_command(cmd, check_rc=False)
         # self.module.log(msg="  rc : '{}'".format(rc))
         # self.module.log(msg="  out: '{}' ({})".format(out, type(out)))
         # self.module.log(msg="  err: '{}'".format(err))
@@ -217,7 +245,17 @@ def main():
     ''' ... '''
     module = AnsibleModule(
         argument_spec=dict(
-            package_name=dict(required=True, type='str'),
+            state = dict(
+                choices=[
+                    "installed",
+                    "available",
+                ],
+                default = "installed"
+            ),
+            package_name = dict(
+                required=True,
+                type='str'
+            ),
         ),
         supports_check_mode=False,
     )

@@ -9,4 +9,6 @@ icingaweb_packages:
 icingaweb_user: nginx
 icingaweb_group: nginx
 
+php_fpm_daemon: php-fpm
+
 ...

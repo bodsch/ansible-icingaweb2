@@ -41,7 +41,7 @@
         dest: /tmp
         mode: 0700
 
-    - name: download and extract icingaweb2 archive
+    - name: extract icingaweb2 archive
       unarchive:
         src: /tmp/icingaweb2-v{{ icingaweb_version }}.tar.gz
         dest: /usr/share
@@ -49,6 +49,8 @@
         group: "{{ icingaweb_group }}"
         mode: 0755
         remote_src: true
+      notify:
+        - restart php-fpm
 
     - name: ensure icingacli is in the path
       file:

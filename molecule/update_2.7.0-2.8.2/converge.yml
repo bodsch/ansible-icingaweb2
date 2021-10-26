@@ -1,0 +1,21 @@
+---
+
+- name: converge
+  hosts: instance
+  any_errors_fatal: false
+
+  vars:
+    icingaweb_version: 2.7.0
+
+  roles:
+    - role: ansible-icingaweb2
+
+- name: update icingaweb
+  hosts: instance
+  any_errors_fatal: false
+
+  vars:
+    icingaweb_version: 2.8.2
+
+  roles:
+    - role: ansible-icingaweb2

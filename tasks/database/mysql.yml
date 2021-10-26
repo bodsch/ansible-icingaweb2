@@ -33,7 +33,7 @@
     login_user: "{{ icingaweb_auth_backend.database.username }}"
     login_password: "{{ icingaweb_auth_backend.database.password }}"
     table_schema: "{{ icingaweb_auth_backend.database.dbname }}"
-  # no_log: true
+  no_log: true
   register: mysql_icingaweb2_schema
   when:
     - icingaweb_auth_backend is defined
@@ -42,15 +42,6 @@
     - icingaweb_auth_backend.database.username is defined
     - icingaweb_auth_backend.database.password is defined
     - icingaweb_auth_backend.database.dbname is defined
-
-# - name: error
-#   fail:
-#     msg:
-#       - "ERROR: {{ mysql_icingaweb2_schema }}"
-#   when:
-#     - mysql_icingaweb2_schema is defined
-#     - mysql_icingaweb2_schema.failed is defined
-#     - mysql_icingaweb2_schema.failed
 
 - block:
     - name: import database schema
@@ -85,7 +76,7 @@
     login_password: "{{ icingaweb_auth_backend.database.password }}"
     table_schema: "{{ icingaweb_auth_backend.database.dbname }}"
     table_name: icingaweb_dbversion
-  # no_log: true
+  no_log: true
   register: mysql_icingaweb_dbversion
 
 - name: import dbversion schema
@@ -97,7 +88,7 @@
     config_file: ''
     name: "{{ icingaweb_auth_backend.database.dbname }}"
     target: '/etc/icingaweb2/updates/mysql.dbversion.sql'
-  # no_log: true
+  no_log: true
   register: icingaweb2_dbversion_schema
   when:
     - mysql_icingaweb_dbversion is defined

@@ -14,4 +14,6 @@ icingaweb_packages:
 icingaweb_user: www-data
 icingaweb_group: www-data
 
+php_fpm_daemon: php{{ php_version }}-fpm
+
 ...
