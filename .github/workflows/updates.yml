@@ -33,7 +33,7 @@ jobs:
           # VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true
 
-  2.7.0-2.8.2:
+  2-7-0_to_2-8-2:
     name: "${{ matrix.image }} / python: ${{ matrix.python-version }}, ansible: ${{ matrix.ansible-version }}"
     needs:
       - lint
@@ -81,7 +81,7 @@ jobs:
           ANSIBLE_FORCE_COLOR: '1'
           DISTRIBUTION: ${{ matrix.image }}
 
-  2.8.2-2.9.3:
+  2-8-2_to_2-9-3:
     name: "${{ matrix.image }} / python: ${{ matrix.python-version }}, ansible: ${{ matrix.ansible-version }}"
     needs:
       - lint
