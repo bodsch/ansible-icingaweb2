@@ -55,10 +55,6 @@ icingaweb_python_packages:
   - name: mysqlclient
     version: 2.0.3
 
-icingaweb_defaults_php_daemon:
-  restart: true
-  name: php-fpm
-
 icingaweb_build_packages: []
 
 _icingaweb_package_mariadb_clients: mariadb-client-core
