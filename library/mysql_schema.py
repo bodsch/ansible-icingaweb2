@@ -142,7 +142,7 @@ class MysqlSchema(object):
 
         self.module.log(msg=f"{records} {type(records)} {exists}")
 
-        if not self.table_name is None:
+        if self.table_name is not None:
             table_names = []
             for e in records:
                 table_names.append(e[1])
@@ -153,7 +153,7 @@ class MysqlSchema(object):
                 return True, False, None
 
         else:
-            self.module.log(msg=f"  - table schema exists")
+            self.module.log(msg="  - table schema exists")
 
             if(int(exists) >= 4):
                 return True, False, None

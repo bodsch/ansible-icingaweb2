@@ -45,7 +45,7 @@ class PackageVersion(object):
         self.package_name = module.params.get("package_name")
 
         (self.distribution, self.version, self.codename) = distro.linux_distribution(
-          full_distribution_name=False
+            full_distribution_name=False
         )
         # self.module.log(msg="distribution       : '{0}'".format(self.distribution))
 
@@ -77,7 +77,6 @@ class PackageVersion(object):
             result = self._search_pacman()
 
         return result
-
 
     def _search_apt(self):
         """
@@ -162,7 +161,7 @@ class PackageVersion(object):
         """
             pacman support
 
-            pacman --noconfirm --sync --search php7 | grep -E "^(extra|world)\/php7 (.*)\[installed\]" | cut -d' ' -f2
+            pacman --noconfirm --sync --search php7 | grep -E "^(extra|world)\\/php7 (.*)\\[installed\\]" | cut -d' ' -f2
         """
         self.module.log(msg="= {function_name}()".format(function_name="_search_pacman"))
 
@@ -241,18 +240,19 @@ class PackageVersion(object):
 # Module execution.
 #
 
+
 def main():
     ''' ... '''
     module = AnsibleModule(
         argument_spec=dict(
-            state = dict(
+            state=dict(
                 choices=[
                     "installed",
                     "available",
                 ],
-                default = "installed"
+                default="installed"
             ),
-            package_name = dict(
+            package_name=dict(
                 required=True,
                 type='str'
             ),
