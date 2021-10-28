@@ -239,6 +239,8 @@ def main():
     icingaweb = MysqlSchema(module)
     result = icingaweb.run()
 
+    module.log(msg="= result : '{}'".format(result))
+
     module.exit_json(**result)
 
 

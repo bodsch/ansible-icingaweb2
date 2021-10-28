@@ -51,16 +51,16 @@
         msg:
           - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
 
-- name: prepare icinga2
-  hosts: icinga2
-  gather_facts: true
-
-  roles:
-    - role: icinga2
-
-  post_tasks:
-    - debug:
-        msg:
-          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
+# - name: prepare icinga2
+#   hosts: icinga2
+#   gather_facts: true
+#
+#   roles:
+#     - role: icinga2
+#
+#   post_tasks:
+#     - debug:
+#         msg:
+#           - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
 
 ...

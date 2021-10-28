@@ -36,7 +36,8 @@ EXAMPLES = """
 
 
 class PackageVersion(object):
-
+    """
+    """
     def __init__(self, module):
 
         self.module = module
@@ -47,14 +48,13 @@ class PackageVersion(object):
         (self.distribution, self.version, self.codename) = distro.linux_distribution(
             full_distribution_name=False
         )
-        # self.module.log(msg="distribution       : '{0}'".format(self.distribution))
 
     def run(self):
         """
         """
         result = dict(
             failed=False,
-            msg="unknown distribution: {0}".format(self.distribution),
+            msg=f"unknown or unsupported distribution: '{self.distribution}'",
             version=""
         )
 
@@ -85,6 +85,18 @@ class PackageVersion(object):
         import apt
 
         cache = apt.cache.Cache()
+
+        # try:
+        #     cache.update()
+        # except SystemError as error:
+        #     self.module.log(msg=f"error         : {error}")
+        #     raise FetchFailedException(error)
+        # if not res and raise_on_error:
+        #     self.module.log(msg="FetchFailedException()")
+        #     raise FetchFailedException()
+        # else:
+        #     cache.open()
+
         cache.update()
         cache.open()
 
@@ -109,11 +121,11 @@ class PackageVersion(object):
                 version_compressed=version_string_compressed
             )
         except KeyError as error:
-            self.module.log(msg="error         : {0}".format(error))
+            self.module.log(msg=f"error         : {error}")
 
             result = dict(
                 failed=False,
-                msg="package {0} is not installed".format(self.package_name),
+                msg=f"package {self.package_name} is not installed",
             )
 
         return result
@@ -130,13 +142,21 @@ class PackageVersion(object):
         if(not package_mgr):
             return True, "", "no valid package manager (yum or dnf) found"
 
-        self.module.log(msg="  '{0}'".format(package_mgr))
+        self.module.log(msg="  use package manager '{0}'".format(package_mgr))
 
-        rc, out, err = self.module.run_command(
-            [package_mgr, "list", "installed", "--cacheonly", "*{0}*".format(self.package_name)],
-            check_rc=False)
+        args = []
+        args.append(package_mgr)
+        args.append("list")
+        args.append("installed")
+        args.append("--cacheonly")
+        args.append(f"*{self.package_name}*")
 
-        pattern = re.compile(r".*{0}.*(?P<version>[0-9]+\.[0-9]+)\..*@(?P<repo>.*)".format(self.package_name))
+        rc, out, err = self.module.run_command(args, check_rc=False)
+
+        pattern = re.compile(
+            r"^{0}[0-9+].*\.x86_64.*(?P<version>[0-9]+\.[0-9]+)\..*@(?P<repo>.*)".format(self.package_name),
+            re.MULTILINE
+        )
 
         version = re.search(pattern, out)
 
@@ -152,7 +172,7 @@ class PackageVersion(object):
         else:
             result = dict(
                 failed=False,
-                msg="package {0} is not installed".format(self.package_name),
+                msg=f"package {self.package_name} is not installed",
             )
 
         return result
@@ -163,7 +183,7 @@ class PackageVersion(object):
 
             pacman --noconfirm --sync --search php7 | grep -E "^(extra|world)\\/php7 (.*)\\[installed\\]" | cut -d' ' -f2
         """
-        self.module.log(msg="= {function_name}()".format(function_name="_search_pacman"))
+        # self.module.log(msg="= _search_pacman()")
 
         # pattern for matching
         #  - local/php 8.0.21-1 and
@@ -189,9 +209,6 @@ class PackageVersion(object):
             """
               installed
             """
-            # args.append("--query")
-            # args.append("--noconfirm")
-            # args.append("--search")
             args.append("--query")
         else:
             """
@@ -219,7 +236,7 @@ class PackageVersion(object):
         else:
             result = dict(
                 failed=False,
-                msg="package {0} is not installed".format(self.package_name),
+                msg=f"package {self.package_name} is not installed",
             )
 
         return result
@@ -232,7 +249,7 @@ class PackageVersion(object):
 
         rc, out, err = self.module.run_command(cmd, check_rc=False)
         # self.module.log(msg="  rc : '{}'".format(rc))
-        # self.module.log(msg="  out: '{}' ({})".format(out, type(out)))
+        self.module.log(msg="  out: '{}' ({})".format(out, type(out)))
         # self.module.log(msg="  err: '{}'".format(err))
         return rc, out, err
 
@@ -261,6 +278,8 @@ def main():
     )
 
     result = PackageVersion(module).run()
+
+    module.log(msg="= result : '{}'".format(result))
 
     module.exit_json(**result)
 
