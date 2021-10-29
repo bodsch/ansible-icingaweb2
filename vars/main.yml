@@ -39,6 +39,10 @@ icingaweb_defaults_resources:
     password: icinga2_ido
     charset: utf8
 
+icingaweb_defaults_php_daemon:
+  restart: true
+  name: php-fpm
+
 icingaweb_packages: []
 
 icingaweb_php_packages: []
@@ -52,5 +56,7 @@ icingaweb_python_packages:
     version: 2.0.3
 
 icingaweb_build_packages: []
+
+_icingaweb_package_mariadb_clients: mariadb-client-core
 
 ...

@@ -1,0 +1,33 @@
+---
+
+nginx_server_tokens: "off"
+nginx_remove_default_vhost: true
+
+nginx_extra_http_options: |
+  map_hash_max_size 128;
+  map_hash_bucket_size 128;
+
+nginx_vhosts:
+  - listen: 80
+    server_name: _
+    extra_parameters: |
+      location /icinga {
+        root  /usr/share/icingaweb2/public;
+        index index.php;
+        location ~ ^/icinga/index\.php(.*)$ {
+          fastcgi_index          index.php;
+          fastcgi_param          ICINGAWEB_CONFIGDIR /etc/icingaweb2;
+          fastcgi_param          SCRIPT_FILENAME /usr/share/icingaweb2/public/index.php;
+          fastcgi_read_timeout   600;
+          fastcgi_pass           unix:/run/php/worker-01.sock;
+          include fastcgi_params;
+        }
+        location ~ ^/icinga(.+)? {
+          alias /usr/share/icingaweb2/public;
+          index index.php;
+          try_files $1 $uri $uri/ /icinga/index.php$is_args$args;
+        }
+        location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
+          expires 1d;
+        }
+      }

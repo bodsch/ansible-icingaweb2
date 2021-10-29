@@ -18,27 +18,14 @@
       files:
         # eg. debian-10 / ubuntu-20 / centos-8 / oraclelinux-8
         - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+        # eg. archlinux-systemd / archlinux-openrc
+        - "{{ ansible_distribution | lower }}-{{ ansible_service_mgr | lower }}.yaml"
         # eg. debian / ubuntu / centos / oraclelinux
         - "{{ ansible_distribution | lower }}.yaml"
         # eg. redhat / debian
         - "{{ ansible_os_family | lower }}.yaml"
         - default.yaml
       skip: true
-
-# - block:
-#     - name: detect python3 binary
-#       stat:
-#         path: "/usr/bin/python3"
-#       register: python3_binary
-#
-#     - name: set fact for ansible_python_interpreter to /usr/bin/python3
-#       set_fact:
-#         ansible_python_interpreter: /usr/bin/python3
-#       when:
-#         python3_binary.stat.exists
-#
-#     - name: get latest system information
-#       setup:
 
 - block:
     - name: make sure python3-apt is installed (only debian based)
@@ -54,21 +41,6 @@
   when:
     - ansible_os_family | lower == 'debian'
 
-# - block:
-#     - name: make sure dnf is installed (only redhat based <8)
-#       package:
-#         name:
-#           - dnf
-#           - iproute
-#         state: present
-#
-#     - name: get latest system information
-#       setup:
-#   when:
-#     - ansible_os_family | lower == 'redhat'
-#     - ansible_distribution | lower == 'centos'
-#     - ansible_distribution_version | int < 8
-
 - name: create local temp directory
   become: false
   delegate_to: 127.0.0.1
@@ -77,26 +49,68 @@
     state: directory
     mode: 0755
 
-- name: get version of installed php-fpm
-  package_version:
-    package_name: "php-fpm"
-  register: package_version
+- name: php dependecy
+  block:
+    - name: get version of installed php-fpm
+      package_version:
+        package_name: "php"
+        state: installed
+      register: package_version
 
-- name: define php version
-  set_fact:
-    php_version: "{{ package_version.version }}"
-    php_package_version: "{{ package_version.version_compressed }}"
-  when:
-    - package_version is defined
-    - package_version.version is defined
-    - package_version.version_compressed is defined
+    - name: define php version
+      set_fact:
+        php_version: "{{ package_version.version }}"
+        php_package_version: "{{ package_version.version_compressed }}"
+        php_major_version: "{{ package_version.version[0:1] }}"
+      when:
+        - package_version is defined
+        - package_version.version is defined
+        - package_version.version_compressed is defined
 
-- name: assert php_version
-  assert:
-    that:
-      - php_version is defined
-      - php_version is version_compare('7.0', '>=')
-    msg: "This role only works with PHP >= 7.0 .. found: {{ php_version }}"
+    - name: assert php_version
+      assert:
+        that:
+          - php_version is defined
+          - php_version is version_compare('7.0', '>=')
+          - php_version is version_compare('8', '<')
+        msg: "This role only works with PHP >= 7.0 and < 8.x .. found: {{ php_version }}"
+
+    - name: do facts module to get latest information
+      setup:
+
+    - name: re-include OS specific configuration
+      include_vars: "{{ lookup('first_found', params) }}"
+      vars:
+        params:
+          paths:
+            - "vars"
+          files:
+            - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
+            - "{{ ansible_distribution | lower }}-{{ ansible_service_mgr | lower }}.yaml"
+            - "{{ ansible_distribution | lower }}.yaml"
+            - "{{ ansible_os_family | lower }}.yaml"
+          skip: true
+
+# - name: fix missing php binary or link
+#   block:
+#       - name: detect /usr/bin/php
+#         shell: |
+#           command -v php
+#         args:
+#           warn: false
+#         register: _installed_php
+#
+#       - debug:
+#           msg:
+#             - "{{ _installed_php.stdout }}"
+#
+#       - name: create link
+#         file:
+#           src: "{{ _installed_php.stdout }}"
+#           dest:
+#           state: link
+#         when:
+#           - _installed_php.stdout
 
 - name: merge dependencies between defaults and custom
   set_fact:
@@ -104,7 +118,8 @@
 
 - name: get database package name
   package_version:
-    package_name: "mariadb-client-core"
+    package_name: "{{ _icingaweb_package_mariadb_clients }}"
+    state: installed
   register: package_version
 
 - name: remove mariadb-client-core from dependency list if it already installed
@@ -131,6 +146,11 @@
   set_fact:
     icingaweb_resources: "{{ icingaweb_defaults_resources |
       combine( icingaweb_resources, recursive=True ) }}"
+
+- name: merge icingaweb_php_daemon configuration between defaults and custom
+  set_fact:
+    icingaweb_php_daemon: "{{ icingaweb_defaults_php_daemon |
+      combine( icingaweb_php_daemon, recursive=True ) }}"
 
 - name: install requirements
   package:

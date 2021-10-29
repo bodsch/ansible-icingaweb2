@@ -41,7 +41,7 @@
         dest: /tmp
         mode: 0700
 
-    - name: download and extract icingaweb2 archive
+    - name: extract icingaweb2 archive
       unarchive:
         src: /tmp/icingaweb2-v{{ icingaweb_version }}.tar.gz
         dest: /usr/share
@@ -49,6 +49,8 @@
         group: "{{ icingaweb_group }}"
         mode: 0755
         remote_src: true
+      notify:
+        - restart php-fpm
 
     - name: ensure icingacli is in the path
       file:
@@ -61,18 +63,6 @@
         force: true
   when:
     - not __stat_present_icingaweb2.stat.exists
-
-- name: copy dbversion statement
-  copy:
-    src: "dbversion.sql"
-    dest: "{{ icingaweb_install_dir }}/etc/schema/mysql.dbversion.sql"
-    mode: 0660
-
-- name: create insert dbversion statement
-  template:
-    src: "create_dbversion.sql.j2"
-    dest: "{{ icingaweb_install_dir }}/etc/schema/mysql.dbversion_{{ icingaweb_version }}.sql"
-    mode: 0660
 
 - name: icingaweb_version version is '2.9.0'
   block:
