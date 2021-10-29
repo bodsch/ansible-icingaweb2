@@ -28,6 +28,10 @@ icingaweb_authentication:
     user_name_attribute: "userPrincipalName"
     filter: "(|(memberOf=cn=svc_icinga_viewer,dc=icinga,dc=local)(memberOf=cn=svc_icinga_admin,dc=icinga,dc=local))"
 
+  autologin:
+    backend: external
+    strip_username_regexp: "/@[A-Za-z0-9.]+$/"
+
 icingaweb_groups:
   ldap_groups:
     backend: "ldap" # msldap
