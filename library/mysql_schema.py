@@ -57,6 +57,7 @@ class MysqlSchema(object):
         self.login_unix_socket = module.params.get("login_unix_socket")
         self.database_config_file = module.params.get("database_config_file")
         self.table_schema = module.params.get("table_schema")
+        self.table_name = module.params.get("table_name")
 
         self.db_connect_timeout = 30
 
@@ -64,6 +65,7 @@ class MysqlSchema(object):
         self.module.log(msg="user         : {}".format(self.login_user))
         self.module.log(msg="password     : {}".format(self.login_password))
         self.module.log(msg="table_schema : {}".format(self.table_schema))
+        self.module.log(msg="table_name   : {}".format(self.table_name))
         self.module.log(msg="-------------------------------------------------------------")
 
     def run(self):
@@ -113,15 +115,15 @@ class MysqlSchema(object):
         """
         cursor, conn, error, message = self.__mysql_connect()
 
-        self.module.log(msg="  - error: {0} | msg: {1}".format(error, message))
+        # self.module.log(msg="  - error: {0} | msg: {1}".format(error, message))
 
         if error:
             return None, error, message
 
-        query = "SELECT count(TABLE_NAME) FROM information_schema.tables where TABLE_SCHEMA = '{schema}'"
-        query = query.format(schema=self.table_schema)
+        query = "SELECT TABLE_SCHEMA, TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA = '{0}'"
+        query = query.format(self.table_schema)
 
-        self.module.log(msg="query : {}".format(query))
+        # self.module.log(msg="query : {}".format(query))
 
         try:
             cursor.execute(query)
@@ -134,16 +136,28 @@ class MysqlSchema(object):
 
             return False, True, message
 
-        exists, = cursor.fetchone()
+        records = cursor.fetchall()
         cursor.close()
         conn.close()
+        exists = len(records)
 
-        message = "table schema exists {0}".format(exists)
+        # self.module.log(msg="{0} {type(0)} {1}".format(records, exists))
 
-        self.module.log(msg="  - {0}".format(message))
+        if self.table_name is not None:
+            table_names = []
+            for e in records:
+                table_names.append(e[1])
 
-        if(int(exists) >= 4):
-            return True, False, None
+            if self.table_name in table_names:
+                self.module.log(msg="  - table name {0} exists in table schema".format(self.table_name))
+
+                return True, False, None
+
+        else:
+            self.module.log(msg="  - table schema exists")
+
+            if(int(exists) >= 4):
+                return True, False, None
 
         return False, False, None
 
@@ -174,7 +188,7 @@ class MysqlSchema(object):
         if self.login_password is not None:
             config['passwd'] = self.login_password
 
-        self.module.log(msg="config : {}".format(config))
+        # self.module.log(msg="config : {}".format(config))
 
         if mysql_driver is None:
             self.module.fail_json(msg=mysql_driver_fail_msg)
@@ -218,12 +232,15 @@ def main():
             login_unix_socket=dict(type='str'),
             database_config_file=dict(required=False, type='path'),
             table_schema=dict(required=True, type='str'),
+            table_name=dict(required=False, type='str'),
         ),
         supports_check_mode=False,
     )
 
     icingaweb = MysqlSchema(module)
     result = icingaweb.run()
+
+    module.log(msg="= result : '{0}'".format(result))
 
     module.exit_json(**result)
 

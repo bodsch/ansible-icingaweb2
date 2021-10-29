@@ -134,6 +134,8 @@ def main():
     icingaweb = IcingaWeb2Modules()
     result = icingaweb.run()
 
+    module.log(msg="= result : '{}'".format(result))
+
     module.exit_json(**result)
 
 

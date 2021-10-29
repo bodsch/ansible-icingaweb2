@@ -7,6 +7,10 @@ icingaweb_php_thirdparty: 0.10.0
 
 icingaweb_install_dir: /usr/share/icingaweb2
 
+icingaweb_php_daemon:
+  restart: true
+  name: "{{ php_fpm_daemon }}"
+
 icingaweb_modules_disabled:
   - setup
 
@@ -114,3 +118,5 @@ icingaweb_module:
       protected_customvars:
         - '*http_auth_pair*'
         - '*password*'
+
+...

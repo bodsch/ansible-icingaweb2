@@ -12,6 +12,9 @@ user = "{{ graphite.user }}"
 {% if graphite.password is defined and graphite.password | length != 0 %}
 password = "{{ graphite.password }}"
 {% endif %}
+{% if graphite.insecure is defined %}
+insecure = "{{ graphite.insecure }}"
+{% endif %}
 {% endif %}
 
 {% if graphite.ui is defined and graphite.ui | count != 0 %}

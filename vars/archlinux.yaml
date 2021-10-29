@@ -9,4 +9,8 @@ icingaweb_packages:
 icingaweb_user: http
 icingaweb_group: http
 
+_icingaweb_package_mariadb_clients: mariadb-clients
+
+php_fpm_daemon: php-fpm{{ php_major_version }}
+
 ...

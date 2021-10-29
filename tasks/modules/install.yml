@@ -19,6 +19,7 @@
         version: "{{ item.version | default(omit) }}"
         dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_modules/{{ item.name }}"
         update: true
+        force: true
       loop:
         "{{ icingaweb_external_modules }}"
       loop_control:

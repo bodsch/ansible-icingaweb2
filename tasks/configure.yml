@@ -8,6 +8,14 @@
     group: "{{ icingaweb_group }}"
     mode: 0750
 
+- name: create /etc/icingaweb2/updates directory
+  file:
+    name: /etc/icingaweb2/updates
+    state: directory
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+    mode: 0750
+
 - name: install database
   include_tasks: database/mysql.yml
 
