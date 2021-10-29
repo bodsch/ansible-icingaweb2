@@ -120,7 +120,8 @@ class MysqlSchema(object):
         if error:
             return None, error, message
 
-        query = f"SELECT TABLE_SCHEMA, TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA = '{self.table_schema}'"
+        query = "SELECT TABLE_SCHEMA, TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA = '{0}'"
+        query = query.format(self.table_schema)
 
         # self.module.log(msg="query : {}".format(query))
 
@@ -140,7 +141,7 @@ class MysqlSchema(object):
         conn.close()
         exists = len(records)
 
-        self.module.log(msg=f"{records} {type(records)} {exists}")
+        # self.module.log(msg="{0} {type(0)} {1}".format(records, exists))
 
         if self.table_name is not None:
             table_names = []
@@ -148,7 +149,7 @@ class MysqlSchema(object):
                 table_names.append(e[1])
 
             if self.table_name in table_names:
-                self.module.log(msg=f"  - table name {self.table_name} exists in table schema")
+                self.module.log(msg="  - table name {0} exists in table schema".format(self.table_name))
 
                 return True, False, None
 
@@ -239,7 +240,7 @@ def main():
     icingaweb = MysqlSchema(module)
     result = icingaweb.run()
 
-    module.log(msg="= result : '{}'".format(result))
+    module.log(msg="= result : '{0}'".format(result))
 
     module.exit_json(**result)
 

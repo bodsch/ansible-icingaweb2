@@ -54,7 +54,7 @@ class PackageVersion(object):
         """
         result = dict(
             failed=False,
-            msg=f"unknown or unsupported distribution: '{self.distribution}'",
+            msg="unknown or unsupported distribution: '{0}'.format(self.distribution)",
             version=""
         )
 
@@ -121,11 +121,11 @@ class PackageVersion(object):
                 version_compressed=version_string_compressed
             )
         except KeyError as error:
-            self.module.log(msg=f"error         : {error}")
+            self.module.log(msg="error         : {0}".format(error))
 
             result = dict(
                 failed=False,
-                msg=f"package {self.package_name} is not installed",
+                msg="package {0} is not installed".format(self.package_name),
             )
 
         return result
@@ -149,7 +149,7 @@ class PackageVersion(object):
         args.append("list")
         args.append("installed")
         args.append("--cacheonly")
-        args.append(f"*{self.package_name}*")
+        args.append("*{0}*".format(self.package_name))
 
         rc, out, err = self.module.run_command(args, check_rc=False)
 
@@ -172,7 +172,7 @@ class PackageVersion(object):
         else:
             result = dict(
                 failed=False,
-                msg=f"package {self.package_name} is not installed",
+                msg="package {0} is not installed".format(self.package_name),
             )
 
         return result
@@ -236,7 +236,7 @@ class PackageVersion(object):
         else:
             result = dict(
                 failed=False,
-                msg=f"package {self.package_name} is not installed",
+                msg="package {0} is not installed".format(self.package_name),
             )
 
         return result
@@ -279,7 +279,7 @@ def main():
 
     result = PackageVersion(module).run()
 
-    module.log(msg="= result : '{}'".format(result))
+    module.log(msg="= result : '{0}'".format(result))
 
     module.exit_json(**result)
 
