@@ -58,13 +58,11 @@
   set_fact:
     php_version: "{{ package_version.version }}"
     php_package_version: "{{ package_version.version_compressed }}"
+    php_major_version: "{{ package_version.version[0:1] }}"
   when:
     - package_version is defined
     - package_version.version is defined
     - package_version.version_compressed is defined
-
-- debug:
-    msg: "{{ package_version }}"
 
 - name: assert php_version
   assert:
@@ -74,70 +72,25 @@
       - php_version is version_compare('8', '<')
     msg: "This role only works with PHP >= 7.0 and < 8.x .. found: {{ php_version }}"
 
-# =======
-# - name: php dependecy
-#   block:
-#     - name: get version of installed php-fpm
-#       package_version:
-#         package_name: "php"
-#         state: installed
-#       register: package_version
-#
-#     - name: define php version
-#       set_fact:
-#         php_version: "{{ package_version.version }}"
-#         php_package_version: "{{ package_version.version_compressed }}"
-#         php_major_version: "{{ package_version.version[0:1] }}"
-#       when:
-#         - package_version is defined
-#         - package_version.version is defined
-#         - package_version.version_compressed is defined
-#
-#     - name: assert php_version
-#       assert:
-#         that:
-#           - php_version is defined
-#           - php_version is version_compare('7.0', '>=')
-#           - php_version is version_compare('8', '<')
-#         msg: "This role only works with PHP >= 7.0 and < 8.x .. found: {{ php_version }}"
-#
-#     - name: do facts module to get latest information
-#       setup:
-#
-#     - name: re-include OS specific configuration
-#       include_vars: "{{ lookup('first_found', params) }}"
-#       vars:
-#         params:
-#           paths:
-#             - "vars"
-#           files:
-#             - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
-#             - "{{ ansible_distribution | lower }}-{{ ansible_service_mgr | lower }}.yaml"
-#             - "{{ ansible_distribution | lower }}.yaml"
-#             - "{{ ansible_os_family | lower }}.yaml"
-#           skip: true
-#
-# # - name: fix missing php binary or link
-# #   block:
-# #       - name: detect /usr/bin/php
-# #         shell: |
-# #           command -v php
-# #         args:
-# #           warn: false
-# #         register: _installed_php
-# #
-# #       - debug:
-# #           msg:
-# #             - "{{ _installed_php.stdout }}"
-# #
-# #       - name: create link
-# #         file:
-# #           src: "{{ _installed_php.stdout }}"
-# #           dest:
-# #           state: link
-# #         when:
-# #           - _installed_php.stdout
-# >>>>>>> master
+# fix for archlinux
+# archlinux supps php8 as /usr/bin/php
+#  and php7 as /usr/bin/php7
+- name: fix missing php binary or link
+  block:
+    - name: detect /usr/bin/php
+      shell: |
+        command -v php7
+      args:
+        warn: false
+      register: _installed_php
+
+    - name: create link
+      file:
+        src: "{{ _installed_php.stdout }}"
+        dest: /usr/bin/php
+        state: link
+      when:
+        - _installed_php.stdout
 
 - name: merge dependencies between defaults and custom
   set_fact:
