@@ -21,8 +21,11 @@
   version: 2.2.4
 
 - name: nginx
-  src: https://github.com/geerlingguy/ansible-role-nginx.git
-  version: 3.1.0
+  # src: https://github.com/geerlingguy/ansible-role-nginx.git
+  # version: 3.1.0
+  src: https://github.com/bodsch/ansible-role-nginx.git
+  scm: git
+  version: fix/archlinux-dont-need-pidfile
 
 - name: monitoring-tools
   src: https://github.com/bodsch/ansible-monitoring-plugins.git
@@ -31,6 +34,6 @@
 - name: icinga2
   src: https://github.com/bodsch/ansible-icinga2.git
   scm: git
-  version: 1.5.1
+  version: 1.5.3
 
 ...
