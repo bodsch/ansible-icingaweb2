@@ -43,6 +43,7 @@ This role also supports other distributions like ArchLinux, Gentoo by using the 
 
 Tested on
 
+* ArchLinux
 * Debian 10
 * Ubuntu 18.04 / 20.04
 * CentOS 7 / 8
