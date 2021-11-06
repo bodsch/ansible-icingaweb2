@@ -73,8 +73,8 @@
     msg: "This role only works with PHP >= 7.0 and < 8.x .. found: {{ php_version }}"
 
 # fix for archlinux
-# archlinux supps php8 as /usr/bin/php
-#  and php7 as /usr/bin/php7
+# archlinux install php8 as /usr/bin/php
+# and php7 as /usr/bin/php7
 - name: fix missing php binary or link
   block:
     - name: detect /usr/bin/php
@@ -91,6 +91,8 @@
         state: link
       when:
         - _installed_php.stdout
+  when:
+    - ansible_distribution | lower == 'archlinux'
 
 - name: merge dependencies between defaults and custom
   set_fact:
