@@ -43,6 +43,7 @@
   gather_facts: true
 
   roles:
+    # this role has some problems with archlinux
     - role: nginx
     - role: php-fpm
 

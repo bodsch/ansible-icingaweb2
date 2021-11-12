@@ -56,6 +56,35 @@ php_modules:
     priority: 20
     content: |
       extension=pdo_mysql.so
+      pdo_mysql.cache_size = 2000
+  - name: gd
+    enabled: true
+    priority: 20
+    content: |
+      extension=gd.so
+      gd.jpeg_ignore_warning = 1
+  - name: intl
+    enabled: true
+    priority: 20
+    content: |
+      extension=intl
+      intl.default_locale=de
+  - name: xmlrpc
+    enabled: true
+    priority: 20
+    content: |
+      extension=xmlrpc
+  - name: gettext
+    enabled: true
+    priority: 20
+    content: |
+      extension=gettext
+  - name: curl
+    enabled: true
+    priority: 20
+    content: |
+      extension=curl
+  # disable (old) modules
   - name: apcu
     enabled: false
     priority: 20
@@ -64,11 +93,6 @@ php_modules:
       apc.shm_size=96M
       apc.enable_cli=0
       apc.rfc1867=1
-  - name: gd
-    enabled: true
-    priority: 20
-    content: |
-      extension=gd.so
   - name: memcached
     enabled: false
     priority: 20

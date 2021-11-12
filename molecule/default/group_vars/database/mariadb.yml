@@ -4,6 +4,8 @@
 
 # ansible_python_interpreter: /usr/bin/python3
 
+mariadb_debian_repo: "https://archive.mariadb.org/repo"
+
 mariadb_root_password_update: true
 
 mariadb_databases:
