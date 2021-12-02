@@ -2,8 +2,6 @@
 
 package_version: ""
 
-icingaweb_local_tmp_directory: /tmp/ansible/icingaweb
-
 icingaweb_defaults_modules_enabled:
   - monitoring
 
