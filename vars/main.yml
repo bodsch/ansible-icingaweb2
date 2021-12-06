@@ -2,6 +2,8 @@
 
 package_version: ""
 
+icingaweb_local_tmp_directory: /home/{{ lookup('env', 'USER') }}/tmp/icingaweb
+
 icingaweb_defaults_modules_enabled:
   - monitoring
 
