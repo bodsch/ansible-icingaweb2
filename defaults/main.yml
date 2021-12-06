@@ -7,8 +7,6 @@ icingaweb_php_thirdparty: 0.10.0
 
 icingaweb_install_dir: /usr/share/icingaweb2
 
-icingaweb_local_tmp_directory: /tmp/ansible/icingaweb
-
 icingaweb_php_daemon:
   restart: true
   name: "{{ php_fpm_daemon }}"
