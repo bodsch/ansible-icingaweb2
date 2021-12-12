@@ -33,6 +33,14 @@ The package offered by Icinga has a hard (and in my eyes unnecessary) dependency
 
 This role also supports other distributions like ArchLinux, Gentoo by using the sources.
 
+The source code archive is downloaded to the Ansible controller and then copied to the 
+target system.
+For this purpose, a temporary directory is created under `${HOME}/.cache/ansible/icingaweb`
+
+If you want a different directory, you can specify an individual directory by setting the 
+environment variable `CUSTOM_LOCAL_TMP_DIRECTORY`.
+
+
 ## Requirements & Dependencies
 
  - running mariadb / mysql database
