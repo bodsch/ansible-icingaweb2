@@ -3,7 +3,7 @@
 - name: snapd
   src: https://github.com/bodsch/ansible-snapd.git
   scm: git
-  version: 1.0.1
+  version: 1.1.0
 
 - name: apparmor
   src: https://github.com/bodsch/ansible-apparmor.git
@@ -18,7 +18,7 @@
 - name: mariadb
   src: https://github.com/bodsch/ansible-mariadb.git
   scm: git
-  version: 2.2.7
+  version: 2.2.8
 
 - name: nginx
   # src: https://github.com/geerlingguy/ansible-role-nginx.git
@@ -29,11 +29,11 @@
 
 - name: monitoring-tools
   src: https://github.com/bodsch/ansible-monitoring-plugins.git
-  version: 1.3.4
+  version: 1.3.5
 
 - name: icinga2
   src: https://github.com/bodsch/ansible-icinga2.git
   scm: git
-  version: 1.5.3
+  version: 1.5.4
 
 ...
