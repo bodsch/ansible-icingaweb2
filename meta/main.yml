@@ -1,7 +1,5 @@
 ---
 
-dependencies: []
-
 galaxy_info:
   role_name: icingaweb2
   namespace: bodsch
@@ -11,18 +9,21 @@ galaxy_info:
   license: BSD
   min_ansible_version: 2.9
   platforms:
-    - name: Ubuntu
-      versions:
-        - bionic # 18.04
-        - focal  # 20.04
-
+    - name: ArchLinux
     - name: Debian
       versions:
-        - buster # 10
-
+        # 10
+        - buster
+        # 11
+        - bullseye
+    - name: Ubuntu
+      versions:
+        # 18.04
+        - bionic
+        # 20.04
+        - focal
     - name: EL
       versions:
-        - 7
         - 8
 
   galaxy_tags:
@@ -30,3 +31,7 @@ galaxy_info:
     - icinga
     - icingaweb
     - web
+
+dependencies: []
+
+...

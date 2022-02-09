@@ -3,7 +3,7 @@
 icingaweb_packages:
   - mariadb
   - iproute
-  - MySQL-python
+  - python3-PyMySQL
 
 icingaweb_user: nginx
 icingaweb_group: nginx

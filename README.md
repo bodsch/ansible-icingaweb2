@@ -47,15 +47,17 @@ environment variable `CUSTOM_LOCAL_TMP_DIRECTORY`.
  - PHP > 7.0
  - nginx
 
-### Operating systems
-
-Tested on
+## tested operating systems
 
 * ArchLinux
-* Debian 10
-* Ubuntu 18.04 / 20.04
-* CentOS 7 / 8
-* OracleLinux 7 / 8
+* Debian based
+    - Debian 10 / 11
+    - Ubuntu 18.04 / 20.04
+* RedHat based
+    - CentOS 8 (**not longer supported**)
+    - Alma Linux 8
+    - Rocky Linux 8
+    - OracleLinux 8
 
 ## Contribution
 

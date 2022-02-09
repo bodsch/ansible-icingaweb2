@@ -22,11 +22,12 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - debian:10
+          - debian:11
         python-version:
           - '3.9'
         ansible-version:
-          - '2.10'
+          - '4.1.0'
+          - '5.1.0'
 
     steps:
       - name: check out the codebase.
@@ -68,11 +69,12 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - debian:10
+          - debian:11
         python-version:
           - '3.9'
         ansible-version:
-          - '2.10'
+          - '4.1.0'
+          - '5.1.0'
 
     steps:
       - name: check out the codebase.
