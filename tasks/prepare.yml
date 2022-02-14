@@ -86,6 +86,8 @@
       args:
         warn: false
       register: _installed_php
+      changed_when: _installed_php.rc != 0
+      failed_when: _installed_php.rc != 0
 
     - name: create link
       file:
