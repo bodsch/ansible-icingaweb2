@@ -1,9 +1,22 @@
 ---
 
-icingaweb_version: 2.9.4
+icingaweb_version: 2.9.5
 
-icingaweb_php_library: 0.6.0
+icingaweb_web_modules:
+  - name: icingaweb_php_library
+    version: 0.7.0
+    url: https://github.com/Icinga/icinga-php-library
+  - name: icinga-php-thirdparty
+    version: 0.10.0
+  - name: icingaweb2-module-pdfexport
+    version: 0.10.0
+  - name: icingadb-web
+    version: 1.0.0-rc2
+
+icingaweb_php_library: 0.7.0
 icingaweb_php_thirdparty: 0.10.0
+icingaweb_php_pdfexport: 0.10.0
+icingaweb_php_icingadb: 1.0.0-rc2
 
 icingaweb_install_dir: /usr/share/icingaweb2
 

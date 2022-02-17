@@ -67,6 +67,7 @@
 - name: icingaweb_version version is '2.9.0'
   block:
     - name: create directory for PHP libraries
+      become: true
       file:
         path: /usr/share/icinga-php
         state: directory
@@ -83,7 +84,7 @@
       register: stat_present_vendor
 
     - block:
-        - name: download icinga-php-library v{{ icingaweb_php_library }}.tar.gz to local directory {{ icingaweb_local_tmp_directory }}
+        - name: download icinga-php-library v{{ icingaweb_php_library }}.tar.gz
           become: false
           get_url:
             url: https://github.com/Icinga/icinga-php-library/archive/v{{ icingaweb_php_library }}.tar.gz
@@ -126,7 +127,7 @@
         - not stat_present_ipl.stat.exists
 
     - block:
-        - name: download icinga-php-library v{{ icingaweb_php_thirdparty }}.tar.gz to local directory {{ icingaweb_local_tmp_directory }}
+        - name: download icinga-php-thirdparty v{{ icingaweb_php_thirdparty }}.tar.gz
           become: false
           get_url:
             url: https://github.com/Icinga/icinga-php-thirdparty/archive/v{{ icingaweb_php_thirdparty }}.tar.gz
@@ -180,5 +181,108 @@
 
   when:
     - icingaweb_version is version('2.9.0', '>=', strict=True)
+
+- name: install various web modules
+  block:
+
+    - name: detect icinga pdfexport library
+      stat:
+        path: /usr/share/icinga-php/pdfexport
+      register: stat_present_pdfexport
+
+    - name: detect icinga icingadb library
+      stat:
+        path: /usr/share/icinga-php/icingadb
+      register: stat_present_icingadb
+
+    - block:
+        - name: download icinga-php-pdfexport v{{ icingaweb_php_pdfexport }}.tar.gz
+          become: false
+          get_url:
+            url: https://github.com/Icinga/icingaweb2-module-pdfexport/archive/v{{ icingaweb_php_pdfexport }}.tar.gz
+            dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-pdfexport-v{{ icingaweb_php_pdfexport }}.tar.gz"
+            mode: 0660
+          register: _download_artefact
+          until: _download_artefact is succeeded
+          retries: 5
+          delay: 2
+          check_mode: false
+          delegate_to: localhost
+
+        - name: deploy library archives
+          copy:
+            src: "{{ icingaweb_local_tmp_directory }}/icinga-php-pdfexport-v{{ icingaweb_php_pdfexport }}.tar.gz"
+            dest: /tmp
+            mode: 0700
+
+        - name: extract library archives
+          unarchive:
+            src: "/tmp/icinga-php-pdfexport-v{{ icingaweb_php_pdfexport }}.tar.gz"
+            dest: /usr/share/icinga-php/
+            owner: "{{ icingaweb_user }}"
+            group: "{{ icingaweb_group }}"
+            mode: 0755
+            remote_src: true
+      when:
+        - stat_present_pdfexport is defined
+        - stat_present_pdfexport.stat is defined
+        - not stat_present_pdfexport.stat.exists
+
+    - block:
+        - name: download icingadb-web v{{ icingaweb_php_icingadb }}.tar.gz
+          become: false
+          get_url:
+            url: https://github.com/Icinga/icingadb-web/archive/v{{ icingaweb_php_icingadb }}.tar.gz
+            dest: "{{ icingaweb_local_tmp_directory }}/icingadb-web-v{{ icingaweb_php_icingadb }}.tar.gz"
+            mode: 0660
+          register: _download_artefact
+          until: _download_artefact is succeeded
+          retries: 5
+          delay: 2
+          check_mode: false
+          delegate_to: localhost
+
+        - name: deploy library archives
+          copy:
+            src: "{{ icingaweb_local_tmp_directory }}/icingadb-web-v{{ icingaweb_php_icingadb }}.tar.gz"
+            dest: /tmp
+            mode: 0700
+
+        - name: extract library archives
+          unarchive:
+            src: "/tmp/icingadb-web-v{{ icingaweb_php_icingadb }}.tar.gz"
+            dest: /usr/share/icinga-php/
+            owner: "{{ icingaweb_user }}"
+            group: "{{ icingaweb_group }}"
+            mode: 0755
+            remote_src: true
+      when:
+        - stat_present_icingadb is defined
+        - stat_present_icingadb.stat is defined
+        - not stat_present_icingadb.stat.exists
+
+    - name: create link from icinga-php-pdfexport to pdfexport
+      file:
+        src: "/usr/share/icinga-php/icinga-php-pdfexport-{{ icingaweb_php_pdfexport }}"
+        dest: "/usr/share/icinga-php/pdfexport"
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        state: link
+        force: true
+
+    - name: create link from icingadb-web to icingadb
+      file:
+        src: "/usr/share/icinga-php/icingadb-web-{{ icingaweb_php_icingadb }}"
+        dest: "/usr/share/icinga-php/icingadb"
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        state: link
+        force: true
+
+#    - name: configure icingadb-web
+  when:
+    - enable_icingadb is defined
 
 ...

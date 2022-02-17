@@ -15,12 +15,12 @@
           - "ansible version      : {{ ansible_version.full }}"
           - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
 
-    - name: uninstall php8
-      package:
-        name: php
-        state: absent
-      when:
-        - ansible_distribution | lower == 'archlinux'
+    # - name: uninstall php8
+    #   package:
+    #     name: php
+    #     state: absent
+    #   when:
+    #     - ansible_distribution | lower == 'archlinux'
 
   roles:
     - role: ansible-icingaweb2

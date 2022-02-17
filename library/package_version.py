@@ -109,8 +109,10 @@ class PackageVersion(object):
             if(pkg):
                 pkg_version = pkg.versions[0]
                 version = pkg_version.version
-                pattern = re.compile(r'^\d:(?P<version>\d.+)\+.*')
+                pattern = re.compile(r'^\d:(?P<version>[0-9.]+)\+.*')
                 version = re.search(pattern, version)
+
+                self.module.log(msg=" - version  : {} {}".format(version, type(version)))
 
                 version_string = version.group('version')
                 version_string_compressed = version_string.replace('.', '')
