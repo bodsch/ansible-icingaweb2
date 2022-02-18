@@ -42,11 +42,11 @@
     - role: nginx
     - role: php-fpm
 
-- name: prepare icinga2
-  hosts: icinga2
-  gather_facts: true
-
-  roles:
-    - role: icinga2
+# - name: prepare icinga2
+#   hosts: icinga2
+#   gather_facts: true
+#
+#   roles:
+#     - role: icinga2
 
 ...

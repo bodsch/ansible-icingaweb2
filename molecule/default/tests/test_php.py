@@ -111,4 +111,13 @@ def test_fpm_pools(host, get_vars):
     for i in host.socket.get_listening_sockets():
         print(i)
 
-    assert host.socket("unix:///run/php/worker-01.sock").is_listening
+
+    socket_name = "/run/php/worker-01.sock"
+
+    f = host.file(socket_name)
+    assert f.exists
+
+    listen = []
+
+    if not (distribution == 'ubuntu' and release == '18.04'):
+        assert host.socket("unix://{}".format(socket_name).is_listening
