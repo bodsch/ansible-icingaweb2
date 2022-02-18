@@ -9,18 +9,18 @@
   tags:
     - icingaweb_install
 
-# - include_tasks: configure.yml
-#   tags:
-#     - icingaweb_configure
-#
-# - name: install themes
-#   include_tasks: themes/install.yml
-#   tags:
-#     - icingaweb_themes
-#
-# - name: external modules
-#   include_tasks: modules/install.yml
-#   tags:
-#     - icingaweb_modules
+- include_tasks: configure.yml
+  tags:
+    - icingaweb_configure
+
+- name: install themes
+  include_tasks: themes/install.yml
+  tags:
+    - icingaweb_themes
+
+- name: external modules
+  include_tasks: modules/install.yml
+  tags:
+    - icingaweb_modules
 
 ...
