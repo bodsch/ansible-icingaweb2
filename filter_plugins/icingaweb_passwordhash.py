@@ -20,8 +20,16 @@ class FilterModule(object):
 
     def filters(self):
         return {
+            'type': self.var_type,
             'create_password_hash': self.password_hash,
+            'dict_from_list': self.dict_from_list,
         }
+
+    def var_type(self, var):
+        """
+          Get the type of a variable
+        """
+        return type(var).__name__
 
     def password_hash(self, data):
         """
@@ -52,6 +60,17 @@ class FilterModule(object):
             json.dump(data, fp)
 
         return data
+
+    def dict_from_list(self, data, search):
+        """
+        """
+        display.v("dict_from_list({}, {})".format(data, search))
+
+        result = next((item for item in data if item.get('name') == search), {})
+
+        display.v("result : {}".format(result))
+
+        return result
 
     # https://docs.python.org/3/library/crypt.html
     def __password_hash(sef, plaintext):

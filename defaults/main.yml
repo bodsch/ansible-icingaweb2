@@ -125,6 +125,8 @@ icingaweb_php_dependencies: []
   # attention ... use the right PHP version!
   # - php-ldap
 
+icingaweb_icingadb: {}
+
 icingaweb_module:
   monitoring:
     security:

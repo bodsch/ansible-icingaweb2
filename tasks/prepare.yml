@@ -161,6 +161,11 @@
     icingaweb_resources: "{{ icingaweb_defaults_resources |
       combine( icingaweb_resources, recursive=True ) }}"
 
+- name: merge icingaweb_icingadb configuration between defaults and custom
+  set_fact:
+    icingaweb_icingadb: "{{ icingaweb_defaults_icingadb |
+      combine( icingaweb_icingadb, recursive=True ) }}"
+
 - name: merge icingaweb_php_daemon configuration between defaults and custom
   set_fact:
     icingaweb_php_daemon: "{{ icingaweb_defaults_php_daemon |

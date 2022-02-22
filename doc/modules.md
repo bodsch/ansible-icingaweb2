@@ -2,7 +2,7 @@
 
 creates `modules/monitoring/config.ini`
 
-```
+```yaml
 icingaweb_module:
   monitoring:
     security:
@@ -27,7 +27,7 @@ Do you have any wishes for further ... read the [Contribution](../CONTRIBUTING.m
 
 The following parameters can be used to influence the installation and activation: 
 
-```
+```yaml
 icingaweb_external_modules:
   - audit:
     enabled: false
@@ -38,18 +38,21 @@ icingaweb_external_modules:
 
 - `enabled` enabled or disable the module
 - `name` a name for the installation
-- `src` the sorcecode
+- `src` the sourcecode
 - `version` the version
 
-Additionally there is the possibility to configure the corresponding modules. The respective parameters are individual and will be explained separately.
+Additionally there is the possibility to configure the corresponding modules. 
+The respective parameters are individual and will be explained separately.
 
 Each configuration takes place in a `configuration` block.
 
 ### Audit
 
-There are two different blocks [`Standard Log`](https://github.com/Icinga/icingaweb2-module-audit#standard-log) and [`JSON Log`](https://github.com/Icinga/icingaweb2-module-audit#standard-log).
+There are two different blocks [`Standard Log`](https://github.com/Icinga/icingaweb2-module-audit#standard-log) and 
+[`JSON Log`](https://github.com/Icinga/icingaweb2-module-audit#standard-log).
 
-The standard log (`log`) is a normal log with human readable messages. It's possible to log to a file and to syslog.
+The standard log (`log`) is a normal log with human readable messages. 
+It's possible to log to a file and to syslog.
 
 * `type`<br>
      One of these three possibilities are available:
@@ -69,7 +72,8 @@ The standard log (`log`) is a normal log with human readable messages. It's poss
 * `path`<br>
      The log file in which the audit information is stored.
 
-The JSON log (`stream`) is supposed to be consumed by other applications. It writes one JSON object per line to a file.
+The JSON log (`stream`) is supposed to be consumed by other applications. 
+It writes one JSON object per line to a file.
 
 * `format`<br>
      The format in which the data is stored. It is only available for `json`.<br>
@@ -77,7 +81,7 @@ The JSON log (`stream`) is supposed to be consumed by other applications. It wri
 * `path`<br>
      The log file in which the audit information is stored.
 
-```
+```yaml
     configuration:
       log:
         # file / syslog / none
@@ -93,7 +97,7 @@ The JSON log (`stream`) is supposed to be consumed by other applications. It wri
 
 **Complete example:**
 
-```
+```yaml
 icingaweb_external_modules:
 
   - audit:
@@ -112,14 +116,16 @@ icingaweb_external_modules:
 
 ### Graphite
 
-This module integrates an existing [Graphite](https://graphite.readthedocs.io/en/latest/) installation in the IcingaWeb frontend.
+This module integrates an existing [Graphite](https://graphite.readthedocs.io/en/latest/) installation 
+in the IcingaWeb frontend.
 
 * `host`<br>
     The hostname for the corresponding graphite service
 * `port`<br>
     The port for the graphite Web URL
-    
-These following credentials are only needed, when your Graphite Web is protected by a HTTP basic authentication mechanism.
+
+These following credentials are only needed, when your Graphite Web is protected by a HTTP basic 
+authentication mechanism.
 
 * `user`<br>
     username for the basic authentication
@@ -134,7 +140,7 @@ These following credentials are only needed, when your Graphite Web is protected
    graphs both in the graphs lists and in monitored objects' detail views.<br>
    If you'd like to suppress the No graphs found messages, activate `disable_no_graphs_found`
 
-```
+```yaml
     configuration:
       host: localhost
       port: 2003
@@ -152,7 +158,7 @@ These following credentials are only needed, when your Graphite Web is protected
 
 **Complete example:**
 
-```
+```yaml
 icingaweb_external_modules:
 
   - graphite:
@@ -174,8 +180,7 @@ icingaweb_external_modules:
 Add Grafana graphs into Icinga Web 2 to display performance metrics.
 
 
-
-```
+```yaml
     configuration:
       support_grafana_5: false
       host: tsdb.icinga.local
@@ -213,7 +218,7 @@ Add Grafana graphs into Icinga Web 2 to display performance metrics.
 
 After configuring the Grafana connection, further graphs can be set up.
 
-```
+```yaml
     graphs:
       - ping4:
         dashboard: hostalive
@@ -232,7 +237,7 @@ After configuring the Grafana connection, further graphs can be set up.
 
 **Complete example:**
 
-```
+```yaml
 icingaweb_external_modules:
 
   - grafana:
@@ -277,7 +282,7 @@ icingaweb_external_modules:
     graphs:
       - ping4:
         dashboard: hostalive
-        dashboarduid: Z-TfDRpGz    
+        dashboarduid: Z-TfDRpGz
         panelId: 9
         orgId: 1
         repeatable: false

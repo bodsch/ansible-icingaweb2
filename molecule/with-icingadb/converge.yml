@@ -1,0 +1,26 @@
+---
+
+- name: converge
+  hosts: instance
+  any_errors_fatal: false
+
+  environment:
+    NETRC: ''
+
+  pre_tasks:
+    - debug:
+        msg:
+          - "os family            : {{ ansible_distribution }} ({{ ansible_os_family }})"
+          - "distribution version : {{ ansible_distribution_major_version }}"
+          - "ansible version      : {{ ansible_version.full }}"
+          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
+
+    # - name: uninstall php8
+    #   package:
+    #     name: php
+    #     state: absent
+    #   when:
+    #     - ansible_distribution | lower == 'archlinux'
+
+  roles:
+    - role: ansible-icingaweb2

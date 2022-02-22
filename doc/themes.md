@@ -1,6 +1,6 @@
 # Support Themes
 
-```
+```yaml
 icingaweb_themes:
   - unicorn:
     name: unicorn
@@ -11,7 +11,7 @@ icingaweb_themes:
     name: batman-dark
     src: https://github.com/jschanz/icingaweb2-theme-batman-dark.git
     version: v1.0.0
-    
+
 # if users should not be allowed to change their theme
 icingaweb_themes_disabled: true
 

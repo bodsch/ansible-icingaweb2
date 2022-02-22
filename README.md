@@ -82,24 +82,39 @@ Please read the following documention for configuration points.
 - [resources](doc/resources.md)
 - [themes](doc/themes.md)
 - [logging](doc/logging.md)
+- [icingadb](doc/icingadb.md)
 
 ---
 
 ## Examples
 
-A complete test setup can be found in GitLab under [icinga2-infrastructure](https://gitlab.com/icinga2-infrastructure/deployment).
+Take a look into the [molecule](molecule) directory.
+Some example configurations are stored there:
 
-Or take e look into the [molecule](molecule/defaults/converge.yml) test.
+- [simple installation](molecule/default)
+- [update from 2.7.0 to 2.8.2](molecule/update_2.7.0-2.8.2)
+- [update from 2.8.2 to 2.9.3](molecule/update_2.8.2-2.9.3)
+- [with icingadb](molecule/icingadb)
+
+Or a complete test setup can be found in GitLab under [icinga2-infrastructure](https://gitlab.com/icinga2-infrastructure/deployment).
 
 
 ## tests
 
 For Example
 
+```bash
+tox -e py39-ansible510 -- molecule test
 ```
-$ tox -e py39-ansible210 -- molecule test
+or
+```bash
+tox -e py310-ansible510 -- molecule test --scenario-name update_2.7.0-2.8.2
 ```
+or
+```bash
+tox -e py310-ansible510 -- molecule test --scenario-name with-icingadb
 
+```
 ## License
 
 BSD 2-clause

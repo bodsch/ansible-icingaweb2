@@ -1,0 +1,18 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+; {{ ansible_managed }}
+
+{% if icingaweb_icingadb.redis.primary is defined and
+      icingaweb_icingadb.redis.primary.host is defined and
+      icingaweb_icingadb.redis.primary.host | string | length > 0 %}
+[redis1]
+host = "{{ icingaweb_icingadb.redis.primary.host }}"
+port = "{{ icingaweb_icingadb.redis.primary.port }}"
+{% endif %}
+
+{% if icingaweb_icingadb.redis.secondary is defined and
+      icingaweb_icingadb.redis.secondary.host is defined and
+      icingaweb_icingadb.redis.secondary.host | string | length > 0 %}
+[redis2]
+host = "{{ icingaweb_icingadb.redis.secondary.host }}"
+port = "{{ icingaweb_icingadb.redis.secondary.port }}"
+{% endif %}
