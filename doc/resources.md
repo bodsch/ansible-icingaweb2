@@ -2,7 +2,7 @@
 
 creates `resources.ini`
 
-```
+```yaml
 icingaweb_resources:
   db:
     icingaweb-mysql-tcp:

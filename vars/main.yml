@@ -45,6 +45,16 @@ icingaweb_defaults_php_daemon:
   restart: true
   name: php-fpm
 
+icingaweb_defaults_icingadb:
+  database: icingadb
+  commandtransports: {}
+  redis:
+    tls: false
+    primary:
+      host: ""
+      port: 6380
+    secondary: {}
+
 icingaweb_packages: []
 
 icingaweb_php_packages: []

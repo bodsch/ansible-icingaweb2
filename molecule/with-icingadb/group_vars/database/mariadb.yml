@@ -1,0 +1,38 @@
+---
+
+mariadb_debian_repo: "https://ftp.nluug.nl/db/mariadb/repo"
+
+mariadb_root_password: Y5FZfKXzCeOWGf4kBOiFSp6Il
+
+mariadb_root_password_update: true
+
+mariadb_databases:
+  - name: icinga2_ido
+  - name: icingaweb_config
+  - name: "{{ icingadb_database.database }}"
+
+mariadb_users:
+  - name: icinga2_ido
+    host: "%"
+    password: icinga2
+    encrypted: false
+    priv: "icinga2_ido.*:ALL"
+  - name: icingaweb_config
+    host: "%"
+    password: icingaweb_config
+    encrypted: false
+    priv: "icingaweb_config.*:ALL"
+  - name: "{{ icingadb_database.user }}"
+    host: "%"
+    password: "{{ icingadb_database.password }}"
+    priv: "{{ icingadb_database.database }}.*:ALL"
+    encrypted: false
+
+mariadb_config_mysqld:
+  bind-address: 0.0.0.0
+  # socket: "{{ mariadb_socket }}"
+  skip-external-locking:
+  skip-name-resolve: 1
+  performance_schema: 1
+  expire_logs_days: 2
+  max_connections: 20

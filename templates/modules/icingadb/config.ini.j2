@@ -1,0 +1,12 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+; {{ ansible_managed }}
+
+[icingadb]
+resource = "{{ icingaweb_icingadb.database }}"
+
+[redis]
+tls = "{{ icingaweb_icingadb.redis.tls | default('false') | ternary('1','0') }}"
+
+[redis1]
+
+[redis2]

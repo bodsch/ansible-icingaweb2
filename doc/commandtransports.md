@@ -4,7 +4,7 @@
 
 creates `modules/monitoring/commandtransports.ini`
 
-```
+```yaml
 icingaweb_commandtransport:
   master:
     transport: api
@@ -16,7 +16,7 @@ icingaweb_commandtransport:
 
 ## For an Icinga2 HA Master Setup
 
-```
+```yaml
 icingaweb_commandtransport:
   master-1:
     transport: api

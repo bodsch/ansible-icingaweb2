@@ -109,25 +109,82 @@
         - item.configuration is defined
         - item.configuration | count > 0
 
+    # --------------------------------------------------------------------------------------------
+
+    - name: extract module information for grafana
+      set_fact:
+        _icingaweb_module_grafana: "{{ icingaweb_external_modules | dict_from_list('grafana') }}"
+
+    - name: extract module information for icingadb
+      set_fact:
+        _icingaweb_module_icingadb: "{{ icingaweb_external_modules | dict_from_list('icingadb') }}"
+
+    # --------------------------------------------------------------------------------------------
+
     - name: create grafanas graphs.ini
       become: true
       template:
-        src: modules/{{ item.name }}/graphs.ini.j2
-        dest: /etc/icingaweb2/modules/{{ item.name }}/graphs.ini
+        src: modules/{{ _icingaweb_module_grafana.name }}/graphs.ini.j2
+        dest: /etc/icingaweb2/modules/{{ _icingaweb_module_grafana.name }}/graphs.ini
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
         mode: 0666
-      loop:
-        "{{ icingaweb_external_modules }}"
-      loop_control:
-        label: "  module: {{ item.name }}  - version: {{ item.version | default('', true) }}"
       when:
-        - item.enabled
-        - item.name == 'grafana'
-        - item.configuration is defined
-        - item.configuration | count > 0
-        - item.graphs is defined
-        - item.graphs | count > 0
+        - _icingaweb_module_grafana is defined
+        - _icingaweb_module_grafana.enabled is defined
+        - _icingaweb_module_grafana.enabled
+        - _icingaweb_module_grafana.configuration is defined
+        - _icingaweb_module_grafana.configuration | count > 0
+        - _icingaweb_module_grafana.graphs is defined
+        - _icingaweb_module_grafana.graphs | count > 0
+
+    # --------------------------------------------------------------------------------------------
+
+    - name: icingadb
+      block:
+        - name: create directory for icingadb configuration
+          become: true
+          file:
+            path: /etc/icingaweb2/modules/{{ _icingaweb_module_icingadb.name }}
+            state: directory
+            recurse: true
+            owner: "{{ icingaweb_user }}"
+            group: "{{ icingaweb_group }}"
+            mode: 0755
+
+        - name: create icingadb configuration
+          become: true
+          template:
+            src: modules/{{ _icingaweb_module_icingadb.name }}/config.ini.j2
+            dest: /etc/icingaweb2/modules/{{ _icingaweb_module_icingadb.name }}/config.ini
+            owner: "{{ icingaweb_user }}"
+            group: "{{ icingaweb_group }}"
+            mode: 0666
+
+        - name: create redis configuration
+          become: true
+          template:
+            src: modules/{{ _icingaweb_module_icingadb.name }}/redis.ini.j2
+            dest: /etc/icingaweb2/modules/{{ _icingaweb_module_icingadb.name }}/redis.ini
+            owner: "{{ icingaweb_user }}"
+            group: "{{ icingaweb_group }}"
+            mode: 0666
+
+        - name: create commandtransport configuration
+          become: true
+          template:
+            src: modules/{{ _icingaweb_module_icingadb.name }}/commandtransports.ini.j2
+            dest: /etc/icingaweb2/modules/{{ _icingaweb_module_icingadb.name }}/commandtransports.ini
+            owner: "{{ icingaweb_user }}"
+            group: "{{ icingaweb_group }}"
+            mode: 0666
+
+      when:
+        - _icingaweb_module_icingadb is defined
+        - _icingaweb_module_icingadb.enabled is defined
+        - _icingaweb_module_icingadb.enabled
+
+    # --------------------------------------------------------------------------------------------
 
     - name: disable modules
       become: true

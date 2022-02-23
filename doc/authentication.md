@@ -2,7 +2,7 @@
 
 creates `authentication.ini`
 
-```
+```yaml
 icingaweb_auth_backend: "{{ icingaweb_resources.db.icingaweb }}"
 
 icingaweb_authentication:
