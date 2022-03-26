@@ -26,6 +26,12 @@ Supports also an Icinga2 HA cluster.
 | `icingaweb_resources.db.icingaweb` | `icingaweb_resources.icingaweb` |
 | `icingaweb_auth_backend`           | `icingaweb_auth_backend.database` |
 
+**Version < 1.7.x**
+
+| <= 1.7 | >= 1.8 |
+| :---- | :---- |
+| `icingaweb_users` | `icingaweb_db_users` |
+
 
 ## Why from sources?
 
@@ -77,6 +83,7 @@ Please read the following documention for configuration points.
 ## Documentation
 
 - [Authentication](doc/authentication.md)
+- [Users and Groups](doc/database_users_and_groups.md)
 - [commandtransports](doc/commandtransports.md)
 - [modules](doc/modules.md)
 - [resources](doc/resources.md)

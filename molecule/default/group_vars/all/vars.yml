@@ -41,25 +41,25 @@ icingaweb_commandtransport:
     username: icingaweb
     password: S0mh1TuFJI
 
-icingaweb_users:
-  - admin:
-    username: admin
-    password: admin
-    preferences:
-      language: de_DE
-      timezone: Europe/Berlin
-      show_application_state_messages: false
-      show_stacktraces: false
-      show_benchmark: false
-      auto_refresh: true
-  - bodsch:
-    username: bodsch
-    password: xxx
-  - dark:
-    username: dark
-    password: s3cur3
-    active: false
-    force: true
+# icingaweb_users:
+#   - admin:
+#     username: admin
+#     password: admin
+#     preferences:
+#       language: de_DE
+#       timezone: Europe/Berlin
+#       show_application_state_messages: false
+#       show_stacktraces: false
+#       show_benchmark: false
+#       auto_refresh: true
+#   - bodsch:
+#     username: bodsch
+#     password: xxx
+#   - dark:
+#     username: dark
+#     password: s3cur3
+#     active: false
+#     force: true
 
 icingaweb_themes:
   - unicorn:
@@ -82,5 +82,26 @@ icingaweb_external_modules:
     name: audit
     src: https://github.com/Icinga/icingaweb2-module-audit.git
     version: v1.0.1
+
+icingaweb_db_groups:
+  - groupname: "admin"
+    parent: ""
+    members:
+      - admin
+    force: false
+  - groupname: "admins_2"
+    state: absent
+
+icingaweb_db_users:
+  - admin:
+    username: admin
+    password: admin
+    preferences:
+      language: de_DE
+      timezone: Europe/Berlin
+      show_application_state_messages: false
+      show_stacktraces: false
+      show_benchmark: false
+      auto_refresh: true
 
 ...

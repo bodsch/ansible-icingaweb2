@@ -1,0 +1,37 @@
+---
+
+- name: import icingaweb database groups
+  become: true
+  icingaweb_database_group:
+    state: "{{ item.state | default('present') }}"
+    groupname: "{{ item.groupname }}"
+    parent: "{{ item.parent | default(omit) }}"
+    members: "{{ item.members | default([]) }}"
+    force: "{{ item.force | default(omit) }}"
+    database_login_host: "{{ icingaweb_auth_backend.database.host }}"
+    database_name: "{{ icingaweb_auth_backend.database.dbname }}"
+    database_config_file: /etc/icingaweb2/.my.cnf
+  no_log: true
+  register: import_icingaweb_db_groups
+  loop:
+    "{{ icingaweb_db_groups }}"
+  loop_control:
+    label: "groupname: {{ item.groupname }}, state: {{ item.state | default('present') }}"
+  when:
+    - icingaweb_db_groups is defined
+    - icingaweb_db_groups | count != 0
+    - icingaweb_auth_backend is defined
+    - icingaweb_auth_backend.database is defined
+    - icingaweb_auth_backend.database.host is defined
+    - icingaweb_auth_backend.database.dbname is defined
+
+- name: error
+  fail:
+    msg:
+      - "ERROR: {{ import_icingaweb_db_groups }}"
+  when:
+    - import_icingaweb_db_groups is defined
+    - import_icingaweb_db_groups.failed is defined
+    - import_icingaweb_db_groups.failed
+
+...

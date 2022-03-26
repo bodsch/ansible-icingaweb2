@@ -1,0 +1,12 @@
+---
+
+- name: install and configure database
+  include_tasks: database/mysql.yml
+
+- name: create database users
+  include_tasks: database/users.yml
+
+- name: create configure groups
+  include_tasks: database/groups.yml
+
+...

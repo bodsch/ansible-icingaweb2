@@ -1,0 +1,39 @@
+---
+
+# userhandling in database
+- name: import icingaweb database users
+  become: true
+  icingaweb_database_user:
+    state: "{{ item.state | default('present') }}"
+    username: "{{ item.username }}"
+    password: "{{ item.password }}"
+    active: "{{ item.active | default(omit) }}"
+    preferences: "{{ item.preferences | default(omit) }}"
+    force: "{{ item.force | default(omit) }}"
+    database_login_host: "{{ icingaweb_auth_backend.database.host }}"
+    database_name: "{{ icingaweb_auth_backend.database.dbname }}"
+    database_config_file: /etc/icingaweb2/.my.cnf
+  no_log: true
+  register: import_icingaweb_db_users
+  loop:
+    "{{ icingaweb_db_users }}"
+  loop_control:
+    label: "username: {{ item.username }}, active: {{ item.active | default(omit) }}, state: {{ item.state | default('present') }}"
+  when:
+    - icingaweb_db_users is defined
+    - icingaweb_db_users | count != 0
+    - icingaweb_auth_backend is defined
+    - icingaweb_auth_backend.database is defined
+    - icingaweb_auth_backend.database.host is defined
+    - icingaweb_auth_backend.database.dbname is defined
+
+- name: error
+  fail:
+    msg:
+      - "ERROR: {{ import_icingaweb_db_users }}"
+  when:
+    - import_icingaweb_db_users is defined
+    - import_icingaweb_db_users.failed is defined
+    - import_icingaweb_db_users.failed
+
+...
