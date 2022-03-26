@@ -90,17 +90,23 @@ icingaweb_auth_backend:
     username: "{{ icingaweb_auth_dba_username }}"
     password: "{{ icingaweb_auth_dba_password }}"
 
-icingaweb_users:
-  admin:
-    username: admin
-    password: admin
-    preferences:
-      language: de_DE
-      timezone: Europe/Berlin
-      show_application_state_messages: false
-      show_stacktraces: false
-      show_benchmark: false
-      auto_refresh: true
+icingaweb_db_users: []
+
+icingaweb_db_groups: []
+
+# OBSOLETE!
+# replaced with icingaweb_db_users
+# icingaweb_users:
+#   admin:
+#     username: admin
+#     password: admin
+#     preferences:
+#       language: de_DE
+#       timezone: Europe/Berlin
+#       show_application_state_messages: false
+#       show_stacktraces: false
+#       show_benchmark: false
+#       auto_refresh: true
 
 icingaweb_roles:
   - name: 'local admins'

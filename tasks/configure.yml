@@ -17,7 +17,7 @@
     mode: 0750
 
 - name: install database
-  include_tasks: database/mysql.yml
+  include_tasks: database/main.yml
 
 - name: create modules directories
   file:
@@ -113,67 +113,6 @@
     - config
     - backends
     - commandtransports
-
-# userhandling in database
-- name: import icingaweb users into database
-  become: true
-  icingaweb_database_user:
-    state: "{{ item.state | default('present') }}"
-    username: "{{ item.username }}"
-    password: "{{ item.password }}"
-    active: "{{ item.active | default(omit) }}"
-    preferences: "{{ item.preferences | default(omit) }}"
-    force: "{{ item.force | default(omit) }}"
-    database_login_host: "{{ icingaweb_auth_backend.database.host }}"
-    database_name: "{{ icingaweb_auth_backend.database.dbname }}"
-    database_config_file: /etc/icingaweb2/.my.cnf
-  no_log: true
-  register: import_icingaweb2_users
-  loop:
-    "{{ icingaweb_users }}"
-  loop_control:
-    label: "username: {{ item.username }}, active: {{ item.active | default(omit) }}, state: {{ item.state | default('present') }}"
-  when:
-    - icingaweb_users is defined
-    - icingaweb_users | count != 0
-    - icingaweb_auth_backend is defined
-    - icingaweb_auth_backend.database is defined
-    - icingaweb_auth_backend.database.host is defined
-    - icingaweb_auth_backend.database.dbname is defined
-
-# - name: import icingaweb groups into database
-#   become: true
-#   icingaweb_database_group:
-#     state: "{{ item.state | default('present') }}"
-#     groupname: "{{ item.groupname }}"
-#     parent: "{{ item.parent | default(omit)}}"
-#     members: "{{ item.members | default(omit) }}"
-#     force: "{{ item.force | default(omit) }}"
-#     database_login_host: "{{ icingaweb_auth_backend.database.host }}"
-#     database_name: "{{ icingaweb_auth_backend.database.dbname }}"
-#     database_config_file: /etc/icingaweb2/.my.cnf
-#   # no_log: true
-#   # register: import_icingaweb2_users
-#   loop:
-#     "{{ icingaweb_group_membership }}"
-#   loop_control:
-#     label: "groupname: {{ item.groupname }}, state: {{ item.state | default('present') }}"
-#   when:
-#     - icingaweb_group_membership is defined
-#     - icingaweb_group_membership | count != 0
-#     - icingaweb_auth_backend is defined
-#     - icingaweb_auth_backend.database is defined
-#     - icingaweb_auth_backend.database.host is defined
-#     - icingaweb_auth_backend.database.dbname is defined
-
-- name: error
-  fail:
-    msg:
-      - "ERROR: {{ import_icingaweb2_users }}"
-  when:
-    - import_icingaweb2_users is defined
-    - import_icingaweb2_users.failed is defined
-    - import_icingaweb2_users.failed
 
 - name: change ownership of /etc/icingaweb2 directory
   file:
