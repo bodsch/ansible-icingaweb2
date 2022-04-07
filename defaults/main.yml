@@ -1,10 +1,10 @@
 ---
 
-icingaweb_version: 2.9.5
+icingaweb_version: 2.9.6
 
 icingaweb_web_modules:
   - name: icingaweb_php_library
-    version: 0.7.0
+    version: 0.8.0
     url: https://github.com/Icinga/icinga-php-library
   - name: icinga-php-thirdparty
     version: 0.10.0

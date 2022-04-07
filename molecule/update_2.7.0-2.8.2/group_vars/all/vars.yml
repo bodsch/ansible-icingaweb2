@@ -41,7 +41,7 @@ icingaweb_commandtransport:
     username: icingaweb
     password: S0mh1TuFJI
 
-icingaweb_users:
+icingaweb_db_users:
   - admin:
     username: admin
     password: admin

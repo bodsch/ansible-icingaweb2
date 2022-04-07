@@ -50,7 +50,7 @@ environment variable `CUSTOM_LOCAL_TMP_DIRECTORY`.
 ## Requirements & Dependencies
 
  - running mariadb / mysql database
- - PHP > 7.0
+ - PHP > 7.0, < 8.x
  - nginx
 
 ## tested operating systems
@@ -58,9 +58,8 @@ environment variable `CUSTOM_LOCAL_TMP_DIRECTORY`.
 * ArchLinux
 * Debian based
     - Debian 10 / 11
-    - Ubuntu 18.04 / 20.04
+    - Ubuntu 20.04
 * RedHat based
-    - CentOS 8 (**not longer supported**)
     - Alma Linux 8
     - Rocky Linux 8
     - OracleLinux 8

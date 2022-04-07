@@ -48,7 +48,7 @@ icingaweb_commandtransport:
     username: icingaweb
     password: S0mh1TuFJI
 
-icingaweb_users:
+icingaweb_db_users:
   - admin:
     username: admin
     password: admin
@@ -104,7 +104,7 @@ icingaweb_external_modules:
     enabled: true
     name: pdfexport
     src: https://github.com/Icinga/icingaweb2-module-pdfexport
-    version: v0.10.0
+    version: v0.10.1
   - icingadb:
     enabled: true
     name: icingadb
