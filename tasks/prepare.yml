@@ -75,6 +75,29 @@
       - php_version is version_compare('8', '<')
     msg: "This role only works with PHP >= 7.0 and < 8.x .. found: {{ php_version }}"
 
+- name: arch specific
+  block:
+    - name: detect installed php binary
+      stat:
+        path: /usr/sbin/php
+        get_checksum: false
+      register: _php_binary
+      ignore_errors: true
+
+    - name: create unified link to php binary
+      file:
+        src: "/usr/sbin/php{{ php_major_version }}"
+        dest: /usr/sbin/php
+        state: link
+        force: true
+      when:
+        - _php_binary is defined
+        - _php_binary.stat is defined
+        - _php_binary.stat.exists is defined
+        - not _php_binary.stat.exists
+  when:
+    - ansible_distribution | lower == 'archlinux'
+
 # - name: handle php8 for archlinux
 #   block:
 #     - name: undefine php_major_version to define correct php_fpm_daemon

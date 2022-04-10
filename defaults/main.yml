@@ -94,20 +94,6 @@ icingaweb_db_users: []
 
 icingaweb_db_groups: []
 
-# OBSOLETE!
-# replaced with icingaweb_db_users
-# icingaweb_users:
-#   admin:
-#     username: admin
-#     password: admin
-#     preferences:
-#       language: de_DE
-#       timezone: Europe/Berlin
-#       show_application_state_messages: false
-#       show_stacktraces: false
-#       show_benchmark: false
-#       auto_refresh: true
-
 icingaweb_roles:
   - name: 'local admins'
     users:
@@ -125,11 +111,6 @@ icingaweb_commandtransport:
 
 icingaweb_dependencies:
   - jq
-
-# maybe obsolete
-icingaweb_php_dependencies: []
-  # attention ... use the right PHP version!
-  # - php-ldap
 
 icingaweb_icingadb: {}
 

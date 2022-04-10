@@ -3,9 +3,7 @@
 # php_version: "{{ '8' if ansible_os_family | lower != 'redhat' else '8.1' }}"
 php_version: "{{ '7' if ansible_os_family | lower != 'redhat' else '7.3' }}"
 
-php_custom_packages:
-  - php-ldap
-  - php-xmlrpc
+php_custom_packages: "{{ ['php-ldap', 'php-xmlrpc'] if ansible_os_family | lower not in ['archlinux'] else [] }}"
 
 php_enable_php_fpm: true
 
