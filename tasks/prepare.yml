@@ -55,6 +55,7 @@
 - name: get version of installed php
   package_version:
     package_name: "php"
+    state: installed
   register: package_version
 
 - name: define php version
@@ -129,7 +130,7 @@
   set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
 
-- name: get database package name
+- name: get installed database package name
   package_version:
     package_name: "{{ _icingaweb_package_mariadb_clients }}"
     state: installed
