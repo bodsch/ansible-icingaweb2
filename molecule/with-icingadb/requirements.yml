@@ -18,8 +18,7 @@
 - name: mariadb
   src: https://github.com/bodsch/ansible-mariadb.git
   scm: git
-  # version: 2.2.9
-  version: feature/generic-library-module
+  version: 2.2.11
 
 - name: nginx
   # src: https://github.com/geerlingguy/ansible-role-nginx.git
