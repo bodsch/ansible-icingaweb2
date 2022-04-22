@@ -55,17 +55,20 @@
 - name: get version of installed php
   package_version:
     package_name: "php"
+    state: installed
   register: package_version
 
 - name: define php version
   set_fact:
-    php_version: "{{ package_version.version }}"
-    php_package_version: "{{ package_version.version_compressed }}"
-    php_major_version: "{{ package_version.version[0:1] }}"
+    php_version: "{{ package_version.available.full_version }}"
+    php_major_version: "{{ package_version.available.major_version }}"
+    php_package_version: "{{ package_version.available.version_string_compressed }}"
   when:
     - package_version is defined
-    - package_version.version is defined
-    - package_version.version_compressed is defined
+    - package_version.available is defined
+    - package_version.available.full_version is defined
+    - package_version.available.major_version is defined
+    - package_version.available.version_string_compressed is defined
 
 - name: assert php_version
   assert:
@@ -129,7 +132,7 @@
   set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
 
-- name: get database package name
+- name: get installed database package name
   package_version:
     package_name: "{{ _icingaweb_package_mariadb_clients }}"
     state: installed
@@ -139,7 +142,9 @@
   set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies | reject('search', 'default-mysql-client-core') | list }}"
   when:
-    - package_version.version is defined
+    - package_version is defined
+    - package_version.available is defined
+    - package_version.available.full_version is defined
 
 - name: merge dependencies between defaults and custom for enabled icingaweb modules
   set_fact:
