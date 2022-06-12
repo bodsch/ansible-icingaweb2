@@ -32,6 +32,15 @@ Supports also an Icinga2 HA cluster.
 | :---- | :---- |
 | `icingaweb_users` | `icingaweb_db_users` |
 
+**Version < 1.8.x**
+
+Since version 1.8, the deployment of external themes and modules has been outsourced to separate Ansible roles.
+
+| <= 1.8 | >= 1.8 |
+| :---- | :---- |
+| `icingaweb_themes` | removed |
+| `icingaweb_themes_default` | removed |
+| `icingaweb_external_modules` | removed |
 
 ## Why from sources?
 
@@ -84,9 +93,7 @@ Please read the following documention for configuration points.
 - [Authentication](doc/authentication.md)
 - [Users and Groups](doc/database_users_and_groups.md)
 - [commandtransports](doc/commandtransports.md)
-- [modules](doc/modules.md)
 - [resources](doc/resources.md)
-- [themes](doc/themes.md)
 - [logging](doc/logging.md)
 - [icingadb](doc/icingadb.md)
 

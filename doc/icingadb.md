@@ -27,11 +27,10 @@ icingaweb_resources:
 ## Installation
 
 ```yaml
-icingaweb_external_modules:
+icingaweb_icingadb:
 
-  - icingadb:
+  module:
     enabled: true
-    name: icingadb
     src: https://github.com/Icinga/icingadb-web
     version: v1.0.0-rc2
 ```
@@ -40,6 +39,7 @@ icingaweb_external_modules:
 
 ```yaml
 icingaweb_icingadb:
+
   database: icingadb
   commandtransports:
     master-1:
@@ -48,7 +48,6 @@ icingaweb_icingadb:
       port: 5665
       username: icingaweb
       password: S0mh1TuFJI  
-
   redis:
     tls: false
     primary:
@@ -82,4 +81,28 @@ icingaweb_icingadb:
     secondary:
       host: icingadb-2
       port: 6379
+```
+
+### Full example
+
+```yaml
+icingaweb_icingadb:
+  module:
+    enabled: false
+    src: https://github.com/Icinga/icingadb-web
+    version: v1.0.0-rc2
+  database: icingadb
+  commandtransports:
+    master-1:
+      transport: api
+      host: icinga2
+      port: 5665
+      username: icingaweb
+      password: S0mh1TuFJI
+  redis:
+    tls: false
+    primary:
+      host: ""
+      port: 6380
+    secondary: {}
 ```

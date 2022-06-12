@@ -63,7 +63,10 @@ def get_vars(host):
     "/etc/icingaweb2/dashboards",
     "/etc/icingaweb2/modules",
     "/etc/icingaweb2/enabledModules",
+    "/etc/icingaweb2/modules/icingadb",
     "/var/log/icingaweb2",
+    "/usr/share/icingaweb2/modules",
+    "/usr/share/icingaweb2/modules/icingadb",
 ])
 def test_directories(host, dirs):
     d = host.file(dirs)
@@ -79,6 +82,10 @@ def test_directories(host, dirs):
     "/etc/icingaweb2/modules/monitoring/backends.ini",
     "/etc/icingaweb2/modules/monitoring/commandtransports.ini",
     "/etc/icingaweb2/modules/monitoring/config.ini",
+    "/etc/icingaweb2/modules/icingadb/config.ini",
+    "/etc/icingaweb2/modules/icingadb/commandtransports.ini",
+    "/etc/icingaweb2/modules/icingadb/redis.ini",
+    "/usr/share/icingaweb2/modules/icingadb/module.info",
 ])
 def test_files(host, files):
     f = host.file(files)
@@ -88,6 +95,7 @@ def test_files(host, files):
 @pytest.mark.parametrize("links", [
     "/usr/share/icingaweb2",
     "/etc/icingaweb2/enabledModules/monitoring",
+    "/etc/icingaweb2/enabledModules/icingadb",
 ])
 def test_links(host, links):
     f = host.file(links)

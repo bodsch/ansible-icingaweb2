@@ -182,4 +182,10 @@
   when:
     - icingaweb_version is version('2.9.0', '>=', strict=True)
 
+- name: icingadb
+  include_tasks: installation/icingadb.yml
+  when:
+    - icingaweb_icingadb is defined
+    - icingaweb_icingadb.module.enabled | default('false')
+
 ...

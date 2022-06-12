@@ -54,6 +54,10 @@ icingaweb_defaults_icingadb:
       host: ""
       port: 6380
     secondary: {}
+  module:
+    enabled: false
+    src: https://github.com/Icinga/icingadb-web
+    version: v1.0.0-rc2
 
 icingaweb_defaults_db_user: []
 
