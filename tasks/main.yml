@@ -13,14 +13,22 @@
   tags:
     - icingaweb_configure
 
-- name: install themes
-  include_tasks: themes/install.yml
-  tags:
-    - icingaweb_themes
-
-- name: external modules
-  include_tasks: modules/install.yml
-  tags:
-    - icingaweb_modules
+# - name: install themes
+#   include_tasks: themes/install.yml
+#   tags:
+#     - icingaweb_themes
+#   when:
+#     - icingaweb_themes is defined
+#     - icingaweb_themes | count > 0
+#     - icingaweb_themes | type == "list"
+#
+# - name: external modules
+#   include_tasks: modules/install.yml
+#   tags:
+#     - icingaweb_modules
+#   when:
+#     - icingaweb_external_modules is defined
+#     - icingaweb_external_modules | count > 0
+#     - icingaweb_external_modules | type == "list"
 
 ...

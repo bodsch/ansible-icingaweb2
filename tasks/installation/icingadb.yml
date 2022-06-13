@@ -1,0 +1,63 @@
+---
+
+- name: icingadb module
+  block:
+    - name: download external module to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_modules
+      become: false
+      delegate_to: localhost
+      git:
+        depth: 1 # copy the least bit of history possible to get that repo.
+        repo: "{{ icingaweb_icingadb.module.src }}"
+        version: "{{ icingaweb_icingadb.module.version | default(omit) }}"
+        dest: "{{ icingaweb_local_tmp_directory }}/icingadb"
+        update: true
+        force: true
+
+    - name: create transfer archive
+      become: false
+      delegate_to: localhost
+      archive:
+        path: "{{ icingaweb_local_tmp_directory }}/icingadb"
+        dest: "{{ icingaweb_local_tmp_directory }}/icingadb.zip"
+        mode: 0660
+        remove: false
+        format: zip
+        exclude_path:
+          - "{{ icingaweb_local_tmp_directory }}/icingadb/.git*"
+        exclusion_patterns:
+          - "{{ icingaweb_local_tmp_directory }}/icingadb/.git*"
+
+    - name: propagate icingadb.zip
+      become: true
+      copy:
+        src: "{{ icingaweb_local_tmp_directory }}/icingadb.zip"
+        dest: "/tmp/"
+        mode: 0660
+
+    - name: extract icingadb.zip
+      unarchive:
+        src: "/tmp/icingadb.zip"
+        dest: "{{ icingaweb_install_dir }}/modules/"
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        remote_src: true
+      register: _extract_icingadb
+
+    - name: fix rights for modules
+      become: true
+      file:
+        path: "{{ icingaweb_install_dir }}/modules/icingadb"
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        recurse: true
+      when:
+        - _extract_icingadb is defined
+        - _extract_icingadb.changed
+
+  when:
+    - icingaweb_icingadb is defined
+    - icingaweb_icingadb.module.enabled | default('false')
+
+...

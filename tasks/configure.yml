@@ -102,6 +102,12 @@
   loop_control:
     label: "  module: {{ item }}"
 
+- name: icingadb
+  include_tasks: configure/icingadb.yml
+  when:
+    - icingaweb_icingadb is defined
+    - icingaweb_icingadb.module.enabled | default('false')
+
 - name: create monitoring modules configuration
   template:
     src: modules/monitoring/{{ item }}.ini.j2

@@ -61,26 +61,4 @@ icingaweb_db_users:
     active: false
     force: true
 
-icingaweb_themes:
-  - unicorn:
-    name: unicorn
-    src: https://github.com/Mikesch-mp/icingaweb2-theme-unicorn.git
-    version: v1.0.2
-    image: { name: "unicorn.png", "url": "http://i.imgur.com/SCfMd.png" }
-    enabled: true
-  - batman-dark:
-    name: batman-dark
-    src: https://github.com/jschanz/icingaweb2-theme-batman-dark.git
-    version: v1.0.0
-    enabled: false
-
-icingaweb_themes_default: Icinga
-
-icingaweb_external_modules:
-  - audit:
-    enabled: true
-    name: audit
-    src: https://github.com/Icinga/icingaweb2-module-audit.git
-    version: v1.0.1
-
 ...
