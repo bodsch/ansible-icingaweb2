@@ -83,6 +83,22 @@
         path: /usr/share/icinga-php/vendor
       register: stat_present_vendor
 
+    - name: detect installed icinga ipl library
+      stat:
+        path: "{{ stat_present_ipl.stat.lnk_target }}"
+      register: stat_present_ipl
+      when:
+        - stat_present_ipl.stat.exists
+        - stat_present_ipl.stat.islnk
+
+    - name: detect installed icinga vendor library
+      stat:
+        path: "{{ stat_present_vendor.stat.lnk_target }}"
+      register: stat_present_vendor
+      when:
+        - stat_present_vendor.stat.exists
+        - stat_present_vendor.stat.islnk
+
     - block:
         - name: download icinga-php-library v{{ icingaweb_php_library }}.tar.gz
           become: false

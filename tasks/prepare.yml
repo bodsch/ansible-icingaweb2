@@ -74,7 +74,7 @@
   assert:
     that:
       - php_version is defined
-      - php_version is version_compare('7.0', '>=')
+      - php_version is version_compare('7', '>=')
       - php_version is version_compare('8', '<')
     msg: "This role only works with PHP >= 7.0 and < 8.x .. found: {{ php_version }}"
 
@@ -150,30 +150,13 @@
   set_fact:
     icingaweb_modules_enabled: "{{ icingaweb_defaults_modules_enabled + icingaweb_modules_enabled }}"
 
-- name: merge icingaweb_groups configuration between defaults and custom
+- name: merge icingaweb configuration between defaults and custom
   set_fact:
-    icingaweb_groups: "{{ icingaweb_defaults_groups |
-      combine( icingaweb_groups, recursive=True ) }}"
-
-- name: merge icingaweb_authentication configuration between defaults and custom
-  set_fact:
-    icingaweb_authentication: "{{ icingaweb_defaults_authentication |
-      combine( icingaweb_authentication, recursive=True ) }}"
-
-- name: merge icingaweb_resources configuration between defaults and custom
-  set_fact:
-    icingaweb_resources: "{{ icingaweb_defaults_resources |
-      combine( icingaweb_resources, recursive=True ) }}"
-
-- name: merge icingaweb_icingadb configuration between defaults and custom
-  set_fact:
-    icingaweb_icingadb: "{{ icingaweb_defaults_icingadb |
-      combine( icingaweb_icingadb, recursive=True ) }}"
-
-- name: merge icingaweb_php_daemon configuration between defaults and custom
-  set_fact:
-    icingaweb_php_daemon: "{{ icingaweb_defaults_php_daemon |
-      combine( icingaweb_php_daemon, recursive=True ) }}"
+    icingaweb_groups: "{{ icingaweb_defaults_groups | combine( icingaweb_groups, recursive=True ) }}"
+    icingaweb_authentication: "{{ icingaweb_defaults_authentication | combine( icingaweb_authentication, recursive=True ) }}"
+    icingaweb_resources: "{{ icingaweb_defaults_resources | combine( icingaweb_resources, recursive=True ) }}"
+    icingaweb_icingadb: "{{ icingaweb_defaults_icingadb | combine( icingaweb_icingadb, recursive=True ) }}"
+    icingaweb_php_daemon: "{{ icingaweb_defaults_php_daemon | combine( icingaweb_php_daemon, recursive=True ) }}"
 
 - name: install requirements
   package:

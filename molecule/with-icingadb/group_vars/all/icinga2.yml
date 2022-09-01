@@ -26,10 +26,18 @@ icinga2_api:
     icingaweb:
       password: S0mh1TuFJI
       permissions:
-        - "status/query"
         - "actions/*"
         - "objects/modify/*"
         - "objects/query/*"
+        - "status/query"
+
+    icingadb-web:
+      password: S0mh1TuFJI
+      permissions:
+        - "actions/*"
+        - "objects/modify/*"
+        - "objects/query/*"
+        - "status/query"
 
 icinga2_ido:
   user: icinga2_ido

@@ -2,7 +2,7 @@
 
 - name: icingadb module
   block:
-    - name: download external module to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_modules
+    - name: download external icingadb module {{ icingaweb_icingadb.module.version }} to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_modules
       become: false
       delegate_to: localhost
       git:

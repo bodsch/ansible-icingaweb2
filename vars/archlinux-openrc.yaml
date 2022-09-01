@@ -1,17 +1,20 @@
 ---
 
 icingaweb_packages:
+  # - python-pymysql
+  #- python3-apt
+  #- python3-pymysql
+  #- python3-mysqldb
+  #- python3-pip
+  #- python3-setuptools
   - python-mysqlclient
   - mariadb-clients
   - mariadb-libs
   - iproute2
   - unzip
+#  - libmariadb-dev
 
 icingaweb_user: http
 icingaweb_group: http
-
-_icingaweb_package_mariadb_clients: mariadb-clients
-
-php_fpm_daemon: php-fpm{{ php_major_version }}
 
 ...
