@@ -5,6 +5,10 @@
   gather_facts: true
 
   pre_tasks:
+    - name: update package cache
+      package:
+        update_cache: true
+
     - name: update pacman system
       command: |
         pacman --refresh --sync --sysupgrade --noconfirm
@@ -39,7 +43,6 @@
   gather_facts: true
 
   roles:
-    # this role has some problems with archlinux
     - role: nginx
     - role: php-fpm
 

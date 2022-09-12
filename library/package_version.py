@@ -264,7 +264,8 @@ class PackageVersion(object):
         if rc == 0:
             pattern = re.compile(
                 # r'^(?P<repository>core|extra|community|world|local)\/{}[0-9\s]*(?P<version>\d\.\d).*-.*'.format(self.package_name),
-                r'^(?P<repository>core|extra|community|world|local)\/{} (?P<version>\d+(\.\d+){{0,2}}(\.\*)?)-.*'.format(self.package_name),
+                # r'^(?P<repository>core|extra|community|world|local)\/{} (?P<version>\d+(\.\d+){{0,2}}(\.\*)?)-.*'.format(self.package_name),
+                r'^(?P<repository>core|extra|community|world|local)\/{}([0-9])? (?P<version>\d+(\.\d+){{0,2}}(\.\*)?).*-.*'.format(self.package_name),
                 re.MULTILINE
             )
 
@@ -288,9 +289,9 @@ class PackageVersion(object):
         # self.module.log(msg="cmd: {}".format(cmd))
 
         rc, out, err = self.module.run_command(cmd, check_rc=False)
-        # self.module.log(msg="  rc : '{}'".format(rc))
-        # self.module.log(msg="  out: '{}' ({})".format(out, type(out)))
-        # self.module.log(msg="  err: '{}'".format(err))
+        self.module.log(msg="  rc : '{}'".format(rc))
+        self.module.log(msg="  out: '{}' ({})".format(out, type(out)))
+        self.module.log(msg="  err: '{}'".format(err))
         return rc, out, err
 
 # ---------------------------------------------------------------------------------------

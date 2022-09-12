@@ -11,18 +11,26 @@
   register: __stat_present_icingaweb2
   changed_when: not __stat_present_icingaweb2.stat.exists
 
-- block:
-    - name: ensure installation directory exists
-      file:
-        src: '/usr/share/icingaweb2-{{ icingaweb_version }}'
-        dest: '{{ icingaweb_install_dir }}'
-        owner: "{{ icingaweb_user }}"
-        group: "{{ icingaweb_group }}"
-        mode: 0755
-        state: link
-        force: true
+- name: detect type of {{ icingaweb_install_dir }}
+  stat:
+    path: "{{ icingaweb_install_dir }}"
+    get_checksum: false
+    get_md5: false
+    # get_mime: false
+    get_attributes: false
+  register: __stat_share_icingaweb2
 
+- name: remove directory '{{ icingaweb_install_dir }}'
+  file:
+    state: absent
+    path: '{{ icingaweb_install_dir }}'
+  when:
+    - __stat_share_icingaweb2.stat is defined
+    - __stat_share_icingaweb2.stat.isdir | default('true')
+
+- block:
     - name: download icinaweb2 v{{ icingaweb_version }}.tar.gz to local directory {{ icingaweb_local_tmp_directory }}
+      delegate_to: localhost
       become: false
       get_url:
         url: https://github.com/Icinga/icingaweb2/archive/v{{ icingaweb_version }}.tar.gz
@@ -33,7 +41,6 @@
       retries: 5
       delay: 2
       check_mode: false
-      delegate_to: localhost
 
     - name: deploy application archiv
       copy:
@@ -52,17 +59,43 @@
       notify:
         - restart php-fpm
 
-    - name: ensure icingacli is in the path
-      file:
-        src: '{{ icingaweb_install_dir }}/bin/icingacli'
-        dest: /usr/bin/icingacli
-        owner: "{{ icingaweb_user }}"
-        group: "{{ icingaweb_group }}"
-        mode: 0755
-        state: link
-        force: true
+  rescue:
+    # - name: remove installation directory
+    #   file:
+    #     state: absent
+    #     path: "{{ icingaweb_install_dir }}"
+    #
+    # - name: remove link to installation directory
+    #   file:
+    #     state: absent
+    #     path: '/usr/share/icingaweb2-{{ icingaweb_version }}'
+
+    - name: exit with fail
+      fail:
+        msg: "Error while installing of icingaweb2!"
+
   when:
     - not __stat_present_icingaweb2.stat.exists
+
+- name: create link for icingaweb2-{{ icingaweb_version }} to {{ icingaweb_install_dir }}
+  file:
+    src: '/usr/share/icingaweb2-{{ icingaweb_version }}'
+    dest: '{{ icingaweb_install_dir }}'
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+    mode: 0755
+    state: link
+    force: true
+
+- name: ensure icingacli is in the path
+  file:
+    src: '{{ icingaweb_install_dir }}/bin/icingacli'
+    dest: /usr/bin/icingacli
+    owner: "{{ icingaweb_user }}"
+    group: "{{ icingaweb_group }}"
+    mode: 0755
+    state: link
+    force: true
 
 - name: icingaweb_version version is '2.9.0'
   block:
@@ -99,77 +132,15 @@
         - stat_present_vendor.stat.exists
         - stat_present_vendor.stat.islnk
 
-    - block:
-        - name: download icinga-php-library v{{ icingaweb_php_library }}.tar.gz
-          become: false
-          get_url:
-            url: https://github.com/Icinga/icinga-php-library/archive/v{{ icingaweb_php_library }}.tar.gz
-            dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
-            mode: 0660
-          register: _download_artefact
-          until: _download_artefact is succeeded
-          retries: 5
-          delay: 2
-          check_mode: false
-          delegate_to: localhost
-
-        - name: deploy library archives
-          copy:
-            src: "{{ icingaweb_local_tmp_directory }}/icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
-            dest: /tmp
-            mode: 0700
-
-        - name: extract library archives
-          unarchive:
-            src: "/tmp/icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
-            dest: /usr/share/icinga-php/
-            owner: "{{ icingaweb_user }}"
-            group: "{{ icingaweb_group }}"
-            mode: 0755
-            remote_src: true
-
-        - name: create link from icinga-php-library to ipl
-          file:
-            src: "/usr/share/icinga-php/icinga-php-library-{{ icingaweb_php_library }}"
-            dest: "/usr/share/icinga-php/ipl"
-            owner: "{{ icingaweb_user }}"
-            group: "{{ icingaweb_group }}"
-            mode: 0755
-            state: link
-            force: true
+    - name: icinga-php-library
+      include_tasks: installation/icinga-php-library.yml
       when:
         - stat_present_ipl is defined
         - stat_present_ipl.stat is defined
         - not stat_present_ipl.stat.exists
 
-    - block:
-        - name: download icinga-php-thirdparty v{{ icingaweb_php_thirdparty }}.tar.gz
-          become: false
-          get_url:
-            url: https://github.com/Icinga/icinga-php-thirdparty/archive/v{{ icingaweb_php_thirdparty }}.tar.gz
-            dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
-            mode: 0660
-          register: _download_artefact
-          until: _download_artefact is succeeded
-          retries: 5
-          delay: 2
-          check_mode: false
-          delegate_to: localhost
-
-        - name: deploy library archives
-          copy:
-            src: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
-            dest: /tmp
-            mode: 0700
-
-        - name: extract library archives
-          unarchive:
-            src: "/tmp/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
-            dest: /usr/share/icinga-php/
-            owner: "{{ icingaweb_user }}"
-            group: "{{ icingaweb_group }}"
-            mode: 0755
-            remote_src: true
+    - name: icinga-php-thirdparty
+      include_tasks: installation/icinga-php-thirdparty.yml
       when:
         - stat_present_vendor is defined
         - stat_present_vendor.stat is defined
