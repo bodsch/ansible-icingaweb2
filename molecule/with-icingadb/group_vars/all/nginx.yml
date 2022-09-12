@@ -1,33 +1,78 @@
 ---
 
-nginx_server_tokens: "off"
-nginx_remove_default_vhost: true
+nginx_gzip:
+  enabled: true
 
-nginx_extra_http_options: |
-  map_hash_max_size 128;
-  map_hash_bucket_size 128;
+nginx_logformat:
+  json_combined:
+    format: |
+      '{'
+        '"time_local": "$time_local",'
+        '"remote_addr": "$remote_addr",'
+        '"remote_user": "$remote_user",'
+        '"request": "$request",'
+        '"status": "$status",'
+        '"body_bytes_sent": "$body_bytes_sent",'
+        '"request_time": "$request_time",'
+        '"http_referrer": "$http_referer",'
+        '"http_user_agent": "$http_user_agent"'
+      '}';
+    # escape: json
 
 nginx_vhosts:
-  - listen: 80
-    server_name: _
-    extra_parameters: |
-      location /icinga {
-        root  /usr/share/icingaweb2/public;
-        index index.php;
-        location ~ ^/icinga/index\.php(.*)$ {
+  default:
+    filename: 00-icingaweb.conf
+    state: present  # default: present
+    enabled: true   # default: true
+
+    domains:
+      -
+    filename: 00-icinga.molecule.lan
+
+    listen:
+      - 80
+
+    root: /usr/share/icingaweb2/public
+    index:
+      - index.php
+
+    logfiles:
+      access:
+        file: /var/log/nginx/icinga.molecule.lan/access.log
+        loglevel: main
+      error:
+        file: /var/log/nginx/icinga.molecule.lan/error.log
+        loglevel: notice
+
+    locations:
+
+      "~ ^/index\\.php(.*)$":
+        options: |
           fastcgi_index          index.php;
           fastcgi_param          ICINGAWEB_CONFIGDIR /etc/icingaweb2;
           fastcgi_param          SCRIPT_FILENAME /usr/share/icingaweb2/public/index.php;
           fastcgi_read_timeout   600;
-          fastcgi_pass           unix:/run/php/worker-01.sock;
+          fastcgi_pass           unix:/run/php7-fpm/worker-01.sock;
+
+          proxy_cookie_path
+            /
+            "/; secure; HttpOnly; SameSite=strict";
+
           include fastcgi_params;
-        }
-        location ~ ^/icinga(.+)? {
-          alias /usr/share/icingaweb2/public;
-          index index.php;
-          try_files $1 $uri $uri/ /icinga/index.php$is_args$args;
-        }
-        location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
-          expires 1d;
-        }
-      }
+
+      # https://XXX/lib/icinga/icinga-php-library/font/awesome/fa-solid-900.woff2
+      "~ ^/lib/icinga/icinga-php-library/font/awesome/(.*)$":
+        options: |
+          alias        /usr/share/icinga-php/ipl/asset/static/font/awesome/$1;
+
+      # https://XXX/lib/icinga/icinga-php-library/font/Icinga-Icons.ttf
+      "~ ^/lib/icinga/icinga-php-library/font/(.*)$":
+        options: |
+          alias        /usr/share/icinga-php/ipl/asset/static/font/$1;
+
+      "~ ^/(.+)?":
+        options: |
+          alias       /usr/share/icingaweb2/public;
+          index       index.php;
+          rewrite     ^/$ /dashboard;
+          try_files $1 $uri $uri/ /index.php$is_args$args;

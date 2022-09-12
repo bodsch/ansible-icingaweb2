@@ -1,39 +1,31 @@
 ---
 
 - name: snapd
-  src: https://github.com/bodsch/ansible-snapd.git
-  scm: git
-  version: 1.1.1
+  src: bodsch.snapd
+  version: 1.1.2
 
 - name: apparmor
-  src: https://github.com/bodsch/ansible-apparmor.git
-  scm: git
+  src: bodsch.apparmor
   version: 1.0.1
 
 - name: php-fpm
-  src: https://github.com/bodsch/ansible-php.git
-  scm: git
-  version: 2.0.0
+  src: bodsch.php
+  version: 2.0.2
 
 - name: mariadb
-  src: https://github.com/bodsch/ansible-mariadb.git
-  scm: git
-  version: 2.2.11
+  src: bodsch.mariadb
+  version: 2.2.13
 
 - name: nginx
-  # src: https://github.com/geerlingguy/ansible-role-nginx.git
-  # version: 3.1.0
-  src: https://github.com/bodsch/ansible-role-nginx.git
-  scm: git
-  version: fix/archlinux-dont-need-pidfile
+  src: bodsch.nginx
+  version: 0.10.0
 
 - name: monitoring-tools
-  src: https://github.com/bodsch/ansible-monitoring-plugins.git
-  version: 1.3.6
+  src: bodsch.monitoring_plugins
+  version: 1.4.0
 
 - name: icinga2
-  src: https://github.com/bodsch/ansible-icinga2.git
-  scm: git
-  version: 1.7.1
+  src: bodsch.icinga2
+  version: 1.8.0
 
 ...

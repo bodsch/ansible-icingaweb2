@@ -25,11 +25,6 @@
   roles:
     - role: monitoring-tools
 
-  post_tasks:
-    - debug:
-        msg:
-          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
-
 - name: prepare database container
   hosts: database
   gather_facts: true
@@ -38,11 +33,6 @@
     - role: apparmor
     - role: snapd
     - role: mariadb
-
-  post_tasks:
-    - debug:
-        msg:
-          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
 
 - name: prepare instance container
   hosts: instance
@@ -53,21 +43,11 @@
     - role: nginx
     - role: php-fpm
 
-  post_tasks:
-    - debug:
-        msg:
-          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
-
 # - name: prepare icinga2
 #   hosts: icinga2
 #   gather_facts: true
 #
 #   roles:
 #     - role: icinga2
-#
-#   post_tasks:
-#     - debug:
-#         msg:
-#           - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
 
 ...

@@ -43,19 +43,19 @@ platforms:
       - name: icinga
         ipv4_address: "10.11.0.11"
 
-  - name: icinga2
-    image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
-    privileged: true
-    pre_build_image: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    groups:
-      - icinga
-    networks:
-      - name: icinga
-        ipv4_address: "10.11.0.15"
+  # - name: icinga2
+  #   image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
+  #   command: ${MOLECULE_DOCKER_COMMAND:-""}
+  #   docker_host: "${DOCKER_HOST:-unix://run/docker.sock}"
+  #   privileged: true
+  #   pre_build_image: true
+  #   volumes:
+  #     - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  #   groups:
+  #     - icinga
+  #   networks:
+  #     - name: icinga
+  #       ipv4_address: "10.11.0.15"
 
   - name: instance
     image: "bodsch/ansible-${DISTRIBUTION:-debian:11}"
@@ -78,13 +78,13 @@ provisioner:
     # - -v
   config_options:
     defaults:
-      deprecation_warnings: True
+      deprecation_warnings: true
       stdout_callback: yaml
       callbacks_enabled: profile_tasks
 
 scenario:
   test_sequence:
-    - lint
+    # - lint
     - destroy
     - dependency
     - syntax
