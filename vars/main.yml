@@ -57,7 +57,7 @@ icingaweb_defaults_icingadb:
   module:
     enabled: false
     src: https://github.com/Icinga/icingadb-web
-    version: v1.0.0-rc2
+    version: v1.0.0
 
 icingaweb_defaults_db_user: []
 

@@ -25,11 +25,6 @@
   roles:
     - role: monitoring-tools
 
-  post_tasks:
-    - debug:
-        msg:
-          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
-
 - name: prepare database container
   hosts: database
   gather_facts: true
@@ -38,11 +33,6 @@
     - role: apparmor
     - role: snapd
     - role: mariadb
-
-  post_tasks:
-    - debug:
-        msg:
-          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
 
 - name: prepare icingadb container
   hosts: icingadb
@@ -57,25 +47,14 @@
   gather_facts: true
 
   roles:
-    # this role has some problems with archlinux
     - role: nginx
     - role: php-fpm
 
-  post_tasks:
-    - debug:
-        msg:
-          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
-
-- name: prepare icinga2 container
-  hosts: icinga2
-  gather_facts: true
-
-  roles:
-    - role: icinga2
-
-  post_tasks:
-    - debug:
-        msg:
-          - "python version       : {{ ansible_python.version.major }}.{{ ansible_python.version.minor }}"
+# - name: prepare icinga2 container
+#   hosts: icinga2
+#   gather_facts: true
+#
+#   roles:
+#     - role: icinga2
 
 ...
