@@ -3,20 +3,11 @@
 icingaweb_version: 2.11.1
 
 icingaweb_web_modules:
-  - name: icingaweb_php_library
-    version: 0.9.1
-    url: https://github.com/Icinga/icinga-php-library
+  - name: icinga-php-library
+    version: 0.10.0
   - name: icinga-php-thirdparty
-    version: 0.10.2
-  - name: icingaweb2-module-pdfexport
     version: 0.11.0
-  - name: icingadb-web
-    version: 1.0.0
 
-icingaweb_php_library: 0.9.1
-icingaweb_php_thirdparty: 0.11.0
-icingaweb_php_pdfexport: 0.10.2
-icingaweb_php_icingadb: 1.0.0
 
 icingaweb_install_dir: /usr/share/icingaweb2
 
@@ -112,7 +103,12 @@ icingaweb_commandtransport:
 icingaweb_dependencies:
   - jq
 
-icingaweb_icingadb: {}
+icingaweb_icingadb:
+  module:
+    enabled: false
+    src: https://github.com/Icinga/icingadb-web
+    version: v1.0.1
+
 
 icingaweb_module:
   monitoring:

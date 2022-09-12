@@ -42,6 +42,16 @@ Since version 1.8, the deployment of external themes and modules has been outsou
 | `icingaweb_themes_default` | removed |
 | `icingaweb_external_modules` | removed |
 
+**Version < 1.9.x**
+
+Remove molecule tests for RedHat based distributions.
+
+| <= 1.9 | >= 1.9 |
+| :---- | :---- |
+| `icingaweb_php_library` | `icingaweb_web_modules[icinga-php-library]` |
+| `icingaweb_php_thirdparty` | `icingaweb_web_modules[icinga-php-thirdparty]` |
+
+
 ## Why from sources?
 
 The package offered by Icinga has a hard (and in my eyes unnecessary) dependency on Apache2.

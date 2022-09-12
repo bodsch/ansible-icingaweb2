@@ -1,29 +1,57 @@
 ---
 
-- name: download icinga-php-thirdparty v{{ icingaweb_php_thirdparty }}.tar.gz
-  delegate_to: localhost
-  become: false
-  get_url:
-    url: https://github.com/Icinga/icinga-php-thirdparty/archive/v{{ icingaweb_php_thirdparty }}.tar.gz
-    dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
-    mode: 0660
-  register: _download_artefact
-  until: _download_artefact is succeeded
-  retries: 5
-  delay: 2
-  check_mode: false
+- name: define icinga php thirdparty version
+  set_fact:
+    icingaweb_php_thirdparty: "{{ icingaweb_web_modules | module_version('icinga-php-thirdparty') }}"
 
-- name: deploy library archives
-  copy:
-    src: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
-    dest: /tmp
-    mode: 0700
+- name: detect installed icinga php thirdparty version {{ icingaweb_php_thirdparty }}
+  stat:
+    path: /usr/share/icinga-php/icinga-php-thirdparty-{{ icingaweb_php_thirdparty }}/vendor/autoload.php
+    get_checksum: false
+    get_md5: false
+    get_attributes: false
+  register: stat_installed_thirdparty
 
-- name: extract library archives
-  unarchive:
-    src: "/tmp/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
-    dest: /usr/share/icinga-php/
+- name: download and install icinga-php-thirdparty {{ icingaweb_php_thirdparty }}
+  block:
+    - name: download icinga-php-thirdparty v{{ icingaweb_php_thirdparty }}.tar.gz
+      delegate_to: localhost
+      become: false
+      get_url:
+        url: https://github.com/Icinga/icinga-php-thirdparty/archive/v{{ icingaweb_php_thirdparty }}.tar.gz
+        dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
+        mode: 0660
+      register: _download_artefact
+      until: _download_artefact is succeeded
+      retries: 5
+      delay: 2
+      check_mode: false
+
+    - name: deploy library archives
+      copy:
+        src: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
+        dest: /tmp
+        mode: 0700
+
+    - name: extract library archives
+      unarchive:
+        src: "/tmp/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
+        dest: /usr/share/icinga-php/
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        remote_src: true
+  when:
+    - stat_installed_thirdparty is defined
+    - stat_installed_thirdparty.stat is defined
+    - not stat_installed_thirdparty.stat.exists
+
+- name: create link from icinga-php-thirdparty to vendor
+  file:
+    src: "/usr/share/icinga-php/icinga-php-thirdparty-{{ icingaweb_php_thirdparty }}"
+    dest: "/usr/share/icinga-php/vendor"
     owner: "{{ icingaweb_user }}"
     group: "{{ icingaweb_group }}"
     mode: 0755
-    remote_src: true
+    state: link
+    force: true

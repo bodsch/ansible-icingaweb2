@@ -23,6 +23,7 @@ class FilterModule(object):
             'type': self.var_type,
             'create_password_hash': self.password_hash,
             'dict_from_list': self.dict_from_list,
+            'module_version': self.module_version,
         }
 
     def var_type(self, var):
@@ -33,7 +34,6 @@ class FilterModule(object):
 
     def password_hash(self, data):
         """
-
         """
         password_hash = ''
 
@@ -43,11 +43,11 @@ class FilterModule(object):
         display.vv("found: {} ({}) entries".format(count, type_))
         display.vvv(json.dumps(data, indent=2, sort_keys=False))
 
-        if(count != 0):
+        if (count != 0):
             for key in data.keys():
                 password = data.get(key, {}).get('password')
 
-                if(password):
+                if (password):
                     password_hash = self.__password_hash(password)
 
                     _ = data[key].pop('password')
@@ -71,6 +71,17 @@ class FilterModule(object):
         display.v("result : {}".format(result))
 
         return result
+
+    def module_version(self, data, module):
+        """
+        """
+        version = None
+
+        for d in data:
+            if d.get("name") == module:
+                version = d.get("version")
+
+        return version
 
     # https://docs.python.org/3/library/crypt.html
     def __password_hash(sef, plaintext):

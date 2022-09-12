@@ -106,65 +106,11 @@
         state: directory
         mode: 0755
 
-    - name: detect icinga ipl library
-      stat:
-        path: /usr/share/icinga-php/ipl
-      register: stat_present_ipl
-
-    - name: detect icinga vendor library
-      stat:
-        path: /usr/share/icinga-php/vendor
-      register: stat_present_vendor
-
-    - name: detect installed icinga ipl library
-      stat:
-        path: "{{ stat_present_ipl.stat.lnk_target }}"
-      register: stat_present_ipl
-      when:
-        - stat_present_ipl.stat.exists
-        - stat_present_ipl.stat.islnk
-
-    - name: detect installed icinga vendor library
-      stat:
-        path: "{{ stat_present_vendor.stat.lnk_target }}"
-      register: stat_present_vendor
-      when:
-        - stat_present_vendor.stat.exists
-        - stat_present_vendor.stat.islnk
-
     - name: icinga-php-library
       include_tasks: installation/icinga-php-library.yml
-      when:
-        - stat_present_ipl is defined
-        - stat_present_ipl.stat is defined
-        - not stat_present_ipl.stat.exists
 
     - name: icinga-php-thirdparty
       include_tasks: installation/icinga-php-thirdparty.yml
-      when:
-        - stat_present_vendor is defined
-        - stat_present_vendor.stat is defined
-        - not stat_present_vendor.stat.exists
-
-    - name: create link from icinga-php-library to ipl
-      file:
-        src: "/usr/share/icinga-php/icinga-php-library-{{ icingaweb_php_library }}"
-        dest: "/usr/share/icinga-php/ipl"
-        owner: "{{ icingaweb_user }}"
-        group: "{{ icingaweb_group }}"
-        mode: 0755
-        state: link
-        force: true
-
-    - name: create link from icinga-php-thirdparty to vendor
-      file:
-        src: "/usr/share/icinga-php/icinga-php-thirdparty-{{ icingaweb_php_thirdparty }}"
-        dest: "/usr/share/icinga-php/vendor"
-        owner: "{{ icingaweb_user }}"
-        group: "{{ icingaweb_group }}"
-        mode: 0755
-        state: link
-        force: true
 
   when:
     - icingaweb_version is version('2.9.0', '>=', strict=True)
