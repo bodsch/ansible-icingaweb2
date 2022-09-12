@@ -1,13 +1,19 @@
 ---
-name: icingadb
+name: icingaweb2 with icingadb
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
   schedule:
     - cron: "0 3 * * 0"
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "code linter"
+    branches:
+      - main
+      - feature/**
+      - fix/**
+    types:
+      - completed
 
 defaults:
   run:
@@ -16,8 +22,9 @@ defaults:
 jobs:
 
   support_icingadb:
-    name: "${{ matrix.image }} / python: ${{ matrix.python-version }}, ansible: ${{ matrix.ansible-version }}"
-    runs-on: ubuntu-18.04
+    name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
@@ -34,10 +41,10 @@ jobs:
         with:
           path: 'ansible-icingaweb2'
 
-      - name: set up python ${{ matrix.python-version }}
+      - name: 🐍 set up python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.x'
 
       - name: install dependencies
         run: |
@@ -54,8 +61,8 @@ jobs:
 
       - name: test with tox
         run: |
-          tox -e py$(printf "${{ matrix.python-version }}" | tr -d '.')-ansible$(printf "${{ matrix.ansible-version }}" | tr -d '.') -- \
-              molecule test --scenario-name with-icingadb
+          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
+            -- molecule test --scenario-name with-icingadb
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'

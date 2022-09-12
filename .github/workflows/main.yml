@@ -2,42 +2,28 @@
 name: CI
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
   schedule:
     - cron: "0 2 * * 0"
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "code linter"
+    branches:
+      - main
+      - feature/**
+      - fix/**
+    types:
+      - completed
 
 defaults:
   run:
     working-directory: 'ansible-icingaweb2'
 
 jobs:
-  lint:
-    name: linting
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: lint
-        uses: docker://ghcr.io/github/super-linter:slim-v4
-        env:
-          # DEFAULT_BRANCH: master
-          GITHUB_TOKEN: ${{ secrets.GH_REGISTRY_TOKEN }}
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_ANSIBLE: true
-          # VALIDATE_MARKDOWN: true
-          VALIDATE_YAML: true
-
   arch:
     name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
-    needs:
-      - lint
     runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
@@ -82,9 +68,8 @@ jobs:
 
   deb:
     name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
-    needs:
-      - lint
     runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
@@ -129,56 +114,55 @@ jobs:
           ANSIBLE_FORCE_COLOR: '1'
           DISTRIBUTION: ${{ matrix.image }}
 
-  rpm:
-    name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
-    needs:
-      - lint
-    runs-on: ubuntu-20.04
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          - oraclelinux:8
-          - rockylinux:8
-          - almalinux:8
-        python-version:
-          - '3.9'
-        ansible-version:
-          - '4.10'
-          - '5.1'
-
-    steps:
-      - name: check out the codebase.
-        uses: actions/checkout@v2
-        with:
-          path: 'ansible-icingaweb2'
-
-      - name: 🐍 set up python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r test-requirements.txt
-
-      # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
-      - name: Disable AppArmor
-        run: |
-            set -x
-            sudo apt-get install apparmor-profiles
-            sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
-            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
-
-      - name: test with tox
-        run: |
-          tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
-            -- molecule test --scenario-name default
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          DISTRIBUTION: ${{ matrix.image }}
+  # rpm:
+  #   name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
+  #   runs-on: ubuntu-20.04
+  #   if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       image:
+  #         - oraclelinux:8
+  #         - rockylinux:8
+  #         - almalinux:8
+  #       python-version:
+  #         - '3.9'
+  #       ansible-version:
+  #         - '4.10'
+  #         - '5.1'
+  #
+  #   steps:
+  #     - name: check out the codebase.
+  #       uses: actions/checkout@v2
+  #       with:
+  #         path: 'ansible-icingaweb2'
+  #
+  #     - name: 🐍 set up python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.x'
+  #
+  #     - name: install dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install -r test-requirements.txt
+  #
+  #     # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
+  #     - name: Disable AppArmor
+  #       run: |
+  #           set -x
+  #           sudo apt-get install apparmor-profiles
+  #           sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+  #           sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+  #
+  #     - name: test with tox
+  #       run: |
+  #         tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
+  #           -- molecule test --scenario-name default
+  #       env:
+  #         PY_COLORS: '1'
+  #         ANSIBLE_FORCE_COLOR: '1'
+  #         DISTRIBUTION: ${{ matrix.image }}
 
   publish:
     if: github.ref == 'refs/heads/main'
