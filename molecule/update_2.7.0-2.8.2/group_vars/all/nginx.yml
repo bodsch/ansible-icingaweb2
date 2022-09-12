@@ -26,8 +26,7 @@ nginx_vhosts:
     enabled: true   # default: true
 
     domains:
-      -
-    filename: 00-icinga.molecule.lan
+      - icinga.molecule.lan
 
     listen:
       - 80
