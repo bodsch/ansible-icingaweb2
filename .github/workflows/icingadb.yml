@@ -30,10 +30,8 @@ jobs:
       matrix:
         image:
           - debian:11
-        python-version:
-          - '3.9'
         ansible-version:
-          - '5.1.0'
+          - '6.1'
 
     steps:
       - name: check out the codebase.
