@@ -31,7 +31,7 @@
       copy:
         src: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
         dest: /tmp
-        mode: 0700
+        mode: 0644
 
     - name: extract library archives
       unarchive:

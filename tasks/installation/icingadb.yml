@@ -19,7 +19,7 @@
       archive:
         path: "{{ icingaweb_local_tmp_directory }}/icingadb"
         dest: "{{ icingaweb_local_tmp_directory }}/icingadb.zip"
-        mode: 0660
+        mode: 0644
         remove: false
         format: zip
         exclude_path:
@@ -32,7 +32,7 @@
       copy:
         src: "{{ icingaweb_local_tmp_directory }}/icingadb.zip"
         dest: "/tmp/"
-        mode: 0660
+        mode: 0644
 
     - name: extract icingadb.zip
       unarchive:
