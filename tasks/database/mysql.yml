@@ -110,5 +110,10 @@
     config_file: ''
     name: "{{ icingaweb_auth_backend.database.dbname }}"
     target: '/etc/icingaweb2/updates/mysql.dbversion_{{ icingaweb_version }}.sql'
+  register: icingaweb2_dbversion_update
+
+- name: d
+  debug:
+    msg: "{{ icingaweb2_dbversion_update }}"
 
 ...

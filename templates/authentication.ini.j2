@@ -1,11 +1,13 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
 
-{% if icingaweb_authentication is defined and icingaweb_authentication | count != 0 -%}
-{% for key  in icingaweb_authentication -%}
+{% if icingaweb_authentication is defined and
+      icingaweb_authentication | count != 0 %}
+  {% for key  in icingaweb_authentication %}
 [{{ key }}]
-{% for k,v in icingaweb_authentication[key].items() -%}
-{{ "%-10s" | format(k,) }} = "{{v }}"
-{% endfor %}
+    {% for k,v in icingaweb_authentication[key].items() %}
+{{ "%-10s" | format(k,) }} = "{{ v }}"
+    {% endfor %}
 
-{% endfor %}
+  {% endfor %}
 {% endif %}

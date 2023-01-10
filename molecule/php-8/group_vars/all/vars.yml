@@ -2,7 +2,8 @@
 
 # icingaweb_version: 2.9.0
 
-icingaweb_log_level: WARN
+# DEBUG, INFO, WARNING, ERROR
+icingaweb_log_level: WARNING
 
 icingaweb_resources:
   icingaweb:

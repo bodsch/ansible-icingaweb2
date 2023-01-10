@@ -1,11 +1,11 @@
-
+#jinja2: trim_blocks: True, lstrip_blocks: True
 [client]
 
 {% if icingaweb_auth_backend.database.username is defined %}
-user = {{ icingaweb_auth_backend.database.username }}
+user      = {{ icingaweb_auth_backend.database.username }}
 {% endif %}
-password = {{ icingaweb_auth_backend.database.password }}
-host = {{ icingaweb_auth_backend.database.host }}
+password  = {{ icingaweb_auth_backend.database.password }}
+host      = {{ icingaweb_auth_backend.database.host }}
 {% if icingaweb_auth_backend.database.socket is defined %}
-socket = {{ icingaweb_auth_backend.database.socket }}
+socket    = {{ icingaweb_auth_backend.database.socket }}
 {%endif %}

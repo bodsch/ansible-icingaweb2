@@ -1,26 +1,31 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
 
-{%- set _attr_db = ['username','password','host','port','db','dbname','charset',
-  'ssl_do_not_verify_server_cert','ssl_cert','ssl_key','ssl_ca','ssl_capath','ssl_cipher', 'type'] %}
-{%- set _attr_ldap = ['hostname','port','root_dn','bind_dn','bind_pw','encryption','timeout','type'] %}
-{%- set _attr_ssh = ['user','private_key','type'] %}
+{% set _supported_types = ["db", "ldap", "msldap", "ssh"] %}
+{% set _attr_db = [
+  'username','password','host','port','db','dbname','charset',
+  'ssl_do_not_verify_server_cert','ssl_cert','ssl_key','ssl_ca',
+  'ssl_capath','ssl_cipher', 'type'] %}
+{% set _attr_ldap = [
+  'hostname','port','root_dn','bind_dn','bind_pw','encryption','timeout','type'] %}
+{% set _attr_ssh = ['user','private_key','type'] %}
 
-{% for key in icingaweb_resources -%}
-[{{- key -}}]
-{% set values = icingaweb_resources[key] %}
-{% set type = values.type %}
+{% for key, values in icingaweb_resources.items() %}
+  {% set type = values.type %}
+  {% if type in _supported_types %}
+    {% set _ = values.pop('type') %}
+[{{ key }}]
 type       = {{ type }}
-{% if type == 'db' %}
-{%- set _attr = _attr_db %}
-{%- elif type == 'ldap' or type == 'msldap' %}
-{%- set _attr = _attr_ldap %}
-{%- elif type == 'ssh' %}
-{%- set _attr = _attr_ssh %}
-{%- endif %}
-{%- for k, v in values.items() | sort %}
-{%- if k != 'type' %}
+    {% if type == 'db' %}
+      {% set _attr = _attr_db %}
+    {% elif type == 'ldap' or type == 'msldap' %}
+      {% set _attr = _attr_ldap %}
+    {% elif type == 'ssh' %}
+      {% set _attr = _attr_ssh %}
+    {% endif %}
+    {% for k, v in values.items() | sort %}
 {{ "%-10s" | format(k,) }} = {{ v }}
-{% endif %}
-{% endfor %}
+    {% endfor %}
 
+  {% endif %}
 {% endfor %}

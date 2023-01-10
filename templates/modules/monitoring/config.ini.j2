@@ -1,16 +1,17 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
 
 {% if icingaweb_module.monitoring is defined %}
-{% set config = icingaweb_module.monitoring %}
-{% set _valid_attr = ['protected_customvars'] %}
+  {% set config = icingaweb_module.monitoring %}
+  {% set _valid_attr = ['protected_customvars'] %}
 {% endif %}
 {% for key in config %}
 [{{ key }}]
-{% for k,v in config[key].items() -%}
-{% if k in _valid_attr %}
-{% if v is sequence %}
+  {% for k,v in config[key].items() -%}
+    {% if k in _valid_attr %}
+      {% if v is sequence %}
 {{ "%-10s" | format(k,) }} = "{{ v | join(',') }}"
-{% endif %}
-{% endif %}
-{% endfor %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
 {% endfor %}

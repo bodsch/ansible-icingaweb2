@@ -1,16 +1,18 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
 
 {% set _valid_attr = ['transport','host','port','username','password'] %}
 
-{% if icingaweb_commandtransport is defined and icingaweb_commandtransport | count != 0 -%}
-{% for key  in icingaweb_commandtransport -%}
+{% if icingaweb_commandtransport is defined and
+      icingaweb_commandtransport | count != 0 %}
+  {% for key, values  in icingaweb_commandtransport.items() %}
 [{{ key }}]
-{% for k,v in icingaweb_commandtransport[key].items() -%}
-{% if k in _valid_attr %}
+    {% for k,v in values.items() -%}
+      {% if k in _valid_attr %}
 {{ "%-10s" | format(k,) }} = "{{ v }}"
-{% endif %}
-{% endfor %}
+      {% endif %}
+    {% endfor %}
 
-{% endfor %}
+  {% endfor %}
 {% endif %}
 

@@ -5,13 +5,13 @@
 
 {% if icingaweb_icingadb.commandtransports is defined and
       icingaweb_icingadb.commandtransports | count != 0 %}
-{% for key  in icingaweb_icingadb.commandtransports %}
+  {% for key, values  in icingaweb_icingadb.commandtransports.items() %}
 [{{ key }}]
-{% for k,v in icingaweb_icingadb.commandtransports[key].items() %}
-{% if k in _valid_attr %}
+    {% for k,v in values.items() %}
+      {% if k in _valid_attr %}
 {{ "%-10s" | format(k,) }} = "{{ v }}"
-{% endif %}
-{% endfor %}
+      {% endif %}
+    {% endfor %}
 
-{% endfor %}
+  {% endfor %}
 {% endif %}

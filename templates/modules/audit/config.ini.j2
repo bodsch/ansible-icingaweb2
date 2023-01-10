@@ -1,27 +1,27 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
 
 {% if item.configuration is defined and item.configuration | count != 0 %}
-{% set audit = item.configuration %}
-{% set _attr = ['log','stream'] %}
-
-{% if audit.log is defined and audit.log | count != 0 %}
-{% set _attr = ['type','path','ident','facility'] %}
+  {% set audit = item.configuration %}
+  {% set _attr = ['log','stream'] %}
+  {% if audit.log is defined and audit.log | count != 0 %}
+    {% set _attr = ['type','path','ident','facility'] %}
 [log]
-{% for k, v in audit.log.items() %}
-{% if k in _attr %}
+    {% for k, v in audit.log.items() %}
+      {% if k in _attr %}
 {{ k }} = "{{ v }}"
-{% endif %}
-{% endfor %}
-{% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 
-{% if audit.stream is defined and audit.stream | count != 0 %}
-{% set _attr = ['format','path'] %}
+  {% if audit.stream is defined and audit.stream | count != 0 %}
+    {% set _attr = ['format','path'] %}
 [stream]
-{% for k, v in audit.stream.items() %}
-{% if k in _attr %}
+    {% for k, v in audit.stream.items() %}
+      {% if k in _attr %}
 {{ k }} = "{{ v }}"
-{% endif %}
-{% endfor %}
-{% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 
 {% endif %}
