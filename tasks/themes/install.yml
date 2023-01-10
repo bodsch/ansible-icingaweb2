@@ -6,7 +6,7 @@
     - name: create local temp directory
       become: false
       delegate_to: localhost
-      file:
+      ansible.builtin.file:
         path: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes/"
         state: directory
         mode: 0770
@@ -14,7 +14,7 @@
     - name: download external themes to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_themes
       become: false
       delegate_to: localhost
-      git:
+      ansible.builtin.git:
         depth: 1 # copy the least bit of history possible to get that repo.
         repo: "{{ item.src }}"
         version: "{{ item.version }}"
@@ -28,7 +28,7 @@
     - name: download external images for themes to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_themes
       become: false
       delegate_to: localhost
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ item.image.url }}"
         dest: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes/{{ item.name }}/public/img/{{ item.image.name }}"
         mode: 0660
@@ -54,7 +54,7 @@
 
     - name: propagate icingaweb_themes.tgz
       become: true
-      copy:
+      ansible.builtin.copy:
         src: "{{ icingaweb_local_tmp_directory }}/icingaweb_themes.tgz"
         dest: "/tmp/"
         mode: 0660

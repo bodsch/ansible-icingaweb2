@@ -26,7 +26,7 @@
     - icingaweb_auth_backend.database.dbname is defined
 
 - name: error
-  fail:
+  ansible.builtin.fail:
     msg:
       - "ERROR: {{ import_icingaweb_db_groups }}"
   when:

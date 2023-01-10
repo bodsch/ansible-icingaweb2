@@ -10,7 +10,7 @@
 #     msg: "Sorry, we don't support python 2 anymore!"
 
 - name: include OS specific configuration
-  include_vars: "{{ lookup('first_found', params) }}"
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
   vars:
     params:
       paths:
@@ -47,7 +47,7 @@
 - name: create local temp directory
   become: false
   delegate_to: 127.0.0.1
-  file:
+  ansible.builtin.file:
     path: "{{ icingaweb_local_tmp_directory }}"
     state: directory
     mode: 0755
@@ -59,7 +59,7 @@
   register: package_version
 
 - name: define php version
-  set_fact:
+  ansible.builtin.set_fact:
     php_version: "{{ package_version.available.full_version }}"
     php_major_version: "{{ package_version.available.major_version }}"
     php_package_version: "{{ package_version.available.version_string_compressed }}"
@@ -70,25 +70,29 @@
     - package_version.available.major_version is defined
     - package_version.available.version_string_compressed is defined
 
-- name: assert php_version
-  assert:
+- name: assert php_version for icingaweb {{ icingaweb_version }}
+  ansible.builtin.assert:
     that:
       - php_version is defined
       - php_version is version_compare('7', '>=')
       - php_version is version_compare('8', '<')
-    msg: "This role only works with PHP >= 7.0 and < 8.x .. found: {{ php_version }}"
+    msg: "This role only works with PHP >= 7.0 and < {{ icingaweb_php_min_version }} .. found: {{ php_version }}"
+  when:
+    - icingaweb_version is version('2.11.2', '<=', strict=True)
 
 - name: arch specific
+  when:
+    - ansible_distribution | lower == 'archlinux'
   block:
     - name: detect installed php binary
-      stat:
+      ansible.builtin.stat:
         path: /usr/sbin/php
         get_checksum: false
       register: _php_binary
       ignore_errors: true
 
     - name: create unified link to php binary
-      file:
+      ansible.builtin.file:
         src: "/usr/sbin/php{{ php_major_version }}"
         dest: /usr/sbin/php
         state: link
@@ -98,8 +102,6 @@
         - _php_binary.stat is defined
         - _php_binary.stat.exists is defined
         - not _php_binary.stat.exists
-  when:
-    - ansible_distribution | lower == 'archlinux'
 
 # - name: handle php8 for archlinux
 #   block:
@@ -129,7 +131,7 @@
 #     - php_major_version | int == 8
 
 - name: merge dependencies between defaults and custom
-  set_fact:
+  ansible.builtin.set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
 
 - name: get installed database package name
@@ -139,7 +141,7 @@
   register: package_version
 
 - name: remove mariadb-client-core from dependency list if it already installed
-  set_fact:
+  ansible.builtin.set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies | reject('search', 'default-mysql-client-core') | list }}"
   when:
     - package_version is defined
@@ -147,11 +149,11 @@
     - package_version.available.full_version is defined
 
 - name: merge dependencies between defaults and custom for enabled icingaweb modules
-  set_fact:
+  ansible.builtin.set_fact:
     icingaweb_modules_enabled: "{{ icingaweb_defaults_modules_enabled + icingaweb_modules_enabled }}"
 
 - name: merge icingaweb configuration between defaults and custom
-  set_fact:
+  ansible.builtin.set_fact:
     icingaweb_groups: "{{ icingaweb_defaults_groups | combine( icingaweb_groups, recursive=True ) }}"
     icingaweb_authentication: "{{ icingaweb_defaults_authentication | combine( icingaweb_authentication, recursive=True ) }}"
     icingaweb_resources: "{{ icingaweb_defaults_resources | combine( icingaweb_resources, recursive=True ) }}"
@@ -159,23 +161,24 @@
     icingaweb_php_daemon: "{{ icingaweb_defaults_php_daemon | combine( icingaweb_php_daemon, recursive=True ) }}"
 
 - name: install requirements
-  package:
+  ansible.builtin.package:
     name: "{{ icingaweb_dependencies }}"
     state: present
 
-- block:
+- name: handle icingaweb group
+  when:
+    - not icingaweb_group is defined or icingaweb_group | length > 0
+  block:
     - name: "find primary group for user '{{ icingaweb_user }}'"
       become: true
-      getent:
+      ansible.builtin.getent:
         database: group
         key: "{{ icingaweb_user }}"
         split: ':'
 
     - name: "set icingaweb_group '{{ getent_group | list | first }}'"
-      set_fact:
+      ansible.builtin.set_fact:
         icingaweb_group: "{{ getent_group | list | first }}"
       when:
         - getent_group is defined
-  when:
-    - not icingaweb_group is defined or icingaweb_group | length > 0
 ...

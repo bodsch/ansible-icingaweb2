@@ -87,7 +87,7 @@ class IcingaWeb2DatabaseUser(object):
         try:
             # Create target Directory
             os.mkdir(self.state_directory)
-        except OSError as e:
+        except OSError:
             pass
 
         # self.module.log(msg="------------------------------")
@@ -97,13 +97,6 @@ class IcingaWeb2DatabaseUser(object):
     def run(self):
         """
         """
-        # self.module.log(msg="- run()")
-
-        res = dict(
-            changed=False,
-            failed=False
-        )
-
         if mysql_driver is None:
             self.module.fail_json(msg=mysql_driver_fail_msg)
         else:
@@ -230,7 +223,7 @@ class IcingaWeb2DatabaseUser(object):
         salt = ""
         try:
             salt = crypt.mksalt(crypt.METHOD_SHA512)
-        except Exception as e:
+        except Exception:
             import random
             CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
             salt = ''.join(random.choice(CHARACTERS) for i in range(16))
@@ -343,7 +336,7 @@ class IcingaWeb2DatabaseUser(object):
         q = "insert into icingaweb_user_preference "
         q += "(username, section, name, value) values ('{0}', 'section', '{1}', '{2}') "
 
-        if(preferences):
+        if (preferences):
             """
             """
             cursor, conn, error, message = self.__mysql_connect()
@@ -361,11 +354,11 @@ class IcingaWeb2DatabaseUser(object):
             queries.append(q.format(username, 'show_application_state_messages', _show_application_msg))
             queries.append(q.format(username, 'show_benchmark', _show_benchmark))
             queries.append(q.format(username, 'show_stacktraces', _show_stacktraces))
-            if(preferences.get('language')):
+            if (preferences.get('language')):
                 queries.append(q.format(username, 'language', preferences.get('language')))
-            if(preferences.get('timezone')):
+            if (preferences.get('timezone')):
                 queries.append(q.format(username, 'timezone', preferences.get('timezone')))
-            if(preferences.get('default_page_size')):
+            if (preferences.get('default_page_size')):
                 queries.append(q.format(username, 'default_page_size', preferences.get('default_page_size')))
 
             for q in queries:

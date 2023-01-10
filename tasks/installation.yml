@@ -2,7 +2,7 @@
 
 # get file or directory stats
 - name: detect installed icingaweb2
-  stat:
+  ansible.builtin.stat:
     path: '/usr/share/icingaweb2-{{ icingaweb_version }}/library/Icinga/Application/Icinga.php'
     get_checksum: false
     get_md5: false
@@ -12,7 +12,7 @@
   changed_when: not __stat_present_icingaweb2.stat.exists
 
 - name: detect type of {{ icingaweb_install_dir }}
-  stat:
+  ansible.builtin.stat:
     path: "{{ icingaweb_install_dir }}"
     get_checksum: false
     get_md5: false
@@ -21,18 +21,21 @@
   register: __stat_share_icingaweb2
 
 - name: remove directory '{{ icingaweb_install_dir }}'
-  file:
+  ansible.builtin.file:
     state: absent
     path: '{{ icingaweb_install_dir }}'
   when:
     - __stat_share_icingaweb2.stat is defined
     - __stat_share_icingaweb2.stat.isdir | default('true')
 
-- block:
+- name: install icingaweb2
+  when:
+    - not __stat_present_icingaweb2.stat.exists
+  block:
     - name: download icinaweb2 v{{ icingaweb_version }}.tar.gz to local directory {{ icingaweb_local_tmp_directory }}
       delegate_to: localhost
       become: false
-      get_url:
+      ansible.builtin.get_url:
         url: https://github.com/Icinga/icingaweb2/archive/v{{ icingaweb_version }}.tar.gz
         dest: "{{ icingaweb_local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
         mode: 0660
@@ -43,13 +46,13 @@
       check_mode: false
 
     - name: deploy application archiv
-      copy:
+      ansible.builtin.copy:
         src: "{{ icingaweb_local_tmp_directory }}/icingaweb2-v{{ icingaweb_version }}.tar.gz"
         dest: /tmp
         mode: 0700
 
     - name: extract icingaweb2 archive
-      unarchive:
+      ansible.builtin.unarchive:
         src: /tmp/icingaweb2-v{{ icingaweb_version }}.tar.gz
         dest: /usr/share
         owner: "{{ icingaweb_user }}"
@@ -71,14 +74,11 @@
     #     path: '/usr/share/icingaweb2-{{ icingaweb_version }}'
 
     - name: exit with fail
-      fail:
+      ansible.builtin.fail:
         msg: "Error while installing of icingaweb2!"
 
-  when:
-    - not __stat_present_icingaweb2.stat.exists
-
 - name: create link for icingaweb2-{{ icingaweb_version }} to {{ icingaweb_install_dir }}
-  file:
+  ansible.builtin.file:
     src: '/usr/share/icingaweb2-{{ icingaweb_version }}'
     dest: '{{ icingaweb_install_dir }}'
     owner: "{{ icingaweb_user }}"
@@ -88,7 +88,7 @@
     force: true
 
 - name: ensure icingacli is in the path
-  file:
+  ansible.builtin.file:
     src: '{{ icingaweb_install_dir }}/bin/icingacli'
     dest: /usr/bin/icingacli
     owner: "{{ icingaweb_user }}"
@@ -98,25 +98,24 @@
     force: true
 
 - name: icingaweb_version version is '2.9.0'
+  when:
+    - icingaweb_version is version('2.9.0', '>=', strict=True)
   block:
     - name: create directory for PHP libraries
       become: true
-      file:
+      ansible.builtin.file:
         path: /usr/share/icinga-php
         state: directory
         mode: 0755
 
     - name: icinga-php-library
-      include_tasks: installation/icinga-php-library.yml
+      ansible.builtin.include_tasks: installation/icinga-php-library.yml
 
     - name: icinga-php-thirdparty
-      include_tasks: installation/icinga-php-thirdparty.yml
-
-  when:
-    - icingaweb_version is version('2.9.0', '>=', strict=True)
+      ansible.builtin.include_tasks: installation/icinga-php-thirdparty.yml
 
 - name: icingadb
-  include_tasks: installation/icingadb.yml
+  ansible.builtin.include_tasks: installation/icingadb.yml
   when:
     - icingaweb_icingadb is defined
     - icingaweb_icingadb.module.enabled | default('false')

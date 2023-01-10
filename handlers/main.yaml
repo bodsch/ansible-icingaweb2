@@ -1,7 +1,7 @@
 ---
 
 - name: restart php-fpm
-  service:
+  ansible.builtin.service:
     name: "{{ icingaweb_php_daemon.name }}"
     state: restarted
   when:

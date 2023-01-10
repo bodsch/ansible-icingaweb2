@@ -1,11 +1,14 @@
 ---
 
 - name: icingadb module
+  when:
+    - icingaweb_icingadb is defined
+    - icingaweb_icingadb.module.enabled | default('false')
   block:
     - name: download external icingadb module {{ icingaweb_icingadb.module.version }} to local directory {{ icingaweb_local_tmp_directory }}/icingaweb_modules
       become: false
       delegate_to: localhost
-      git:
+      ansible.builtin.git:
         depth: 1 # copy the least bit of history possible to get that repo.
         repo: "{{ icingaweb_icingadb.module.src }}"
         version: "{{ icingaweb_icingadb.module.version | default(omit) }}"
@@ -29,13 +32,13 @@
 
     - name: propagate icingadb.zip
       become: true
-      copy:
+      ansible.builtin.copy:
         src: "{{ icingaweb_local_tmp_directory }}/icingadb.zip"
         dest: "/tmp/"
         mode: 0644
 
     - name: extract icingadb.zip
-      unarchive:
+      ansible.builtin.unarchive:
         src: "/tmp/icingadb.zip"
         dest: "{{ icingaweb_install_dir }}/modules/"
         owner: "{{ icingaweb_user }}"
@@ -46,7 +49,7 @@
 
     - name: fix rights for modules
       become: true
-      file:
+      ansible.builtin.file:
         path: "{{ icingaweb_install_dir }}/modules/icingadb"
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
@@ -55,9 +58,5 @@
       when:
         - _extract_icingadb is defined
         - _extract_icingadb.changed
-
-  when:
-    - icingaweb_icingadb is defined
-    - icingaweb_icingadb.module.enabled | default('false')
 
 ...

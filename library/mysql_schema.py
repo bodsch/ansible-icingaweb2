@@ -156,7 +156,7 @@ class MysqlSchema(object):
         else:
             self.module.log(msg="  - table schema exists")
 
-            if(int(exists) >= 4):
+            if (int(exists) >= 4):
                 return True, False, None
 
         return False, False, None

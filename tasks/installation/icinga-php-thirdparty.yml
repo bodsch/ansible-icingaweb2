@@ -1,11 +1,11 @@
 ---
 
 - name: define icinga php thirdparty version
-  set_fact:
+  ansible.builtin.set_fact:
     icingaweb_php_thirdparty: "{{ icingaweb_web_modules | module_version('icinga-php-thirdparty') }}"
 
 - name: detect installed icinga php thirdparty version {{ icingaweb_php_thirdparty }}
-  stat:
+  ansible.builtin.stat:
     path: /usr/share/icinga-php/icinga-php-thirdparty-{{ icingaweb_php_thirdparty }}/vendor/autoload.php
     get_checksum: false
     get_md5: false
@@ -13,11 +13,15 @@
   register: stat_installed_thirdparty
 
 - name: download and install icinga-php-thirdparty {{ icingaweb_php_thirdparty }}
+  when:
+    - stat_installed_thirdparty is defined
+    - stat_installed_thirdparty.stat is defined
+    - not stat_installed_thirdparty.stat.exists
   block:
     - name: download icinga-php-thirdparty v{{ icingaweb_php_thirdparty }}.tar.gz
       delegate_to: localhost
       become: false
-      get_url:
+      ansible.builtin.get_url:
         url: https://github.com/Icinga/icinga-php-thirdparty/archive/v{{ icingaweb_php_thirdparty }}.tar.gz
         dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
         mode: 0660
@@ -28,26 +32,22 @@
       check_mode: false
 
     - name: deploy library archives
-      copy:
+      ansible.builtin.copy:
         src: "{{ icingaweb_local_tmp_directory }}/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
         dest: /tmp
         mode: 0644
 
     - name: extract library archives
-      unarchive:
+      ansible.builtin.unarchive:
         src: "/tmp/icinga-php-thirdparty-v{{ icingaweb_php_thirdparty }}.tar.gz"
         dest: /usr/share/icinga-php/
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
         mode: 0755
         remote_src: true
-  when:
-    - stat_installed_thirdparty is defined
-    - stat_installed_thirdparty.stat is defined
-    - not stat_installed_thirdparty.stat.exists
 
 - name: create link from icinga-php-thirdparty to vendor
-  file:
+  ansible.builtin.file:
     src: "/usr/share/icinga-php/icinga-php-thirdparty-{{ icingaweb_php_thirdparty }}"
     dest: "/usr/share/icinga-php/vendor"
     owner: "{{ icingaweb_user }}"

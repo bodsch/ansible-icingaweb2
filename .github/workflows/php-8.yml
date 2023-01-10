@@ -1,5 +1,5 @@
 ---
-name: icingaweb2 with icingadb
+name: icingaweb2 with php-8
 
 on:
   schedule:
@@ -21,7 +21,7 @@ defaults:
 
 jobs:
 
-  support_icingadb:
+  support_php8:
     name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
     runs-on: ubuntu-20.04
     if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
@@ -49,18 +49,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r test-requirements.txt
 
-      # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
-      - name: Disable AppArmor
-        run: |
-            set -x
-            sudo apt-get install apparmor-profiles
-            sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
-            sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+      # # See: https://github.com/geerlingguy/ansible-role-mysql/issues/422
+      # - name: Disable AppArmor
+      #   run: |
+      #       set -x
+      #       sudo apt-get install apparmor-profiles
+      #       sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+      #       sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
 
       - name: test with tox
         run: |
           tox -e ansible_$(printf "${{ matrix.ansible-version }}") \
-            -- molecule test --scenario-name with-icingadb
+            -- molecule test --scenario-name php-8
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
