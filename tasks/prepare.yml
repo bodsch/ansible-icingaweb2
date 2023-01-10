@@ -1,14 +1,5 @@
 ---
 
-# TODO
-# drop python2 support!
-# add assert
-
-# - name: assert python version
-#   assert:
-#     that: ansible_python.version.major != 2
-#     msg: "Sorry, we don't support python 2 anymore!"
-
 - name: include OS specific configuration
   ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
   vars:
@@ -27,22 +18,34 @@
         - default.yaml
       skip: true
 
-# - block:
-#     - name: make sure python3-apt is installed (only debian based)
-#       package:
-#         name:
-#           - python3-apt
-#         state: present
-#
-#     - name: clean apt cache
-#       command: apt-get clean
-#       args:
-#         warn: false
-#       register: apt_clean
-#       changed_when: apt_clean.rc != 0
-#       failed_when: apt_clean.rc != 0
-#   when:
-#     - ansible_os_family | lower == 'debian'
+
+- name: python3-apt for debian
+  when:
+    - ansible_os_family | lower == 'debian'
+  block:
+    - name: make sure python3-apt is installed (only debian based)
+      ansible.builtin.package:
+        name:
+          - python3-apt
+        state: present
+      register: _installed
+
+    - name: update apt cache
+      when:
+        - _installed.changed
+      block:
+        - name: clean apt cache  # noqa command-instead-of-module
+          ansible.builtin.command: |
+            apt-get clean
+          register: apt_clean
+          changed_when: apt_clean.rc != 0
+          failed_when: apt_clean.rc != 0
+          when: "ansible_version.full is version_compare('2.13', '<')"
+
+        - name: clean apt cache
+          ansible.builtin.apt:
+            clean: true
+          when: "ansible_version.full is version_compare('2.13', '>=')"
 
 - name: create local temp directory
   become: false
@@ -103,33 +106,6 @@
         - _php_binary.stat.exists is defined
         - not _php_binary.stat.exists
 
-# - name: handle php8 for archlinux
-#   block:
-#     - name: undefine php_major_version to define correct php_fpm_daemon
-#       set_fact:
-#         php_major_version: ""
-#
-#     - name: re-include OS specific configuration
-#       include_vars: "{{ lookup('first_found', params) }}"
-#       vars:
-#         params:
-#           paths:
-#             - "vars"
-#           files:
-#             # eg. debian-10 / ubuntu-20 / centos-8 / oraclelinux-8
-#             - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yaml"
-#             # eg. archlinux-systemd / archlinux-openrc
-#             - "{{ ansible_distribution | lower }}-{{ ansible_service_mgr | lower }}.yaml"
-#             # eg. debian / ubuntu / centos / oraclelinux
-#             - "{{ ansible_distribution | lower }}.yaml"
-#             # eg. redhat / debian
-#             - "{{ ansible_os_family | lower }}.yaml"
-#             - default.yaml
-#           skip: true
-#   when:
-#     - ansible_distribution | lower == 'archlinux'
-#     - php_major_version | int == 8
-
 - name: merge dependencies between defaults and custom
   ansible.builtin.set_fact:
     icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
@@ -154,11 +130,11 @@
 
 - name: merge icingaweb configuration between defaults and custom
   ansible.builtin.set_fact:
-    icingaweb_groups: "{{ icingaweb_defaults_groups | combine( icingaweb_groups, recursive=True ) }}"
-    icingaweb_authentication: "{{ icingaweb_defaults_authentication | combine( icingaweb_authentication, recursive=True ) }}"
-    icingaweb_resources: "{{ icingaweb_defaults_resources | combine( icingaweb_resources, recursive=True ) }}"
-    icingaweb_icingadb: "{{ icingaweb_defaults_icingadb | combine( icingaweb_icingadb, recursive=True ) }}"
-    icingaweb_php_daemon: "{{ icingaweb_defaults_php_daemon | combine( icingaweb_php_daemon, recursive=True ) }}"
+    icingaweb_groups: "{{ icingaweb_defaults_groups | combine(icingaweb_groups, recursive=True) }}"
+    icingaweb_authentication: "{{ icingaweb_defaults_authentication | combine(icingaweb_authentication, recursive=True) }}"
+    icingaweb_resources: "{{ icingaweb_defaults_resources | combine(icingaweb_resources, recursive=True) }}"
+    icingaweb_icingadb: "{{ icingaweb_defaults_icingadb | combine(icingaweb_icingadb, recursive=True) }}"
+    icingaweb_php_daemon: "{{ icingaweb_defaults_php_daemon | combine(icingaweb_php_daemon, recursive=True) }}"
 
 - name: install requirements
   ansible.builtin.package:

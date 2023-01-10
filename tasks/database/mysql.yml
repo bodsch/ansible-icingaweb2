@@ -50,7 +50,7 @@
     - not mysql_icingaweb2_schema.exists
   block:
     - name: import database schema
-      ansible.builtin.mysql_db:
+      community.mysql.mysql_db:
         state: import
         login_host: "{{ icingaweb_auth_backend.database.host }}"
         login_user: "{{ icingaweb_auth_backend.database.username }}"
@@ -81,7 +81,7 @@
   register: mysql_icingaweb_dbversion
 
 - name: import dbversion schema
-  ansible.builtin.mysql_db:
+  community.mysql.mysql_db:
     state: import
     login_host: "{{ icingaweb_auth_backend.database.host }}"
     login_user: "{{ icingaweb_auth_backend.database.username }}"
@@ -102,7 +102,7 @@
   changed_when: false
 
 - name: update database version information
-  ansible.builtin.mysql_db:
+  community.mysql.mysql_db:
     state: import
     login_host: "{{ icingaweb_auth_backend.database.host }}"
     login_user: "{{ icingaweb_auth_backend.database.username }}"

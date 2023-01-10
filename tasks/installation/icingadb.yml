@@ -19,7 +19,7 @@
     - name: create transfer archive
       become: false
       delegate_to: localhost
-      archive:
+      community.general.archive:
         path: "{{ icingaweb_local_tmp_directory }}/icingadb"
         dest: "{{ icingaweb_local_tmp_directory }}/icingadb.zip"
         mode: 0644
