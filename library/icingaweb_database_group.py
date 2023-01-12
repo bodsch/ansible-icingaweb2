@@ -378,7 +378,7 @@ class IcingaWeb2DatabaseGroup(object):
         q = f"select id from icingaweb_group where name = '{groupname}'"
 
         try:
-            # number_of_rows = cursor.execute(q)
+            cursor.execute(q)
             group_id = cursor.fetchone()[0]
             # cursor, conn, error, message = self.__mysql_connect()
         except Exception:
