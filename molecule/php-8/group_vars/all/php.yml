@@ -1,0 +1,102 @@
+---
+
+php_version: "{{ '8' if ansible_os_family | lower != 'redhat' else '8.1' }}"
+# php_version: "{{ '7' if ansible_os_family | lower != 'redhat' else '7.3' }}"
+
+php_custom_packages: "{{ ['php-ldap', 'php-xmlrpc'] if ansible_os_family | lower not in ['archlinux'] else [] }}"
+
+php_enable_php_fpm: true
+
+php_fpm_default_pool:
+  delete: true
+  name: www.conf
+
+php_fpm_pools:
+  - name: worker-01
+    user: "{{ php_fpm_pool_user }}"
+    group: "{{ php_fpm_pool_group }}"
+    listen.owner: "{{ php_fpm_pool_user }}"
+    listen.group: "{{ php_fpm_pool_group }}"
+    listen: /run/php/worker-01.sock
+    pm: dynamic
+    pm.max_children: 10
+    pm.start_servers: 4
+    pm.min_spare_servers: 2
+    pm.max_spare_servers: 6
+    pm.status_path: /status
+    ping.path: /ping
+    ping.response: pong
+    access.log: /var/log/php-fpm/$pool_access.log
+    access.format: "%R - %n - %{HTTP_HOST}e - %u %t \"%m %r [%Q%q]\" %s %f %{mili}d %{kilo}M %C%%"
+    chdir: /
+    env:
+      PATH: "/usr/local/bin:/usr/bin:/bin"
+      TMPDIR: "/tmp"
+      LC_ALL: de_DE.UTF-8
+    php_admin_value:
+      date.timezone: "Europe/Berlin"
+      max_execution_time: 300
+
+php_modules:
+  - name: opcache
+    enabled: true
+    priority: 10
+    content: |
+      zend_extension=opcache.so
+      opcache.enable=1
+      opcache.enable_cli=1
+      opcache.memory_consumption=128
+      opcache.interned_strings_buffer=16
+      opcache.max_accelerated_files=10000
+      opcache.max_wasted_percentage=5
+      opcache.validate_timestamps=1
+      opcache.revalidate_path=0
+      opcache.revalidate_freq=1
+      opcache.max_file_size=0
+  - name: pdo_mysql
+    enabled: true
+    priority: 20
+    content: |
+      extension=pdo_mysql.so
+      pdo_mysql.cache_size = 2000
+  - name: gd
+    enabled: true
+    priority: 20
+    content: |
+      extension=gd.so
+      gd.jpeg_ignore_warning = 1
+  - name: intl
+    enabled: true
+    priority: 20
+    content: |
+      extension=intl
+      intl.default_locale=de
+  - name: xmlrpc
+    enabled: true
+    priority: 20
+    content: |
+      extension=xmlrpc
+  - name: gettext
+    enabled: true
+    priority: 20
+    content: |
+      extension=gettext
+  - name: curl
+    enabled: true
+    priority: 20
+    content: |
+      extension=curl
+  # disable (old) modules
+  - name: apcu
+    enabled: false
+    priority: 20
+    content: |
+      extension=apcu.so
+      apc.shm_size=96M
+      apc.enable_cli=0
+      apc.rfc1867=1
+  - name: memcached
+    enabled: false
+    priority: 20
+    content: |
+      extension=memcached.so

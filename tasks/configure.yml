@@ -1,7 +1,7 @@
 ---
 
 - name: create /etc/icingaweb2 directory
-  file:
+  ansible.builtin.file:
     name: /etc/icingaweb2
     state: directory
     owner: "{{ icingaweb_user }}"
@@ -9,7 +9,7 @@
     mode: 0750
 
 - name: create /etc/icingaweb2/updates directory
-  file:
+  ansible.builtin.file:
     name: /etc/icingaweb2/updates
     state: directory
     owner: "{{ icingaweb_user }}"
@@ -17,10 +17,10 @@
     mode: 0750
 
 - name: install database
-  include_tasks: database/main.yml
+  ansible.builtin.include_tasks: database/main.yml
 
 - name: create modules directories
-  file:
+  ansible.builtin.file:
     name: '{{ item }}'
     state: directory
     owner: "{{ icingaweb_user }}"
@@ -31,7 +31,7 @@
     - /etc/icingaweb2/enabledModules
 
 - name: create log directory
-  file:
+  ansible.builtin.file:
     name: '{{ item }}'
     state: directory
     owner: "{{ icingaweb_user }}"
@@ -41,7 +41,7 @@
     - /var/log/icingaweb2
 
 - name: create dashboard directory
-  file:
+  ansible.builtin.file:
     name: '{{ item }}'
     state: directory
     owner: "{{ icingaweb_user }}"
@@ -51,7 +51,7 @@
     - /etc/icingaweb2/dashboards
 
 - name: create configurations
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/etc/icingaweb2/{{ item }}"
     owner: "{{ icingaweb_user }}"
@@ -65,13 +65,13 @@
     - roles.ini
 
 - name: ensure rights for config.ini
-  file:
+  ansible.builtin.file:
     path: /etc/icingaweb2/config.ini
     group: "{{ icingaweb_group }}"
     mode: 0666
 
 - name: ensure module directory exists
-  file:
+  ansible.builtin.file:
     name: '/etc/icingaweb2/modules/{{ item }}'
     state: directory
     group: "{{ icingaweb_group }}"
@@ -80,7 +80,7 @@
     - monitoring
 
 - name: disable icingaweb modules
-  file:
+  ansible.builtin.file:
     state: absent
     path: "/etc/icingaweb2/enabledModules/{{ item }}"
   loop:
@@ -89,7 +89,7 @@
     label: "  module: {{ item }}"
 
 - name: enable icingaweb modules
-  file:
+  ansible.builtin.file:
     state: link
     src: '{{ icingaweb_install_dir }}/modules/{{ item }}'
     dest: '/etc/icingaweb2/enabledModules/{{ item }}'
@@ -103,13 +103,13 @@
     label: "  module: {{ item }}"
 
 - name: icingadb
-  include_tasks: configure/icingadb.yml
+  ansible.builtin.include_tasks: configure/icingadb.yml
   when:
     - icingaweb_icingadb is defined
     - icingaweb_icingadb.module.enabled | default('false')
 
 - name: create monitoring modules configuration
-  template:
+  ansible.builtin.template:
     src: modules/monitoring/{{ item }}.ini.j2
     dest: /etc/icingaweb2/modules/monitoring/{{ item }}.ini
     owner: "{{ icingaweb_user }}"
@@ -121,7 +121,7 @@
     - commandtransports
 
 - name: change ownership of /etc/icingaweb2 directory
-  file:
+  ansible.builtin.file:
     name: /etc/icingaweb2
     state: directory
     owner: "{{ icingaweb_user }}"

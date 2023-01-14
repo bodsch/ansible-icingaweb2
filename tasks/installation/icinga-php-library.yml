@@ -1,11 +1,11 @@
 ---
 
 - name: define icinga php library version
-  set_fact:
+  ansible.builtin.set_fact:
     icingaweb_php_library: "{{ icingaweb_web_modules | module_version('icinga-php-library') }}"
 
 - name: detect installed icinga php library version {{ icingaweb_php_library }}
-  stat:
+  ansible.builtin.stat:
     path: /usr/share/icinga-php/icinga-php-library-{{ icingaweb_php_library }}/vendor/autoload.php
     get_checksum: false
     get_md5: false
@@ -13,11 +13,15 @@
   register: stat_installed_ipl
 
 - name: download and install icinga-php-library {{ icingaweb_php_library }}
+  when:
+    - stat_installed_ipl is defined
+    - stat_installed_ipl.stat is defined
+    - not stat_installed_ipl.stat.exists
   block:
     - name: download icinga-php-library v{{ icingaweb_php_library }}.tar.gz
       delegate_to: localhost
       become: false
-      get_url:
+      ansible.builtin.get_url:
         url: https://github.com/Icinga/icinga-php-library/archive/v{{ icingaweb_php_library }}.tar.gz
         dest: "{{ icingaweb_local_tmp_directory }}/icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
         mode: 0660
@@ -28,13 +32,13 @@
       check_mode: false
 
     - name: deploy library archives
-      copy:
+      ansible.builtin.copy:
         src: "{{ icingaweb_local_tmp_directory }}/icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
         dest: /tmp
         mode: 0644
 
     - name: extract library archives
-      unarchive:
+      ansible.builtin.unarchive:
         src: "/tmp/icinga-php-library-v{{ icingaweb_php_library }}.tar.gz"
         dest: /usr/share/icinga-php/
         owner: "{{ icingaweb_user }}"
@@ -42,13 +46,8 @@
         mode: 0755
         remote_src: true
 
-  when:
-    - stat_installed_ipl is defined
-    - stat_installed_ipl.stat is defined
-    - not stat_installed_ipl.stat.exists
-
 - name: create link from icinga-php-library to ipl
-  file:
+  ansible.builtin.file:
     src: "/usr/share/icinga-php/icinga-php-library-{{ icingaweb_php_library }}"
     dest: "/usr/share/icinga-php/ipl"
     owner: "{{ icingaweb_user }}"

@@ -1,15 +1,18 @@
 ---
 
-- include_tasks: prepare.yml
+- name: prepare
+  ansible.builtin.include_tasks: prepare.yml
   tags:
     - icingaweb_prepare
     - icingaweb_configure
 
-- include_tasks: installation.yml
+- name: install
+  ansible.builtin.include_tasks: installation.yml
   tags:
     - icingaweb_install
 
-- include_tasks: configure.yml
+- name: configure
+  ansible.builtin.include_tasks: configure.yml
   tags:
     - icingaweb_configure
 

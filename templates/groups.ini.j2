@@ -1,11 +1,13 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
 
-{% if icingaweb_groups is defined and icingaweb_groups | count != 0 -%}
-{% for key  in icingaweb_groups -%}
+{% if icingaweb_groups is defined and
+      icingaweb_groups | count > 0 %}
+  {% for key  in icingaweb_groups %}
 [{{ key }}]
-{% for k,v in icingaweb_groups[key].items() -%}
+    {% for k,v in icingaweb_groups[key].items() %}
 {{ "%-10s" | format(k,) }} = "{{ v }}"
-{% endfor %}
+    {% endfor %}
 
 {% endfor %}
 {% endif %}

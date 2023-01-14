@@ -1,14 +1,17 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
 
-{% if icingaweb_roles is defined and icingaweb_roles | count != 0 %}
-{% for u in icingaweb_roles %}
+{% if icingaweb_roles is defined and
+      icingaweb_roles | count != 0 %}
+  {% for u in icingaweb_roles %}
 [{{ u.name }}]
-{% if u.users is defined -%}
+    {% if u.users is defined %}
 users               = "{{ u.users | join(',') }}"
-{% endif %}
+    {% endif %}
 permissions         = "{{ u.permissions }}"
-{% if u.groups is defined -%}
+    {% if u.groups is defined %}
 groups              = "{{ u.groups | join(',') }}"
-{% endif %}
-{%- endfor %}
+    {% endif %}
+
+  {% endfor %}
 {% endif %}

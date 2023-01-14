@@ -84,7 +84,7 @@ class IcingaWeb2DatabaseGroup(object):
         try:
             # Create target Directory
             os.mkdir(self.state_directory)
-        except OSError as e:
+        except OSError:
             pass
 
     def run(self):
@@ -104,7 +104,7 @@ class IcingaWeb2DatabaseGroup(object):
         """
         """
         changed = False
-        file_name = "{}/group_{}.json".format(self.state_directory, self.groupname)
+        file_name = f"{self.state_directory}/group_{self.groupname}.json"
 
         group_id = self.__delete_all_members(self.groupname)
 
@@ -130,12 +130,12 @@ class IcingaWeb2DatabaseGroup(object):
     def _create_group(self):
         """
         """
-        file_name = "{}/group_{}.json".format(self.state_directory, self.groupname)
+        file_name = f"{self.state_directory}/group_{self.groupname}.json"
 
         members_checksum = self.__checksum(str(self.members))
 
         members_checksum_exists = ''
-        group_up2date = False
+        # group_up2date = False
         members_up2date = False
 
         # first step:
@@ -155,7 +155,7 @@ class IcingaWeb2DatabaseGroup(object):
             """
               hupps!?
             """
-            self.module.log(msg=" WARNING group '{}' exists not in database but has a local checksum file".format(self.groupname))
+            self.module.log(msg=f" WARNING group '{self.groupname}' exists not in database but has a local checksum file")
             os.remove(file_name)
             local_checksum_file = False
 
@@ -215,14 +215,14 @@ class IcingaWeb2DatabaseGroup(object):
         }
 
         if self.force:
-            message = "group {} forced inserted".format(self.groupname)
+            message = f"group {self.groupname} forced inserted"
         else:
             state_msg = "inserted"
 
             if group_exists:
                 state_msg = "updated"
 
-            message = "group {} successful {}".format(self.groupname, state_msg)
+            message = f"group {self.groupname} successful {state_msg}"
 
         data_file = open(file_name, 'w')
         data_file.write(json.dumps(data, indent=2))
@@ -267,7 +267,7 @@ class IcingaWeb2DatabaseGroup(object):
             cursor.close()
 
         except Exception as e:
-            self.module.fail_json(msg="Cannot execute SQL '{}' : {}".format(q, to_native(e)))
+            self.module.fail_json(msg=f"Cannot execute SQL '{q}' : {to_native(e)}")
 
         if number_of_rows == 1:
             return True, False, ""
@@ -283,18 +283,17 @@ class IcingaWeb2DatabaseGroup(object):
             return False, error, message
 
         if not self.parent:
-            q = "insert ignore into icingaweb_group (name, parent, ctime, mtime) values ('{}', NULL, now(), now());"
-            q = q.format(groupname)
+            q = f"insert ignore into icingaweb_group (name, parent, ctime, mtime) values ('{groupname}', NULL, now(), now());"
         else:
-            q = "insert ignore into icingaweb_group (name, parent, ctime, mtime) values ('{}', '{}', now(), now());"
-            q = q.format(groupname, self.parent)
+            q = f"insert ignore into icingaweb_group (name, parent, ctime, mtime) values ('{groupname}', '{self.parent}', now(), now());"
 
         try:
+            warnings.filterwarnings('ignore', category=mysql_driver.Warning)
             cursor.execute(q)
             conn.commit()
         except Exception as e:
             conn.rollback()
-            self.module.fail_json(msg="Cannot execute SQL '{}' : {}".format(q, to_native(e)))
+            self.module.fail_json(msg=f"Cannot execute SQL '{q}' : {to_native(e)}")
         finally:
             cursor.close()
 
@@ -309,18 +308,16 @@ class IcingaWeb2DatabaseGroup(object):
             return None, error, message
 
         if not self.parent:
-            q = "update icingaweb_group set parent = NULL, mtime = now() where name = '{}';"
-            q = q.format(groupname)
+            q = f"update icingaweb_group set parent = NULL, mtime = now() where name = '{groupname}';"
         else:
-            q = "update icingaweb_group set parent = '{}', mtime = now() where name = '{}';"
-            q = q.format(self.parent, groupname)
+            q = f"update icingaweb_group set parent = '{self.parent}', mtime = now() where name = '{groupname}';"
 
         try:
             cursor.execute(q)
             conn.commit()
         except Exception as e:
             conn.rollback()
-            self.module.fail_json(msg="Cannot execute SQL '{}' : {}".format(q, to_native(e)))
+            self.module.fail_json(msg=f"Cannot execute SQL '{q}' : {to_native(e)}")
         finally:
             cursor.close()
 
@@ -336,27 +333,33 @@ class IcingaWeb2DatabaseGroup(object):
         if self.members:
             group_id = self.__delete_all_members(groupname)
 
-            cursor, conn, error, message = self.__mysql_connect()
-
-            if error:
-                return None, error, message
+            # cursor, conn, error, message = self.__mysql_connect()
+            #
+            # if error:
+            #     return None, error, message
 
             if group_id:
                 for member in self.members:
                     queries.append(
-                        "insert into icingaweb_group_membership (group_id, username, ctime, mtime) values ({}, '{}', now(), now())".format(group_id, member)
+                        f"insert ignore into icingaweb_group_membership (group_id, username, ctime, mtime) values ('{group_id}', '{member}', now(), now())"
                     )
 
             for q in queries:
                 try:
+                    cursor, conn, error, message = self.__mysql_connect()
+                    if error:
+                        return None, error, message
+
                     cursor.execute(q)
+                    conn.commit()
 
                 except Exception as e:
                     conn.rollback()
-                    self.module.fail_json(msg="Cannot execute SQL '{}' : {}".format(q, to_native(e)))
+                    self.module.fail_json(msg=f"Cannot execute SQL '{q}' : {to_native(e)}")
 
-                conn.commit()
-                conn.close()
+                finally:
+                    cursor.close()
+
         else:
             _ = self.__delete_all_members(groupname)
 
@@ -372,28 +375,28 @@ class IcingaWeb2DatabaseGroup(object):
 
         group_id = None
 
-        q = "select id from icingaweb_group where name = '{}'".format(groupname)
+        q = f"select id from icingaweb_group where name = '{groupname}'"
 
         try:
-            number_of_rows = cursor.execute(q)
+            cursor.execute(q)
             group_id = cursor.fetchone()[0]
             # cursor, conn, error, message = self.__mysql_connect()
-        except Exception as e:
+        except Exception:
             # nothing found
             pass
-            # self.module.fail_json(msg="Cannot execute SQL '{}' : {}".format(q, to_native(e)))
+            # self.module.fail_json(msg=f"Cannot execute SQL '{q}' : {to_native(e)}")
 
         if group_id:
-            self.module.log(msg="found group id: {} {}".format(group_id, type(group_id)))
+            self.module.log(msg=f"found group id: {group_id} {type(group_id)}")
 
-            q = "delete from icingaweb_group_membership where group_id = {}".format(group_id)
+            q = f"delete from icingaweb_group_membership where group_id = {group_id}"
 
             try:
                 cursor.execute(q)
 
             except Exception as e:
                 conn.rollback()
-                self.module.fail_json(msg="Cannot execute SQL '{}' : {}".format(q, to_native(e)))
+                self.module.fail_json(msg=f"Cannot execute SQL '{q}' : {to_native(e)}")
 
         conn.commit()
         conn.close()
@@ -408,14 +411,14 @@ class IcingaWeb2DatabaseGroup(object):
         if error:
             return None, error, message
 
-        q = "delete from icingaweb_group where name = '{}'".format(groupname)
+        q = f"delete from icingaweb_group where name = '{groupname}'"
 
         try:
             cursor.execute(q)
 
         except Exception as e:
             conn.rollback()
-            self.module.fail_json(msg="Cannot execute SQL '{}' : {}".format(q, to_native(e)))
+            self.module.fail_json(msg=f"Cannot execute SQL '{q}' : {to_native(e)}")
 
         conn.commit()
         conn.close()
@@ -456,9 +459,8 @@ class IcingaWeb2DatabaseGroup(object):
         except Exception as e:
             message = "unable to connect to database. "
             message += "check login_host, login_user and login_password are correct "
-            message += "or {0} has the credentials. "
-            message += "Exception message: {1}"
-            message = message.format(config_file, to_native(e))
+            message += f"or {config_file} has the credentials. "
+            message += f"Exception message: {to_native(e)}"
 
             self.module.log(msg=message)
 
@@ -500,7 +502,7 @@ def main():
     dba_group = IcingaWeb2DatabaseGroup(module)
     result = dba_group.run()
 
-    module.log(msg="= result : '{}'".format(result))
+    module.log(msg=f"= result : '{result}'")
 
     module.exit_json(**result)
 

@@ -1,10 +1,5 @@
 ---
-#skip_list:
-#  - role-name
 
-#warn_list:  # or 'skip_list' to silence them completely
 skip_list:
-  - fqcn-builtins  # Use FQCN for builtin actions.
-
-exclude_paths:
-  - .cache/
+  - name[casing]
+  - name[template]

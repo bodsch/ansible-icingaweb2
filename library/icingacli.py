@@ -54,13 +54,13 @@ class IcingaCLI(object):
         if self.state == "enable" and state:
             return dict(
                 changed=False,
-                msg="module {0} is already enabled".format(self.module_name)
+                msg=f"module {self.module_name} is already enabled"
             )
 
         if self.state == "disable" and not state:
             return dict(
                 changed=False,
-                msg="module {0} is already disabled".format(self.module_name)
+                msg=f"module {self.module_name} is already disabled"
             )
 
         if self.state == "enable" or self.state == "disable":
@@ -77,19 +77,19 @@ class IcingaCLI(object):
                 result = dict(
                     failed=False,
                     changed=True,
-                    msg="module {0} is successful {1}d".format(self.module_name, self.state)
+                    msg=f"module {self.module_name} is successful {self.state}d"
                 )
             else:
                 result = dict(
                     failed=True,
                     changed=False,
-                    msg="module {0} is not successful {1}d".format(self.module_name, self.state)
+                    msg=f"module {self.module_name} is not successful {self.state}d"
                 )
         else:
             result = dict(
                 changed=False,
                 failed=True,
-                msg="unsupported state: '{}'".format(self.state)
+                msg=f"unsupported state: '{self.state}'"
             )
 
         return result
@@ -112,6 +112,8 @@ class IcingaCLI(object):
                 line = re.sub(r"\s+", "|", line)
                 module_name = line.split("|")[0]
                 state = line.split("|")[2]
+
+                self.module.log(msg=f" - {module_name} in state {state}")
                 found = True
                 break
 
@@ -121,8 +123,6 @@ class IcingaCLI(object):
         """
         """
         cmd = [self._icingacli] + args
-
-        # self.module.log(msg="cmd: {}".format(cmd))
 
         rc, out, err = self.module.run_command(cmd, check_rc=True)
 
@@ -156,7 +156,7 @@ def main():
     icingacli = IcingaCLI(module)
     result = icingacli.run()
 
-    module.log(msg="= result : '{}'".format(result))
+    module.log(msg=f"= result : '{result}'")
 
     module.exit_json(**result)
 

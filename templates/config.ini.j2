@@ -1,4 +1,10 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ; {{ ansible_managed }}
+{% set _log_level = "WARNING" %}
+{% if icingaweb_log_level is defined and
+      icingaweb_log_level in ["DEBUG", "INFO", "WARNING", "ERROR"] %}
+  {% set _log_level = icingaweb_log_level %}
+{% endif %}
 
 ; https://icinga.com/docs/icingaweb2/latest/doc/03-Configuration/
 
@@ -11,7 +17,7 @@ config_resource     = "{{ icingaweb_config_resource }}"
 
 [logging]
 log                 = "file"
-level               = "{{ icingaweb_log_level | default('WARNING') }}"
+level               = "{{ _log_level }}"
 file                = "/var/log/icingaweb2/icingaweb2.log"
 
 [preferences]
