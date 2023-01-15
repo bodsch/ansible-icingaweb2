@@ -99,6 +99,25 @@
     state: link
     force: true
 
+- name: python support
+  when:
+    - icingaweb_python_packages is defined
+    - icingaweb_python_packages | length > 0
+  block:
+    - name: create requirements.txt
+      ansible.builtin.template:
+        src: requirements.txt.j2
+        dest: /tmp/icingaweb-requirements.txt
+        mode: 0660
+
+    - name: ensure python bindings for icingaweb packages
+      ansible.builtin.pip:
+        requirements: /tmp/icingaweb-requirements.txt
+        state: present
+        executable: pip3
+      register: pip_install
+
+
 - name: icingaweb_version version is '2.9.0'
   when:
     - icingaweb_version is version('2.9.0', '>=', strict=True)

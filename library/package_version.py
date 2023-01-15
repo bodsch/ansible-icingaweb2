@@ -62,9 +62,9 @@ class PackageVersion(object):
         self.package_version = module.params.get("package_version")
         self.repository = module.params.get("repository")
 
-        (self.distribution, self.version, self.codename) = distro.linux_distribution(
-            full_distribution_name=False
-        )
+        self.distribution = distro.id()
+        self.version = distro.version()
+        self.codename = distro.codename()
 
     def run(self):
         """
@@ -118,18 +118,13 @@ class PackageVersion(object):
 
         cache = apt.cache.Cache()
 
-        # try:
-        #     cache.update()
-        # except SystemError as error:
-        #     self.module.log(msg=f"error         : {error}")
-        #     raise FetchFailedException(error)
-        # if not res and raise_on_error:
-        #     self.module.log(msg="FetchFailedException()")
-        #     raise FetchFailedException()
-        # else:
-        #     cache.open()
+        try:
+            cache.update()
+        except SystemError as error:
+            self.module.log(msg=f"error         : {error}")
+            pass
 
-        cache.update()
+        # cache.update()
         cache.open()
 
         try:
