@@ -45,7 +45,7 @@ def read_ansible_yaml(file_name, role_name):
     read_file = None
 
     for e in ["yml", "yaml"]:
-        test_file = f"{file_name}.{e}"
+        test_file = "{}.{}".format(file_name, e)
         if os.path.isfile(test_file):
             read_file = test_file
             break
@@ -100,37 +100,37 @@ def get_vars(host):
     return result
 
 
-@pytest.mark.parametrize("dirs", [
-    "/etc/icingaweb2",
-    "/etc/icingaweb2/dashboards",
-    "/etc/icingaweb2/modules",
-    "/etc/icingaweb2/enabledModules",
-    "/var/log/icingaweb2",
-])
-def test_directories(host, dirs):
-    d = host.file(dirs)
-    assert d.is_directory
+def local_facts(host):
+    """
+        return local fact
+    """
+    return host.ansible("setup").get("ansible_facts").get("ansible_local").get("php_fpm")
 
 
-@pytest.mark.parametrize("files", [
-    "/etc/icingaweb2/authentication.ini",
-    "/etc/icingaweb2/config.ini",
-    "/etc/icingaweb2/groups.ini",
-    "/etc/icingaweb2/resources.ini",
-    "/etc/icingaweb2/roles.ini",
-    "/etc/icingaweb2/modules/monitoring/backends.ini",
-    "/etc/icingaweb2/modules/monitoring/commandtransports.ini",
-    "/etc/icingaweb2/modules/monitoring/config.ini",
-])
-def test_files(host, files):
-    f = host.file(files)
+def test_service(host):
+    """
+        is service running and enabled
+    """
+    service = host.service(local_facts(host).get("daemon"))
+
+    assert service.is_enabled
+    assert service.is_running
+
+
+def test_fpm_pools(host, get_vars):
+    """
+        test sockets
+    """
+    for i in host.socket.get_listening_sockets():
+        print(i)
+
+    distribution = host.system_info.distribution
+    release = host.system_info.release
+
+    socket_name = "/run/php/worker-01.sock"
+
+    f = host.file(socket_name)
     assert f.exists
 
-
-@pytest.mark.parametrize("links", [
-    "/usr/share/icingaweb2",
-    "/etc/icingaweb2/enabledModules/monitoring",
-])
-def test_links(host, links):
-    f = host.file(links)
-    assert f.is_symlink
+    if not (distribution == 'ubuntu' and release == '18.04'):
+        assert host.socket("unix://{}".format(socket_name)).is_listening

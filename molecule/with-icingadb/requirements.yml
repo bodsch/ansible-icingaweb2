@@ -7,7 +7,7 @@
 - name: apparmor
   src: bodsch.apparmor
   version: 1.0.2
-
+  
 - name: php-fpm
   src: bodsch.php
   version: 2.1.1
