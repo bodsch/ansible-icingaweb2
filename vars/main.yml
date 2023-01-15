@@ -75,6 +75,7 @@ icingaweb_group: ""
 icingaweb_python_packages:
   - name: mysqlclient
     version: 2.0.3
+  - name: packaging
 
 icingaweb_build_packages: []
 
