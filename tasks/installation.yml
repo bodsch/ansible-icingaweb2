@@ -32,7 +32,7 @@
   when:
     - not __stat_present_icingaweb2.stat.exists
   block:
-    - name: download icinaweb2 v{{ icingaweb_version }}.tar.gz to local directory {{ icingaweb_local_tmp_directory }}
+    - name: download icinaweb2 version {{ icingaweb_version }}
       delegate_to: localhost
       become: false
       ansible.builtin.get_url:
@@ -86,6 +86,8 @@
     mode: 0755
     state: link
     force: true
+  notify:
+    - restart php-fpm
 
 - name: ensure icingacli is in the path
   ansible.builtin.file:

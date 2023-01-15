@@ -4,6 +4,10 @@
   hosts: instance
   any_errors_fatal: false
 
+  vars:
+    php_version: "{{ '7' if ansible_os_family | lower != 'redhat' else '7.3' }}"
+    icingaweb_version: 2.7.0
+
   roles:
     - role: ansible-icingaweb2
 
@@ -12,6 +16,7 @@
   any_errors_fatal: false
 
   vars:
+    php_version: "{{ '7' if ansible_os_family | lower != 'redhat' else '7.3' }}"
     icingaweb_version: 2.9.0
 
   roles:

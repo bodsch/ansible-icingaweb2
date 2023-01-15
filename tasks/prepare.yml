@@ -79,7 +79,7 @@
       - php_version is defined
       - php_version is version_compare('7', '>=')
       - php_version is version_compare('8.2', '<')
-    msg: "This role only works with PHP >= 7.0 and < {{ icingaweb_php_min_version }} .. found: {{ php_version }}"
+    msg: "This role only works with PHP >= 7.0 and < 8.2 .. found: {{ php_version }}"
   when:
     - icingaweb_version is version('2.11', '<=', strict=True)
 
