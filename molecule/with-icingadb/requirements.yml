@@ -2,35 +2,35 @@
 
 - name: snapd
   src: bodsch.snapd
-  version: 1.2.1
+  version: 1.2.2
 
 - name: apparmor
   src: bodsch.apparmor
-  version: 1.0.2
-  
+  version: 1.0.3
+
 - name: php-fpm
   src: bodsch.php
-  version: 2.1.1
+  version: 2.2.0
 
 - name: mariadb
   src: bodsch.mariadb
-  version: 2.3.1
+  version: 2.4.0
 
 - name: nginx
   src: bodsch.nginx
-  version: 0.11.0
+  version: 0.21.1
 
 - name: monitoring-tools
   src: bodsch.monitoring_plugins
-  version: 1.4.1
+  version: 1.4.2
 
 - name: icinga2
   src: bodsch.icinga2
-  version: 1.8.2
+  version: 1.9.0
 
 - name: icingadb
   src: bodsch.icingadb
-  version: 1.0.1
+  version: 1.1.0
 
 - name: redis
   src: bodsch.redis

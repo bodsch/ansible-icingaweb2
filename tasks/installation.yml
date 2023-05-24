@@ -32,7 +32,7 @@
   when:
     - not __stat_present_icingaweb2.stat.exists
   block:
-    - name: download icinaweb2 version {{ icingaweb_version }}
+    - name: download icingaweb2 version {{ icingaweb_version }}
       delegate_to: localhost
       become: false
       ansible.builtin.get_url:

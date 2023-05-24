@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
-. hooks/_tox_base
+hooks/tox.sh "converge"
 
-tox ${TOX_OPTS} -- molecule converge ${TOX_ARGS}
+#. hooks/_tox_base
+#tox ${TOX_OPTS} -- molecule converge ${TOX_ARGS}
