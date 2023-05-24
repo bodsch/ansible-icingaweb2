@@ -9,6 +9,33 @@
     mode: 0660
   no_log: true
 
+- name: find schema script
+  ansible.builtin.find:
+    paths: "{{ icingaweb_install_dir }}"
+    file_type: file
+    patterns:
+        - "mysql.schema.sql"
+    recurse: true
+  register: found_schema
+
+- name:
+  debug:
+    msg: "{{ found_schema }}"
+
+- name: define database schema file
+  ansible.builtin.set_fact:
+    icingaweb2_database_schema: "{{
+        found_schema.files |
+        sort(attribute='path', reverse=True) |
+        map(attribute='path') | list | first }}"
+  when:
+    - found_schema.files is defined
+    - found_schema.files | count > 0
+
+- name:
+  debug:
+    msg: "{{ icingaweb2_database_schema }}"
+
 - name: ensure database schema for icingaweb is created
   mysql_schema:
     login_host: "{{ icingaweb_auth_backend.database.host }}"
@@ -40,7 +67,7 @@
         config_file: ''
         name: "{{ icingaweb_auth_backend.database.dbname }}"
         target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
-      no_log: true
+      # no_log: true
       register: icingaweb2_database_schema
 
     - name: error
