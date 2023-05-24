@@ -63,6 +63,8 @@ icingaweb_defaults_db_user: []
 
 icingaweb_defaults_db_group: []
 
+icingaweb_defaults_db_script_dir: "{{ icingaweb_install_dir }}/etc/schema"
+
 icingaweb_packages: []
 
 icingaweb_php_packages: []

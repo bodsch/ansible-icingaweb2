@@ -9,6 +9,44 @@
     mode: 0660
   no_log: true
 
+- name: find database upgrades directory
+  ansible.builtin.find:
+    paths: "{{ icingaweb_install_dir }}"
+    file_type: directory
+    patterns:
+        - "mysql-upgrades"
+    recurse: true
+  register: found_directory
+
+- name: find database schema script
+  ansible.builtin.find:
+    paths: "{{ icingaweb_install_dir }}"
+    file_type: file
+    patterns:
+        - "mysql.schema.sql"
+    recurse: true
+  register: found_schema
+
+- name: define database schema file
+  ansible.builtin.set_fact:
+    icingaweb_upgrade_directory: "{{
+        found_directory.files |
+        sort(attribute='path', reverse=True) |
+        map(attribute='path') | list | first }}"
+  when:
+    - found_directory.files is defined
+    - found_directory.files | count > 0
+
+- name: define database schema file
+  ansible.builtin.set_fact:
+    icingaweb2_database_schema: "{{
+        found_schema.files |
+        sort(attribute='path', reverse=True) |
+        map(attribute='path') | list | first }}"
+  when:
+    - found_schema.files is defined
+    - found_schema.files | count > 0
+
 - name: ensure database schema for icingaweb is created
   mysql_schema:
     login_host: "{{ icingaweb_auth_backend.database.host }}"
@@ -39,7 +77,7 @@
         login_password: "{{ icingaweb_auth_backend.database.password }}"
         config_file: ''
         name: "{{ icingaweb_auth_backend.database.dbname }}"
-        target: '{{ icingaweb_install_dir }}/etc/schema/mysql.schema.sql'
+        target: "{{ icingaweb2_database_schema }}"
       no_log: true
       register: icingaweb2_database_schema
 
@@ -52,77 +90,13 @@
         - icingaweb2_database_schema.failed is defined
         - icingaweb2_database_schema.failed
 
-# - name: copy dbversion statement
-#   ansible.builtin.copy:
-#     src: "dbversion.sql"
-#     dest: "/etc/icingaweb2/updates/mysql.dbversion.sql"
-#     mode: 0660
-#
-# - name: create insert dbversion statement
-#   ansible.builtin.template:
-#     src: "create_dbversion.sql.j2"
-#     dest: "/etc/icingaweb2/updates/mysql.dbversion_{{ icingaweb_version }}.sql"
-#     mode: 0660
-#
-# - name: create database upgrade script
-#   ansible.builtin.template:
-#     src: database-upgrade.sh.j2
-#     dest: /usr/local/bin/icingaweb-database-upgrade.sh
-#     mode: 0750
-#
-# - name: ensure icingaweb_dbversion is created
-#   mysql_schema:
-#     login_host: "{{ icingaweb_auth_backend.database.host }}"
-#     login_user: "{{ icingaweb_auth_backend.database.username }}"
-#     login_password: "{{ icingaweb_auth_backend.database.password }}"
-#     table_schema: "{{ icingaweb_auth_backend.database.dbname }}"
-#     table_name: icingaweb_dbversion
-#   no_log: true
-#   register: mysql_icingaweb_dbversion
-#
-# - name: import dbversion schema
-#   community.mysql.mysql_db:
-#     state: import
-#     login_host: "{{ icingaweb_auth_backend.database.host }}"
-#     login_user: "{{ icingaweb_auth_backend.database.username }}"
-#     login_password: "{{ icingaweb_auth_backend.database.password }}"
-#     config_file: ''
-#     name: "{{ icingaweb_auth_backend.database.dbname }}"
-#     target: '/etc/icingaweb2/updates/mysql.dbversion.sql'
-#   # no_log: true
-#   register: icingaweb2_dbversion_schema
-#   when:
-#     - mysql_icingaweb_dbversion is defined
-#     - mysql_icingaweb_dbversion.exists is defined
-#     - not mysql_icingaweb_dbversion.exists
-#
-# - name: update database schema  # noqa 'command-instead-of-shell'
-#   ansible.builtin.command:
-#     cmd: /usr/local/bin/icingaweb-database-upgrade.sh
-#   changed_when: false
-#
-# - name: update database version information
-#   community.mysql.mysql_db:
-#     state: import
-#     login_host: "{{ icingaweb_auth_backend.database.host }}"
-#     login_user: "{{ icingaweb_auth_backend.database.username }}"
-#     login_password: "{{ icingaweb_auth_backend.database.password }}"
-#     config_file: ''
-#     name: "{{ icingaweb_auth_backend.database.dbname }}"
-#     target: '/etc/icingaweb2/updates/mysql.dbversion_{{ icingaweb_version }}.sql'
-#   register: icingaweb2_dbversion_update
-#
-# - name: d
-#   debug:
-#     msg: "{{ icingaweb2_dbversion_update }}"
-
 - name: update database version information
   icingaweb_database_update:
     database_login_host: "{{ icingaweb_auth_backend.database.host }}"
     database_name: "{{ icingaweb_auth_backend.database.dbname }}"
     database_config_file: /etc/icingaweb2/.my.cnf
     icingaweb_version: "{{ icingaweb_version }}"
-    icingaweb_upgrade_directory: "{{ icingaweb_install_dir }}/etc/schema/mysql-upgrades"
+    icingaweb_upgrade_directory: "{{ icingaweb_upgrade_directory }}"
   register: _icingaweb_database_update
 
 - name: output

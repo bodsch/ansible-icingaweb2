@@ -1,5 +1,15 @@
 ---
 
+icingaweb_version: 2.11.4
+
+icingaweb_web_modules:
+  - name: icinga-php-library
+    version: 0.12.0
+  - name: icinga-php-thirdparty
+    version: 0.11.0
+  - name: icingaweb2-module-pdfexport
+    version: 0.10.2
+
 icingaweb_log_level: WARN
 
 icingaweb_resources:
