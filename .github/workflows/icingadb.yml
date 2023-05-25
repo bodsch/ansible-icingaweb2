@@ -1,17 +1,14 @@
 ---
+
 name: icingaweb2 with icingadb
 
 on:
-  schedule:
-    - cron: "0 3 * * 0"
-  workflow_dispatch:
   workflow_run:
     workflows:
       - "CI"
     branches:
       - main
       - feature/**
-      - fix/**
     types:
       - completed
 
@@ -20,7 +17,6 @@ defaults:
     working-directory: 'ansible-icingaweb2'
 
 jobs:
-
   support_icingadb:
     name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
     runs-on: ubuntu-20.04
