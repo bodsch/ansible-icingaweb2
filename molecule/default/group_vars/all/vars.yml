@@ -1,6 +1,6 @@
 ---
 
-icingaweb_version: 2.11.4
+# icingaweb_version: 2.11.4
 
 icingaweb_web_modules:
   - name: icinga-php-library

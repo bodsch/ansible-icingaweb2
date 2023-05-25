@@ -19,7 +19,7 @@ platforms:
     docker_networks:
       - name: icinga
         ipam_config:
-          - subnet: "10.11.0.0/16"
+          - subnet: "10.11.0.0/24"
             gateway: "10.11.0.254"
     networks:
       - name: icinga

@@ -89,6 +89,12 @@
   notify:
     - restart php-fpm
 
+- name: create custom fact file
+  bodsch.core.facts:
+    name: icingaweb2
+    facts:
+      version: "{{ icingaweb_version }}"
+
 - name: ensure icingacli is in the path
   ansible.builtin.file:
     src: '{{ icingaweb_install_dir }}/bin/icingacli'
@@ -104,19 +110,27 @@
     - icingaweb_python_packages is defined
     - icingaweb_python_packages | length > 0
   block:
-    - name: create requirements.txt
-      ansible.builtin.template:
-        src: requirements.txt.j2
-        dest: /tmp/icingaweb-requirements.txt
-        mode: 0660
+    - name: create pip requirements file
+      bodsch.core.pip_requirements:
+        name: icingaweb
+        requirements: "{{ icingaweb_python_packages }}"
+      register: pip_requirements
 
-    - name: ensure python bindings for icingaweb packages
+    - name: fail if pip not installed
+      ansible.builtin.fail:
+        msg: python pip is not installed
+      when:
+        - not pip_requirements.pip.present
+
+    - name: install docker python packages  # noqa no-handler
       ansible.builtin.pip:
-        requirements: /tmp/icingaweb-requirements.txt
-        state: present
         executable: pip3
+        requirements: "{{ pip_requirements.requirements_file }}"
+        state: present
       register: pip_install
-
+      when:
+        - pip_requirements.requirements_file is defined
+        - pip_requirements.changed
 
 - name: icingaweb_version version is '2.9.0'
   when:

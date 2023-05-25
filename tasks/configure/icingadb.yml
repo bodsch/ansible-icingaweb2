@@ -3,42 +3,8 @@
 - name: icingadb module
   when:
     - icingaweb_icingadb is defined
-    - icingaweb_icingadb.module.enabled | default('false')
+    - icingaweb_icingadb.module.enabled | default('false') | bool
   block:
-    - name: create directory for module configuration
-      become: true
-      ansible.builtin.file:
-        path: /etc/icingaweb2/modules/icingadb
-        state: directory
-        recurse: true
-        owner: "{{ icingaweb_user }}"
-        group: "{{ icingaweb_group }}"
-        mode: 0755
-
-    - name: configure module
-      become: true
-      ansible.builtin.template:
-        src: modules/icingadb/config.ini.j2
-        dest: /etc/icingaweb2/modules/icingadb/config.ini
-        owner: "{{ icingaweb_user }}"
-        group: "{{ icingaweb_group }}"
-        mode: 0666
-
-    - name: disable icingadb module
-      ansible.builtin.file:
-        state: absent
-        path: "/etc/icingaweb2/enabledModules/icingadb"
-
-    - name: enable icingadb module
-      ansible.builtin.file:
-        state: link
-        src: '{{ icingaweb_install_dir }}/modules/icingadb'
-        dest: '/etc/icingaweb2/enabledModules/icingadb'
-        owner: "{{ icingaweb_user }}"
-        group: "{{ icingaweb_group }}"
-        mode: 0750
-        force: true
-
     - name: create directory for icingadb configuration
       become: true
       ansible.builtin.file:
@@ -56,7 +22,7 @@
         dest: /etc/icingaweb2/modules/icingadb/config.ini
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
-        mode: 0666
+        mode: 0755
 
     - name: create redis configuration
       become: true
@@ -65,7 +31,7 @@
         dest: /etc/icingaweb2/modules/icingadb/redis.ini
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
-        mode: 0666
+        mode: 0755
 
     - name: create commandtransport configuration
       become: true
@@ -74,6 +40,25 @@
         dest: /etc/icingaweb2/modules/icingadb/commandtransports.ini
         owner: "{{ icingaweb_user }}"
         group: "{{ icingaweb_group }}"
-        mode: 0666
+        mode: 0755
+
+    - name: disable icingadb module
+      ansible.builtin.file:
+        state: absent
+        path: "/etc/icingaweb2/enabledModules/icingadb"
+      when:
+        - not icingaweb_icingadb.module.enabled | default('false') | bool
+
+    - name: enable icingadb module
+      ansible.builtin.file:
+        state: link
+        src: '{{ icingaweb_install_dir }}/modules/icingadb'
+        dest: '/etc/icingaweb2/enabledModules/icingadb'
+        owner: "{{ icingaweb_user }}"
+        group: "{{ icingaweb_group }}"
+        mode: 0755
+        force: true
+      when:
+        - icingaweb_icingadb.module.enabled | default('false') | bool
 
 ...

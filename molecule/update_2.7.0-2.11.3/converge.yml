@@ -1,14 +1,14 @@
 ---
 
-- name: converge for version 2.7.0
-  hosts: instance
-  any_errors_fatal: false
-
-  vars:
-    icingaweb_version: 2.7.0
-
-  roles:
-    - role: ansible-icingaweb2
+# - name: converge for version 2.7.0
+#   hosts: instance
+#   any_errors_fatal: false
+#
+#   vars:
+#     icingaweb_version: 2.7.0
+#
+#   roles:
+#     - role: ansible-icingaweb2
 
 - name: update icingaweb to 2.11.3
   hosts: instance

@@ -27,7 +27,7 @@
     recurse: true
   register: found_schema
 
-- name: define database schema file
+- name: define database upgrade directory
   ansible.builtin.set_fact:
     icingaweb_upgrade_directory: "{{
         found_directory.files |
@@ -78,7 +78,7 @@
         config_file: ''
         name: "{{ icingaweb_auth_backend.database.dbname }}"
         target: "{{ icingaweb2_database_schema }}"
-      no_log: true
+      # no_log: true
       register: icingaweb2_database_schema
 
     - name: error

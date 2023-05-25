@@ -8,8 +8,10 @@
 from __future__ import absolute_import, print_function
 import os
 import warnings
+import re
 
 from packaging.version import Version, parse as parseVersion
+from packaging.version import InvalidVersion
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import configparser
@@ -112,8 +114,8 @@ class IcingaWeb2DatabaseUpdate(object):
                 msg=message
             )
 
-        # _msg = f"  versions: {current_version} vs. {self.icingaweb_version}"
-        # self.module.log(_msg)
+        _msg = f"  versions: {current_version} vs. {self.icingaweb_version}"
+        self.module.log(_msg)
 
         if not current_version:
             (state, db_error, message) = self.__update_version(version=self.icingaweb_version)
@@ -335,10 +337,6 @@ class IcingaWeb2DatabaseUpdate(object):
 
         upgrade_files = self.__read_database_upgrades(from_version=from_version)
 
-        upgrade_files.sort(key = parseVersion)
-
-        # self.module.log(msg=f"upgrade_files: {upgrade_files}")
-
         cursor, conn, db_error, db_message = self.__mysql_connect()
 
         if db_error:
@@ -359,8 +357,7 @@ class IcingaWeb2DatabaseUpdate(object):
             state = False
             db_error = False
             db_message = None
-
-            _msg = f"file '{upgrade}' successful imported."
+            _msg = None # f"file '{upgrade}' successful imported."
 
             with open(upgrade, encoding='utf8') as f:
                 sql_commands = f.read().split(';\n')
@@ -371,10 +368,8 @@ class IcingaWeb2DatabaseUpdate(object):
                     db_message = None
 
                     if command:
-                        self.module.log(msg=command.strip())
-
+                        # self.module.log(msg=command.strip())
                         (state, db_error, db_message) = self.__db_execute(command.strip())
-
                         if db_error:
                             break
 
@@ -406,19 +401,16 @@ class IcingaWeb2DatabaseUpdate(object):
         """
         _versions = []
         upgrade_files = []
+        upgrade_versions = []
 
         self.module.log(msg=f"search versions between {from_version} and {self.icingaweb_version}")
 
         for root, dirs, files in os.walk(self.icingaweb_upgrade_directory, topdown=False):
-
             # self.module.log(msg=f"  - root : {root}")
             # self.module.log(msg=f"  - dirs : {dirs}")
             # self.module.log(msg=f"  - files: {files}")
-
             if files:
                 _versions = files
-
-        # self.module.log(msg=f"versions: {_versions}")
 
         for v in _versions:
             """
@@ -427,15 +419,15 @@ class IcingaWeb2DatabaseUpdate(object):
 
             if version_string.startswith("2.0.0") or Version(version_string) <= Version(from_version):
                 continue
-
-            self.module.log(msg=f"  - {version_string}")
-
             if Version(version_string) > Version(from_version) or Version(version_string) <= Version(self.icingaweb_version):
-                upgrade_files.append(os.path.join(root, v))
+                upgrade_versions.append(version_string)
 
-        # upgrade_files.sort(key = parseVersion)
+        # version sort
+        upgrade_versions.sort(key = parseVersion)
 
-        # self.module.log(msg=f"upgrade_files: {upgrade_files}")
+        for v in upgrade_versions:
+            self.module.log(msg=f"  - {v}")
+            upgrade_files.append(os.path.join(root, f"{v}.sql"))
 
         return upgrade_files
 

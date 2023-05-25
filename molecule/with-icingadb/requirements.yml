@@ -20,13 +20,13 @@
   src: bodsch.nginx
   version: 0.21.1
 
-- name: monitoring-tools
-  src: bodsch.monitoring_plugins
-  version: 1.4.2
-
-- name: icinga2
-  src: bodsch.icinga2
-  version: 1.9.0
+# - name: monitoring-tools
+#   src: bodsch.monitoring_plugins
+#   version: 1.4.2
+#
+# - name: icinga2
+#   src: bodsch.icinga2
+#   version: 1.9.0
 
 - name: icingadb
   src: bodsch.icingadb

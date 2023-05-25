@@ -18,7 +18,6 @@
         - default.yaml
       skip: true
 
-
 - name: python3-apt for debian
   when:
     - ansible_os_family | lower == 'debian'
@@ -49,14 +48,14 @@
 
 - name: create local temp directory
   become: false
-  delegate_to: 127.0.0.1
+  delegate_to: localhost
   ansible.builtin.file:
     path: "{{ icingaweb_local_tmp_directory }}"
     state: directory
     mode: 0755
 
 - name: get version of installed php
-  package_version:
+  bodsch.core.package_version:
     package_name: "php"
     state: installed
   register: package_version
@@ -111,7 +110,7 @@
     icingaweb_dependencies: "{{ icingaweb_dependencies + icingaweb_packages }}"
 
 - name: get installed database package name
-  package_version:
+  bodsch.core.package_version:
     package_name: "{{ _icingaweb_package_mariadb_clients }}"
     state: installed
   register: package_version
