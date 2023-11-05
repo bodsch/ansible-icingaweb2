@@ -3,6 +3,14 @@
 
 Install an icingaweb2 from [sources](https://github.com/Icinga/icingaweb2).
 
+---
+
+> I am in the process of transferring this role to a [collection](https://github.com/bodsch/ansible-collection-icinga) and will therefore no longer process any issues or merge requests here.  
+> However, I will include them in the collection!  
+> **Please be patient until I have completed the work!**
+
+---
+
 Supports various external modules and themes.
 
 Supports also an Icinga2 HA cluster.
@@ -70,9 +78,22 @@ environment variable `CUSTOM_LOCAL_TMP_DIRECTORY`.
 
 ## Requirements & Dependencies
 
- - running mariadb / mysql database
- - PHP > 7.0, < 8.x
- - nginx
+- running mariadb / mysql database
+- PHP > 7.0
+- nginx
+
+### Ansible Collections
+
+- [bodsch.core](https://github.com/bodsch/ansible-collection-core)
+
+```bash
+ansible-galaxy collection install bodsch.core
+```
+or
+```bash
+ansible-galaxy collection install --requirements-file collections.yml
+```
+
 
 ## tested operating systems
 
@@ -119,23 +140,14 @@ Some example configurations are stored there:
 
 Or a complete test setup can be found in GitLab under [icinga2-infrastructure](https://gitlab.com/icinga2-infrastructure/deployment).
 
+----
 
-## tests
+## Author and License
 
-For Example
+- Bodo Schulz
 
-```bash
-tox -e py39-ansible510 -- molecule test
-```
-or
-```bash
-tox -e py310-ansible510 -- molecule test --scenario-name update_2.7.0-2.8.2
-```
-or
-```bash
-tox -e py310-ansible510 -- molecule test --scenario-name with-icingadb
-
-```
 ## License
 
-BSD 2-clause
+[BSD 2-clause](LICENSE)
+
+**FREE SOFTWARE, HELL YEAH!**
